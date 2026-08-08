@@ -1,0 +1,213 @@
+.ml-insights-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.ml-insights-container h2 {
+  margin: 0 0 20px 0;
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ml-insights-loading,
+.ml-insights-error {
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-weight: 500;
+}
+
+.ml-insights-error {
+  background: rgba(220, 38, 38, 0.2);
+  color: #fecaca;
+}
+
+.insight-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  color: #1f2937;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+.insight-card h3 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #111827;
+}
+
+.performance-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.health-score-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: conic-gradient(#10b981 0deg, #10b981 var(--score-angle), #e5e7eb var(--score-angle), #e5e7eb 360deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.health-score-circle::before {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: white;
+  z-index: 1;
+}
+
+.health-score-circle .score {
+  font-size: 36px;
+  font-weight: 700;
+  color: #667eea;
+  z-index: 2;
+  position: relative;
+}
+
+.status-breakdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.status {
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.status.on-track {
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.status.at-risk {
+  background: rgba(251, 146, 60, 0.1);
+  color: #92400e;
+  border: 1px solid #fed7aa;
+}
+
+.status.critical {
+  background: rgba(220, 38, 38, 0.1);
+  color: #7f1d1d;
+  border: 1px solid #fecaca;
+}
+
+.risk-kpis {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.risk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.risk-item {
+  padding: 12px;
+  border-left: 4px solid #dc2626;
+  background: #fef2f2;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.risk-item:hover {
+  background: #fee2e2;
+  transform: translateX(4px);
+}
+
+.risk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.kpi-name {
+  font-weight: 600;
+  color: #111827;
+  font-size: 14px;
+}
+
+.risk-score {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.risk-score.risk-high {
+  background: #fecaca;
+  color: #7f1d1d;
+}
+
+.risk-score.risk-medium {
+  background: #fed7aa;
+  color: #92400e;
+}
+
+.risk-details {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.risk-details span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.insight-timestamp {
+  text-align: right;
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .ml-insights-container {
+    padding: 16px;
+  }
+
+  .status-breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .risk-details {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
