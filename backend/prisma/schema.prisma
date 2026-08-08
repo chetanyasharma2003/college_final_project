@@ -1,0 +1,472 @@
+// Database schema for Government Schemes Analytics Dashboard
+// PostgreSQL database
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============= AUTHENTICATION & USERS =============
+
+model User {
+  id            Int             @id @default(autoincrement())
+  email         String          @unique
+  password_hash String
+  full_name     String
+  role          UserRole        @default(VIEWER)
+  state_access  Int?            // NULL = all-India access
+  last_login    DateTime?
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+  is_active     Boolean         @default(true)
+
+  // Relations
+  state         State?          @relation(fields: [state_access], references: [id])
+  reports       Report[]
+  audit_logs    AuditLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  ADMIN
+  ANALYST
+  OFFICIAL
+  VIEWER
+}
+
+// ============= GEOGRAPHIC DATA =============
+
+model State {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  code          String          @unique @db.VarChar(2)
+  region        String?
+  population    Int?
+  created_at    DateTime        @default(now())
+
+  // Relations
+  districts     District[]
+  kpi_values    KPIValue[]
+  users         User[]
+  pmay_data     PMAYData[]
+  mgnregs_data  MGNREGSData[]
+  pmgsy_data    PMGSYData[]
+  nrlm_data     NRLMData[]
+  ddu_data      DDUGKYData[]
+  generic_data  SchemeDataGeneric[] @relation("GenericSchemeState")
+
+  @@index([code])
+}
+
+model District {
+  id            Int             @id @default(autoincrement())
+  name          String
+  state_id      Int
+  population    Int?
+  area_km2      Decimal         @db.Decimal(10, 2)
+  created_at    DateTime        @default(now())
+
+  // Relations
+  state         State           @relation(fields: [state_id], references: [id], onDelete: Cascade)
+  blocks        Block[]
+  kpi_values    KPIValue[]
+  pmay_data     PMAYData[]
+  mgnregs_data  MGNREGSData[]
+  pmgsy_data    PMGSYData[]
+  nrlm_data     NRLMData[]
+  ddu_data      DDUGKYData[]
+  sagy_data     SAGYData[]
+  generic_data  SchemeDataGeneric[] @relation("GenericSchemeDistrict")
+
+  @@unique([state_id, name])
+  @@index([state_id])
+}
+
+model Block {
+  id            Int             @id @default(autoincrement())
+  name          String
+  district_id   Int
+  population    Int?
+  created_at    DateTime        @default(now())
+
+  // Relations
+  district      District        @relation(fields: [district_id], references: [id], onDelete: Cascade)
+  villages      Village[]
+  kpi_values    KPIValue[]
+
+  @@unique([district_id, name])
+  @@index([district_id])
+}
+
+model Village {
+  id            Int             @id @default(autoincrement())
+  name          String
+  block_id      Int
+  population    Int?
+  latitude      Decimal         @db.Decimal(11, 8)
+  longitude     Decimal         @db.Decimal(11, 8)
+  created_at    DateTime        @default(now())
+
+  // Relations
+  block         Block           @relation(fields: [block_id], references: [id], onDelete: Cascade)
+  kpi_values    KPIValue[]
+  sagy_data     SAGYData[]
+
+  @@unique([block_id, name])
+  @@index([block_id])
+  @@index([latitude, longitude])
+}
+
+// ============= SCHEMES & KPIs =============
+
+model Scheme {
+  id                    Int             @id @default(autoincrement())
+  name                  String          @unique
+  code                  String          @unique
+  description           String?         @db.Text
+  ministry              String?
+  launch_date           DateTime?
+  budget                Decimal?        @db.Decimal(15, 2)
+  target_beneficiaries  Int?
+  created_at            DateTime        @default(now())
+  updated_at            DateTime        @updatedAt
+
+  // Relations
+  kpi_definitions       KPIDefinition[]
+  data_imports          DataImport[]
+  generic_data          SchemeDataGeneric[]
+  data_sources          DataSource[]    @relation("SchemeSources")
+
+  @@index([code])
+}
+
+model KPIDefinition {
+  id            Int             @id @default(autoincrement())
+  scheme_id     Int
+  kpi_name      String          @db.VarChar(150)
+  description   String?         @db.Text
+  unit          String?         @db.VarChar(50)
+  data_type     String          @db.VarChar(20) // numeric, percentage, currency
+  formula       String?         @db.Text
+  target_value  Decimal?        @db.Decimal(15, 2)
+  frequency     String          @db.VarChar(20) @default("monthly") // daily, weekly, monthly, quarterly
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+
+  // Relations
+  scheme        Scheme          @relation(fields: [scheme_id], references: [id], onDelete: Cascade)
+  kpi_values    KPIValue[]
+  predictions   Prediction[]
+
+  @@unique([scheme_id, kpi_name])
+  @@index([scheme_id])
+}
+
+model KPIValue {
+  id              Int             @id @default(autoincrement())
+  kpi_id          Int
+  state_id        Int?
+  district_id     Int?
+  block_id        Int?
+  village_id      Int?
+  value           Decimal         @db.Decimal(15, 4)
+  target_value    Decimal?        @db.Decimal(15, 4)
+  date            DateTime
+  status          String          @db.VarChar(20) @default("on_track") // on_track, at_risk, critical
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+
+  // Relations
+  kpi             KPIDefinition   @relation(fields: [kpi_id], references: [id], onDelete: Cascade)
+  state           State?          @relation(fields: [state_id], references: [id], onDelete: SetNull)
+  district        District?       @relation(fields: [district_id], references: [id], onDelete: SetNull)
+  block           Block?          @relation(fields: [block_id], references: [id], onDelete: SetNull)
+  village         Village?        @relation(fields: [village_id], references: [id], onDelete: SetNull)
+
+  @@unique([kpi_id, state_id, district_id, block_id, village_id, date])
+  @@index([kpi_id, date])
+  @@index([state_id, date])
+  @@index([district_id, date])
+  @@index([created_at])
+}
+
+// ============= SCHEME-WISE DATA =============
+
+model PMAYData {
+  id                      Int             @id @default(autoincrement())
+  state_id                Int
+  district_id             Int
+  houses_sanctioned       Int?
+  houses_completed        Int?
+  houses_occupied         Int?
+  budget_allocated        Decimal?        @db.Decimal(15, 2)
+  budget_spent            Decimal?        @db.Decimal(15, 2)
+  avg_cost_per_unit       Decimal?        @db.Decimal(12, 2)
+  date                    DateTime
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  state                   State           @relation(fields: [state_id], references: [id], onDelete: Cascade)
+  district                District        @relation(fields: [district_id], references: [id], onDelete: Cascade)
+
+  @@unique([state_id, district_id, date])
+  @@index([state_id, date])
+  @@index([district_id, date])
+}
+
+model MGNREGSData {
+  id                      Int             @id @default(autoincrement())
+  state_id                Int
+  district_id             Int
+  person_days_created     Decimal?        @db.Decimal(12, 2)
+  person_days_completed   Decimal?        @db.Decimal(12, 2)
+  avg_wage                Decimal?        @db.Decimal(10, 2)
+  work_completion_rate    Decimal?        @db.Decimal(5, 2)
+  date                    DateTime
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  state                   State           @relation(fields: [state_id], references: [id], onDelete: Cascade)
+  district                District        @relation(fields: [district_id], references: [id], onDelete: Cascade)
+
+  @@unique([state_id, district_id, date])
+  @@index([state_id, date])
+}
+
+model PMGSYData {
+  id                      Int             @id @default(autoincrement())
+  state_id                Int
+  district_id             Int
+  road_length_planned     Decimal?        @db.Decimal(10, 2)
+  road_length_constructed Decimal?        @db.Decimal(10, 2)
+  habitations_connected   Int?
+  completion_rate         Decimal?        @db.Decimal(5, 2)
+  date                    DateTime
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  state                   State           @relation(fields: [state_id], references: [id], onDelete: Cascade)
+  district                District        @relation(fields: [district_id], references: [id], onDelete: Cascade)
+
+  @@unique([state_id, district_id, date])
+  @@index([state_id, date])
+}
+
+model NRLMData {
+  id                      Int             @id @default(autoincrement())
+  state_id                Int
+  district_id             Int
+  shgs_formed             Int?
+  members_registered      Int?
+  loan_disbursed          Decimal?        @db.Decimal(15, 2)
+  women_empowerment_index Decimal?        @db.Decimal(5, 2)
+  date                    DateTime
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  state                   State           @relation(fields: [state_id], references: [id], onDelete: Cascade)
+  district                District        @relation(fields: [district_id], references: [id], onDelete: Cascade)
+
+  @@unique([state_id, district_id, date])
+  @@index([state_id, date])
+}
+
+model DDUGKYData {
+  id                      Int             @id @default(autoincrement())
+  state_id                Int
+  district_id             Int
+  candidates_trained      Int?
+  placement_count         Int?
+  avg_salary              Decimal?        @db.Decimal(10, 2)
+  date                    DateTime
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  state                   State           @relation(fields: [state_id], references: [id], onDelete: Cascade)
+  district                District        @relation(fields: [district_id], references: [id], onDelete: Cascade)
+
+  @@unique([state_id, district_id, date])
+  @@index([state_id, date])
+}
+
+model SAGYData {
+  id                      Int             @id @default(autoincrement())
+  district_id             Int
+  village_id              Int
+  development_index       Decimal?        @db.Decimal(5, 2)
+  infrastructure_score    Decimal?        @db.Decimal(5, 2)
+  community_satisfaction  Decimal?        @db.Decimal(5, 2)
+  date                    DateTime
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  district                District        @relation(fields: [district_id], references: [id], onDelete: Cascade)
+  village                 Village         @relation(fields: [village_id], references: [id], onDelete: Cascade)
+
+  @@unique([district_id, village_id, date])
+  @@index([district_id, date])
+}
+
+// ============= ANALYTICS & PREDICTIONS =============
+
+model Prediction {
+  id                      Int             @id @default(autoincrement())
+  kpi_id                  Int
+  location_type           String          @db.VarChar(20) // state, district, block, village
+  location_id             Int?
+  predicted_value         Decimal         @db.Decimal(15, 4)
+  confidence_score        Decimal?        @db.Decimal(5, 2)
+  prediction_date         DateTime
+  forecast_period         String          @db.VarChar(20) // next_month, next_quarter, next_year
+  model_type              String?         @default("arima") // arima, prophet, lstm
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  kpi                     KPIDefinition   @relation(fields: [kpi_id], references: [id], onDelete: Cascade)
+
+  @@index([kpi_id, prediction_date])
+  @@index([forecast_period])
+}
+
+// ============= REPORTS =============
+
+model Report {
+  id                      Int             @id @default(autoincrement())
+  user_id                 Int
+  title                   String          @db.VarChar(200)
+  report_type             String          @db.VarChar(50) // executive, detailed, comparative, predictive
+  filters                 Json?           // Stored filter criteria
+  file_path               String?         @db.VarChar(255)
+  file_format             String          @db.VarChar(10) @default("pdf") // pdf, csv, xlsx
+  generated_at            DateTime        @default(now())
+  expiry_date             DateTime?
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  user                    User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([generated_at])
+}
+
+// ============= DATA IMPORT TRACKING =============
+
+model DataImport {
+  id                      Int             @id @default(autoincrement())
+  scheme_id               Int
+  source                  String          @db.VarChar(255) // data.gov.in, API endpoint, CSV upload
+  import_type             String          @db.VarChar(20) // api, csv, manual
+  file_name               String?         @db.VarChar(255)
+  records_imported        Int?
+  records_failed          Int?
+  status                  String          @db.VarChar(20) @default("pending") // pending, processing, completed, failed
+  error_message           String?         @db.Text
+  imported_at             DateTime        @default(now())
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  scheme                  Scheme          @relation(fields: [scheme_id], references: [id], onDelete: Cascade)
+
+  @@index([scheme_id, imported_at])
+  @@index([status])
+  @@index([created_at])
+}
+
+// ============= AUDIT LOGGING =============
+
+model AuditLog {
+  id                      Int             @id @default(autoincrement())
+  user_id                 Int?
+  action                  String          @db.VarChar(100)
+  table_name              String          @db.VarChar(100)
+  record_id               Int?
+  changes                 Json?
+  ip_address              String?         @db.VarChar(45)
+  timestamp               DateTime        @default(now())
+
+  // Relations
+  user                    User?           @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([user_id, timestamp])
+  @@index([table_name, timestamp])
+  @@index([timestamp])
+}
+
+// ============= CHATBOT HISTORY =============
+
+model ChatbotQuery {
+  id                      Int             @id @default(autoincrement())
+  user_id                 Int?
+  query_text              String          @db.Text
+  response_text           String?         @db.Text
+  query_type              String?         @db.VarChar(50) // performance, forecast, comparison
+  confidence_score        Decimal?        @db.Decimal(5, 2)
+  user_rating             Int? // 1-5 star rating
+  created_at              DateTime        @default(now())
+
+  @@index([user_id])
+  @@index([created_at])
+  @@index([query_type])
+}
+
+// ============= GENERIC SCHEME DATA =============
+
+model SchemeDataGeneric {
+  id                      Int             @id @default(autoincrement())
+  scheme_id               Int
+  state_id                Int?
+  district_id             Int?
+  data                    Json            // Flexible JSONB storage for any metrics
+  date                    DateTime
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  scheme                  Scheme          @relation(fields: [scheme_id], references: [id], onDelete: Cascade)
+  state                   State?          @relation("GenericSchemeState", fields: [state_id], references: [id], onDelete: SetNull)
+  district                District?       @relation("GenericSchemeDistrict", fields: [district_id], references: [id], onDelete: SetNull)
+
+  @@unique([scheme_id, state_id, district_id, date])
+  @@index([scheme_id, date])
+  @@index([state_id, date])
+  @@index([district_id, date])
+}
+
+// ============= DATA SOURCE TRACKING =============
+
+model DataSource {
+  id                      Int             @id @default(autoincrement())
+  scheme_id               Int
+  name                    String          @db.VarChar(255)
+  api_endpoint            String?         @db.VarChar(500)
+  api_key_env_var         String?         @db.VarChar(100)
+  data_format             String?         @db.VarChar(20) // json, csv, xml
+  frequency               String          @db.VarChar(20) @default("monthly")
+  last_sync               DateTime?
+  status                  String          @db.VarChar(20) @default("active") // active, inactive, error
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
+
+  // Relations
+  scheme                  Scheme          @relation("SchemeSources", fields: [scheme_id], references: [id], onDelete: Cascade)
+
+  @@unique([scheme_id, name])
+  @@index([scheme_id])
+  @@index([status])
+}
