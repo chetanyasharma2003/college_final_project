@@ -198,7 +198,7 @@ class KPIManagementService {
   }
 
   // Get KPI values for a scheme with comparison to targets
-  static async getKPIStatus(schemeCode) {
+  static async getKPIStatus(schemeCode, stateId = null) {
     const scheme = await prisma.scheme.findUnique({ where: { code: schemeCode } });
     if (!scheme) throw new Error(`Scheme ${schemeCode} not found`);
 
@@ -208,8 +208,12 @@ class KPIManagementService {
 
     const status = [];
     for (const kpi of kpis) {
+      // Filter by state if provided, otherwise get latest across all states
       const latestValue = await prisma.kPIValue.findFirst({
-        where: { kpi_id: kpi.id },
+        where: {
+          kpi_id: kpi.id,
+          ...(stateId && { state_id: stateId })
+        },
         orderBy: { date: 'desc' },
       });
 
