@@ -17,17 +17,20 @@ export class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-6 my-4">
-          <h3 className="text-red-200 font-bold mb-2">Component Error</h3>
-          <p className="text-red-100 text-sm mb-4">
-            {this.state.error?.message || 'An unexpected error occurred'}
-          </p>
-          <button
-            onClick={() => this.setState({ hasError: false })}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm"
-          >
-            Retry
-          </button>
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+          <div className="bg-slate-800/80 backdrop-blur border border-red-500/30 rounded-lg p-8 max-w-md text-center shadow-2xl">
+            <div className="text-5xl mb-4">⚠️</div>
+            <h1 className="text-2xl font-bold text-white mb-3">Something went wrong</h1>
+            <p className="text-slate-300 text-sm mb-6 break-words">
+              {this.state.error?.message || 'An unexpected error occurred'}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition font-medium"
+            >
+              Reload Page
+            </button>
+          </div>
         </div>
       );
     }
