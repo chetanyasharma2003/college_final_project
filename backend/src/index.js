@@ -23,16 +23,28 @@ const HOST = process.env.HOST || '0.0.0.0';  // Allow access from Docker network
 // ============= MIDDLEWARE =============
 
 // CORS FIRST - must handle preflight OPTIONS requests
-app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || [
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+  : [
     'http://localhost:3000',
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:5175',
     'http://127.0.0.1:5173',
     'http://127.0.0.1:5174',
-    'http://127.0.0.1:5175'
-  ],
+    'http://127.0.0.1:5175',
+    'https://frontend-eta-smoky-88.vercel.app',
+    'https://frontend-i6luaplsk-chetanya-s-projects.vercel.app'
+  ];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
