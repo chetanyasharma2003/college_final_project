@@ -1,0 +1,9 @@
+services:
+  - type: static
+    name: frontend
+    buildCommand: npm run build
+    staticPublishPath: dist
+    routes:
+      - path: /*
+        file: dist/index.html
+        status: 200
