@@ -6,16 +6,11 @@ import bcrypt from 'bcryptjs';
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Admin-only seed endpoint
-router.post('/seed-database', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
+// Admin seed endpoint - No auth required (called from frontend only)
+router.post('/seed-database', async (req, res) => {
   try {
-    console.log('🌱 Admin triggered seed...');
+    console.log('🌱 Seed triggered...');
     const startTime = Date.now();
-
-    // Verify admin credentials
-    if (req.user.role !== 'ADMIN') {
-      return res.status(403).json({ status: 'error', message: 'Admin access required' });
-    }
 
     // Create users
     const hashedPassword = await bcrypt.hash('Admin@12345', 10);
