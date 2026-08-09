@@ -152,9 +152,11 @@ import schemesDataRoutes from './routes/schemes-data.routes.js';
 import mlAnalyticsRoutes from './routes/ml-analytics.routes.js';
 import syncRoutes from './routes/sync.routes.js';
 import dataSyncRoutes from './routes/data-sync.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 // Route mounting
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/schemes', schemesRoutes);
 app.use('/api/v1/kpis', kpisRoutes);
 app.use('/api/v1/geo', geoRoutes);
