@@ -2,13 +2,21 @@
   "buildCommand": "npm run build",
   "framework": "vite",
   "outputDirectory": "dist",
-  "env": {
-    "VITE_API_URL": "@vite_api_url"
-  },
-  "rewrites": [
+  "regions": ["sfo1"],
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(?!.*\\.)",
+      "dest": "/index.html",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate"
+      }
+    },
+    {
+      "src": "/(?P<path>.*)",
+      "dest": "/index.html",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate"
+      }
     }
   ]
 }
