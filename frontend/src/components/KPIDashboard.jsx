@@ -3,7 +3,7 @@ import { RefreshCw, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 import client from '../api/client';
 import KPICard from './KPICard';
 
-export default function KPIDashboard({ schemeCode, schemeName }) {
+export default function KPIDashboard({ schemeCode, schemeName, stateId = null }) {
   const [kpiData, setKpiData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,12 +13,15 @@ export default function KPIDashboard({ schemeCode, schemeName }) {
     fetchAllKPIs();
     const interval = setInterval(fetchAllKPIs, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [schemeCode]);
+  }, [schemeCode, stateId]);
 
   const fetchAllKPIs = async () => {
     try {
       setLoading(true);
-      const response = await client.get(`/kpis/status/${schemeCode}`);
+      const url = stateId
+        ? `/kpis/status/${schemeCode}?stateId=${stateId}`
+        : `/kpis/status/${schemeCode}`;
+      const response = await client.get(url);
       setKpiData(response.data.kpi_status || []);
       setLastRefresh(new Date());
       setError(null);

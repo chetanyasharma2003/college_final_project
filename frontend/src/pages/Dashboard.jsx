@@ -146,6 +146,7 @@ export default function Dashboard() {
             <KPIDashboard
               schemeCode={selectedSchemeCode}
               schemeName={selectedSchemeName}
+              stateId={selectedStateForFilter}
             />
           </ErrorBoundary>
         </div>

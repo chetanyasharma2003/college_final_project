@@ -72,10 +72,11 @@ router.get('/definitions/:scheme', async (req, res) => {
   }
 });
 
-// Get KPI status for a scheme (comparison with targets)
+// Get KPI status for a scheme (comparison with targets) - with optional state filter
 router.get('/status/:scheme', async (req, res) => {
   try {
-    const status = await KPIManagementService.getKPIStatus(req.params.scheme);
+    const stateId = req.query.stateId ? Number(req.query.stateId) : null;
+    const status = await KPIManagementService.getKPIStatus(req.params.scheme, stateId);
     res.json({ status: 'success', scheme: req.params.scheme, kpi_status: status });
   } catch (error) {
     res.status(400).json({ status: 'error', message: error.message });
