@@ -89,23 +89,32 @@ async function main() {
     console.log('✅ Scheme created:', created.name);
   }
 
-  // Create KPI definitions
-  const kpis = [
-    { code: 'BUDGET', name: 'Total Budget Allocated', unit: 'Crores', target: 100 },
-    { code: 'COMPLETION', name: 'Completion Rate', unit: '%', target: 80 },
-    { code: 'BENEFICIARIES', name: 'Total Beneficiaries', unit: 'Count', target: 1000000 },
-    { code: 'DISBURSED', name: 'Amount Disbursed', unit: 'Crores', target: 90 },
-    { code: 'APPLICATIONS', name: 'Applications Received', unit: 'Count', target: 500000 },
-    { code: 'APPROVED', name: 'Applications Approved', unit: 'Count', target: 400000 },
+  // Get all schemes
+  const allSchemes = await prisma.scheme.findMany();
+
+  // Create KPI definitions for each scheme
+  const kpiTemplates = [
+    { kpi_name: 'Budget Allocated', unit: 'Crores', data_type: 'currency', target_value: 100 },
+    { kpi_name: 'Completion Rate', unit: '%', data_type: 'percentage', target_value: 80 },
+    { kpi_name: 'Beneficiaries', unit: 'Count', data_type: 'numeric', target_value: 1000000 },
+    { kpi_name: 'Amount Disbursed', unit: 'Crores', data_type: 'currency', target_value: 90 },
   ];
 
-  for (const kpi of kpis) {
-    const created = await prisma.kpiDefinition.upsert({
-      where: { code: kpi.code },
-      update: {},
-      create: kpi,
-    });
-    console.log('✅ KPI defined:', created.name);
+  for (const scheme of allSchemes) {
+    for (const kpiTemplate of kpiTemplates) {
+      try {
+        const created = await prisma.kpiDefinition.create({
+          data: {
+            scheme_id: scheme.id,
+            ...kpiTemplate,
+            frequency: 'monthly',
+          },
+        });
+        console.log(`✅ KPI for ${scheme.code}:`, created.kpi_name);
+      } catch (e) {
+        // KPI already exists, skip
+      }
+    }
   }
 
   console.log('\n✅ Database seeding complete!');
