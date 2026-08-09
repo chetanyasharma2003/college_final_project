@@ -22,13 +22,40 @@ router.get('/', async (req, res) => {
 router.get('/latest', async (req, res) => {
   try {
     const schemeId = req.query.schemeId ? Number(req.query.schemeId) : null;
+    const schemeCode = req.query.scheme ? req.query.scheme.toUpperCase() : null;
+    const limit = req.query.limit ? Number(req.query.limit) : 100;
+
+    // Build where clause
+    let where = {};
+    if (schemeId) {
+      where.kpi = { scheme_id: schemeId };
+    } else if (schemeCode) {
+      where.kpi = { scheme: { code: schemeCode } };
+    }
+
     const values = await prisma.kPIValue.findMany({
-      where: schemeId ? { kpi: { scheme_id: schemeId } } : undefined,
-      include: { kpi: true, state: true },
+      where,
+      include: {
+        kpi: true,
+        state: true
+      },
       orderBy: { date: 'desc' },
-      take: 100,
+      take: limit,
     });
-    res.json({ status: 'success', data: values });
+
+    // Add scheme info to response
+    const valuesWithScheme = await Promise.all(values.map(async (v) => {
+      const kpi = await prisma.kPIDefinition.findUnique({
+        where: { id: v.kpi_id },
+        include: { scheme: true }
+      });
+      return {
+        ...v,
+        scheme: kpi?.scheme || null
+      };
+    }));
+
+    res.json({ status: 'success', data: valuesWithScheme });
   } catch (error) {
     res.status(400).json({ status: 'error', message: error.message });
   }

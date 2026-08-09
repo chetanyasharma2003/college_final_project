@@ -1,20 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import SchemeComparison from '../components/SchemeComparison';
-import StateRanking from '../components/StateRanking';
-import PerformanceAnalysis from '../components/PerformanceAnalysis';
 import ErrorBoundary from '../components/ErrorBoundary';
-import { BarChart3, TrendingUp, AlertCircle } from 'lucide-react';
 
 export default function Analytics() {
   const { user } = useSelector(state => state.auth);
-  const [activeTab, setActiveTab] = useState('comparison');
-
-  const tabs = [
-    { id: 'comparison', label: 'Scheme Comparison', icon: BarChart3 },
-    { id: 'ranking', label: 'State Rankings', icon: TrendingUp },
-    { id: 'gaps', label: 'Performance Gaps', icon: AlertCircle },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
@@ -29,46 +19,12 @@ export default function Analytics() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-white/10 overflow-x-auto">
-          {tabs.map(tab => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-3 font-semibold flex items-center gap-2 border-b-2 transition ${
-                  activeTab === tab.id
-                    ? 'border-blue-400 text-blue-400'
-                    : 'border-transparent text-gray-400 hover:text-white'
-                }`}
-              >
-                <Icon size={20} />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Content */}
-        <div className="space-y-8">
-          {activeTab === 'comparison' && (
-            <ErrorBoundary>
-              <SchemeComparison />
-            </ErrorBoundary>
-          )}
-
-          {activeTab === 'ranking' && (
-            <ErrorBoundary>
-              <StateRanking />
-            </ErrorBoundary>
-          )}
-
-          {activeTab === 'gaps' && (
-            <ErrorBoundary>
-              <PerformanceAnalysis />
-            </ErrorBoundary>
-          )}
+        {/* Scheme Comparison Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-white mb-6">📊 Scheme Performance Comparison</h2>
+          <ErrorBoundary>
+            <SchemeComparison />
+          </ErrorBoundary>
         </div>
 
         {/* Insights Section */}

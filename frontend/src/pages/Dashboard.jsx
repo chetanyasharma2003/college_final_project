@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useSchemes, useKPIs, useGeographic, useKPIStatus } from '../api/hooks';
-import { setSchemes, setKPIValues } from '../store/dataSlice';
-import KPICard from '../components/KPICard';
+import { setSchemes, setKPIValues, setSelectedScheme } from '../store/dataSlice';
 import KPIDashboard from '../components/KPIDashboard';
 import SchemeSelector from '../components/SchemeSelector';
 import StateSelector from '../components/StateSelector';
@@ -30,6 +29,11 @@ export default function Dashboard() {
   useEffect(() => {
     if (schemesData.length > 0 && schemes.length === 0) {
       dispatch(setSchemes(schemesData));
+      // Set default scheme to PMAY
+      const pmayScheme = schemesData.find(s => s.code === 'PMAY');
+      if (pmayScheme) {
+        dispatch(setSelectedScheme(pmayScheme.id));
+      }
     }
   }, [schemesData, schemes, dispatch]);
 
@@ -155,20 +159,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Legacy KPI Cards Grid */}
-        {!kpiLoading && filteredKPIValues.length > 0 && (
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-6">Geographic Performance</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {filteredKPIValues.slice(0, 6).map((kpiValue, index) => (
-                <KPICard
-                  key={kpiValue.id || `${kpiValue.kpi_id}-${kpiValue.state_id}-${index}`}
-                  kpiValue={kpiValue}
-                />
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">

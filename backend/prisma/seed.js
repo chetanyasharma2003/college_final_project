@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client.js';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -17,7 +17,7 @@ async function main() {
       password_hash: hashedPassword,
       full_name: 'Admin',
       role: 'ADMIN',
-      state_access: ['ALL'],
+      state_access: null, // NULL = all-India access
       is_active: true,
     },
   });
@@ -33,7 +33,7 @@ async function main() {
       password_hash: hashedPassword,
       full_name: 'Analyst',
       role: 'ANALYST',
-      state_access: ['ALL'],
+      state_access: null, // NULL = all-India access
       is_active: true,
     },
   });
