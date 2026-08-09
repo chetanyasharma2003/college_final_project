@@ -18,7 +18,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
-const HOST = '127.0.0.1';
+const HOST = process.env.HOST || '0.0.0.0';  // Allow access from Docker network
 
 // ============= MIDDLEWARE =============
 
