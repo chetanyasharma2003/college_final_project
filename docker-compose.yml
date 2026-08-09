@@ -46,12 +46,13 @@ services:
       dockerfile: Dockerfile
     container_name: gov-schemes-api
     environment:
-      NODE_ENV: ${NODE_ENV:-production}
+      NODE_ENV: ${NODE_ENV:-development}
       PORT: 5001
       HOST: 0.0.0.0
       DATABASE_URL: postgresql://${DB_USER:-govschemes}:${DB_PASSWORD:-devpassword}@postgres:5432/${DB_NAME:-gov_schemes}
       REDIS_URL: redis://redis:6379
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_SECRET: ${JWT_SECRET:-MyJWTSecretABC12345}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-MyRefreshSecretXYZ789}
       CORS_ORIGIN: http://localhost:5173,http://127.0.0.1:5173
     ports:
       - "5001:5001"
@@ -75,7 +76,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:5001/api/v1
     container_name: gov-schemes-ui
+    environment:
+      VITE_API_URL: http://localhost:5001/api/v1
     ports:
       - "5173:5173"
     depends_on:

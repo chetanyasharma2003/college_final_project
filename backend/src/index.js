@@ -139,6 +139,7 @@ import pmayRoutes from './routes/pmay.routes.js';
 import schemesDataRoutes from './routes/schemes-data.routes.js';
 import mlAnalyticsRoutes from './routes/ml-analytics.routes.js';
 import syncRoutes from './routes/sync.routes.js';
+import dataSyncRoutes from './routes/data-sync.routes.js';
 
 // Route mounting
 app.use('/api/v1/auth', authRoutes);
@@ -154,6 +155,7 @@ app.use('/api/v1/etl', etlRoutes);
 app.use('/api/v1/pmay', pmayRoutes);
 app.use('/api/v1/schemes-data', schemesDataRoutes);
 app.use('/api/v1/sync', syncRoutes);
+app.use('/api/v1/data-sync', dataSyncRoutes);
 
 // ============= ERROR HANDLING =============
 

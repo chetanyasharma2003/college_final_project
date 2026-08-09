@@ -1,32 +1,67 @@
 import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useKPIs } from '../api/hooks';
+import { useSelector } from 'react-redux';
+import client from '../api/client';
 
 export default function TrendChart() {
-  const { kpis, getKPITrend } = useKPIs();
+  const { selectedScheme, schemes } = useSelector(state => state.data);
   const [trendData, setTrendData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (kpis.length > 0) {
+    if (selectedScheme) {
       fetchTrendData();
     }
-  }, [kpis]);
+  }, [selectedScheme]);
 
   const fetchTrendData = async () => {
     try {
       setLoading(true);
       setError(null);
-      if (kpis.length > 0) {
-        const data = await getKPITrend(kpis[0].id, 30);
-        const formattedData = data.map((item) => ({
-          date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          value: parseFloat(item.value),
-          state: item.state?.name,
-        }));
-        setTrendData(formattedData.slice(0, 15)); // Last 15 days
+
+      // Get the scheme code
+      const scheme = schemes.find(s => s.id === selectedScheme);
+      if (!scheme) {
+        setTrendData([]);
+        setLoading(false);
+        return;
       }
+
+      // Fetch scheme-specific KPI values
+      const response = await client.get(`/kpis/latest?scheme=${scheme.code}&limit=500`);
+      const schemeValues = response.data?.data || [];
+
+      if (schemeValues.length === 0) {
+        setTrendData([]);
+        return;
+      }
+
+      // Group by date
+      const dataByDate = {};
+      schemeValues.forEach(kv => {
+        const date = new Date(kv.date).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        });
+        if (!dataByDate[date]) {
+          dataByDate[date] = { date, values: [] };
+        }
+        dataByDate[date].values.push(parseFloat(kv.value) || 0);
+      });
+
+      // Calculate average per date
+      const chartData = Object.values(dataByDate)
+        .map(d => ({
+          date: d.date,
+          value: Math.round(
+            d.values.reduce((a, b) => a + b, 0) / d.values.length
+          ),
+        }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(-15);
+
+      setTrendData(chartData);
     } catch (err) {
       console.error('Error fetching trend:', err);
       setError('Failed to load trend data');
@@ -37,12 +72,12 @@ export default function TrendChart() {
 
   return (
     <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
-      <h3 className="text-xl font-bold text-white mb-4">Performance Trend (Last 30 Days)</h3>
+      <h3 className="text-xl font-bold text-white mb-4">📈 Performance Trend (Last 30 Days)</h3>
 
       {loading ? (
         <div className="flex justify-center items-center h-80 md:h-96">
-          <div role="status" aria-label="Loading chart">
-            <div className="w-8 h-8 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+          <div className="animate-spin">
+            <div className="text-4xl">⏳</div>
           </div>
         </div>
       ) : error ? (
@@ -51,7 +86,6 @@ export default function TrendChart() {
           <button
             onClick={fetchTrendData}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-all"
-            aria-label="Retry loading chart"
           >
             Retry
           </button>
@@ -68,10 +102,8 @@ export default function TrendChart() {
                   backgroundColor: 'rgba(15, 23, 42, 0.95)',
                   border: '1px solid rgba(255, 255, 255, 0.3)',
                   borderRadius: '8px',
-                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
                 }}
                 labelStyle={{ color: '#f0f0f0' }}
-                cursor={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
               />
               <Legend wrapperStyle={{ color: '#e5e7eb' }} />
               <Line
@@ -81,7 +113,7 @@ export default function TrendChart() {
                 strokeWidth={3}
                 dot={{ fill: '#3b82f6', r: 4 }}
                 activeDot={{ r: 6 }}
-                name="KPI Value"
+                name="KPI Trend"
                 isAnimationActive={true}
               />
             </LineChart>

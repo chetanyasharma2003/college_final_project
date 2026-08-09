@@ -1,115 +1,95 @@
-# Quick Start Guide (5 Minutes)
+# ⚡ Quick Start Guide
 
-For developers who want to get running immediately.
+## 5-Minute Setup
 
-## Copy-Paste Setup
-
+### 1. Start Docker
 ```bash
-# 1. Navigate to project
-cd ~/Documents/college_final_project
-
-# 2. Copy environment file
-cp .env.example .env
-
-# 3. Edit .env (change DB_PASSWORD and JWT_SECRET)
-nano .env
-# OR
-open .env  # macOS
-
-# 4. Start containers (PostgreSQL + Redis)
+cd college_final_project
 docker-compose up -d
-
-# 5. Install backend
-cd backend
-npm install
-npm run migrate
-cd ..
-
-# 6. Install frontend
-cd frontend
-npm install
-cd ..
-
-# 7. Start development servers (open 2 terminals)
-# Terminal 1:
-cd backend && npm run dev
-
-# Terminal 2:
-cd frontend && npm run dev
-
-# 8. Open browser
-# Frontend: http://localhost:5173
-# Backend API: http://localhost:5000/api/v1
-# Health Check: http://localhost:5000/health
 ```
 
-## Verify It Works
-
+### 2. Wait for Services
 ```bash
-# In a new terminal, test API
-curl http://localhost:5000/health
-
-# Should respond:
-# {"status":"ok","timestamp":"...","uptime":...}
+docker-compose ps
 ```
 
-## Troubleshooting
+All services should show "healthy" or "up" status (wait ~20 seconds for health checks).
 
-| Issue | Fix |
-|-------|-----|
-| `docker-compose: command not found` | Install Docker Desktop |
-| `npm: command not found` | Install Node.js 18+ |
-| `Port 5000 already in use` | `lsof -ti:5000 \| xargs kill -9` |
-| `Database connection error` | Check `docker-compose ps` is showing postgres as running |
-| `Cannot find module 'express'` | Run `npm install` from correct directory |
-
-## File Locations
-
-- **Backend:** `backend/src/`
-- **Frontend:** `frontend/src/`
-- **Config:** `.env` (create from `.env.example`)
-- **Database Schema:** `backend/prisma/schema.prisma`
-- **Docker:** `docker-compose.yml`
-
-## Key Commands
-
-```bash
-# Backend
-npm run dev          # Start dev server
-npm run migrate      # Run migrations
-npm test             # Run tests
-npm run lint         # Check code
-
-# Frontend
-npm run dev          # Start Vite dev server
-npm run build        # Build for production
-npm run preview      # Preview production build
-
-# Docker
-docker-compose up -d      # Start services
-docker-compose down       # Stop services
-docker-compose logs -f    # View logs
+### 3. Open Browser
+```
+http://localhost:5173/login
 ```
 
-## Default Credentials
-
+### 4. Login
 ```
-Database:
-- Host: localhost
-- Port: 5432
-- User: govschemes
-- Password: (from .env file)
-- Database: gov_schemes_analytics
-
-Redis:
-- Host: localhost
-- Port: 6379
+Email: admin@govschemes.in
+Password: testpass
 ```
 
-## Full Documentation
-
-See [SETUP.md](./SETUP.md) for detailed step-by-step guide.
+### 5. Done! ✅
+You're now logged into the Government Schemes Analytics Dashboard.
 
 ---
 
-**Got stuck?** Read SETUP.md or check server logs: `docker-compose logs`
+## Common Commands
+
+### View Logs
+```bash
+docker-compose logs -f              # All services
+docker-compose logs backend -f      # Just backend
+docker-compose logs postgres -f     # Just database
+```
+
+### Restart Services
+```bash
+docker-compose restart              # Restart everything
+docker-compose restart backend      # Restart just backend
+```
+
+### Stop Everything
+```bash
+docker-compose down
+```
+
+### Full Reset (WARNING: Deletes database)
+```bash
+docker-compose down -v
+docker-compose up -d
+```
+
+---
+
+## Ports
+
+| Service  | Port | URL |
+|----------|------|-----|
+| Frontend | 5173 | http://localhost:5173 |
+| Backend  | 5001 | http://localhost:5001/api/v1 |
+| Database | 5432 | PostgreSQL |
+| Cache    | 6379 | Redis |
+
+---
+
+## Troubleshooting
+
+### Port Already in Use
+```bash
+lsof -ti:5001 | xargs kill -9
+docker-compose up -d
+```
+
+### Services Not Starting
+```bash
+docker-compose down
+docker-compose build
+docker-compose up -d
+```
+
+### Login Failing
+```bash
+docker-compose logs backend | grep -i "error\|auth"
+```
+
+---
+
+**For detailed info**, see `FINAL_STATUS.md`
