@@ -34,9 +34,9 @@ services:
       - key: JWT_REFRESH_SECRET
         sync: false
 
-      # CORS
+      # CORS (includes all deployment URLs)
       - key: CORS_ORIGIN
-        value: "https://college-final-project.vercel.app,http://localhost:5173"
+        value: "https://frontend-ae3v.onrender.com,https://college-final-project.vercel.app,http://localhost:5173"
 
     # Health check
     healthCheckPath: /health

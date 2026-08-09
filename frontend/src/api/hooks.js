@@ -1,29 +1,64 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import client from './client';
 
 // Auth Hooks
 export const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const refreshTimerRef = useRef(null);
 
+  // On first mount: if we have a stored token, silently refresh it to confirm it's still valid
   useEffect(() => {
-    const fetchUser = async () => {
+    const storedToken = localStorage.getItem('accessToken');
+    if (!storedToken) {
+      setLoading(false);
+      return;
+    }
+
+    const validateToken = async () => {
       try {
         const response = await client.get('/auth/me');
         setUser(response.data.data);
       } catch (error) {
+        // Token invalid - clear everything
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      fetchUser();
-    } else {
-      setLoading(false);
-    }
+    validateToken();
+  }, []);
+
+  // Auto-refresh access token every 13 minutes (before 15min expiry)
+  useEffect(() => {
+    if (!user) return;
+
+    const refreshToken = async () => {
+      try {
+        const response = await client.post('/auth/refresh');
+        if (response.data?.data?.accessToken) {
+          localStorage.setItem('accessToken', response.data.data.accessToken);
+        }
+      } catch (error) {
+        logoutUser();
+      }
+    };
+
+    refreshTimerRef.current = setInterval(refreshToken, 13 * 60 * 1000);
+    return () => clearInterval(refreshTimerRef.current);
+  }, [!!user]);
+
+  // Listen for forced logout triggered when refresh also fails
+  useEffect(() => {
+    const handler = () => {
+      clearInterval(refreshTimerRef.current);
+      setUser(null);
+    };
+    window.addEventListener('auth:logout', handler);
+    return () => window.removeEventListener('auth:logout', handler);
   }, []);
 
   const login = useCallback(async (email, password) => {
@@ -52,11 +87,17 @@ export const useAuth = () => {
     }
   }, []);
 
-  const logout = useCallback(() => {
+  const logoutUser = useCallback(() => {
+    clearInterval(refreshTimerRef.current);
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     setUser(null);
   }, []);
+
+  const logout = useCallback(() => {
+    client.post('/auth/logout').catch(() => {});
+    logoutUser();
+  }, [logoutUser]);
 
   return { user, loading, login, register, logout };
 };

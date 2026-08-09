@@ -22,7 +22,7 @@ services:
       - gov-schemes-network
     restart: unless-stopped
 
-  # Redis Cache
+  # Redis Cache (Cineworld-style optimization)
   redis:
     image: redis:7-alpine
     container_name: gov-schemes-cache
@@ -30,6 +30,7 @@ services:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -39,21 +40,21 @@ services:
       - gov-schemes-network
     restart: unless-stopped
 
-  # Backend API
+  # Backend API (Production-grade setup)
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: gov-schemes-api
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: ${NODE_ENV:-production}
       PORT: 5001
       HOST: 0.0.0.0
       DATABASE_URL: postgresql://${DB_USER:-govschemes}:${DB_PASSWORD:-devpassword}@postgres:5432/${DB_NAME:-gov_schemes}
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:-MyJWTSecretABC12345}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-MyRefreshSecretXYZ789}
-      CORS_ORIGIN: http://localhost:5173,http://127.0.0.1:5173
+      CORS_ORIGIN: http://localhost:5173,http://127.0.0.1:5173,https://frontend-ae3v.onrender.com
     ports:
       - "5001:5001"
     depends_on:
@@ -61,6 +62,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    volumes:
+      - backend_uploads:/app/uploads
+      - backend_logs:/app/logs
     networks:
       - gov-schemes-network
     restart: unless-stopped
@@ -99,6 +103,10 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
+    driver: local
+  backend_uploads:
+    driver: local
+  backend_logs:
     driver: local
 
 networks:

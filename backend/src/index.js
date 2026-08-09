@@ -34,7 +34,8 @@ const allowedOrigins = process.env.CORS_ORIGIN
     'http://127.0.0.1:5174',
     'http://127.0.0.1:5175',
     'https://frontend-eta-smoky-88.vercel.app',
-    'https://frontend-i6luaplsk-chetanya-s-projects.vercel.app'
+    'https://frontend-i6luaplsk-chetanya-s-projects.vercel.app',
+    'https://frontend-ae3v.onrender.com'
   ];
 
 app.use(cors({
@@ -53,8 +54,17 @@ app.use(cors({
 // Security headers
 app.use(helmet());
 
+// Request ID tracking (for tracing)
+app.use((req, res, next) => {
+  const id = Math.random().toString(36).slice(2, 10);
+  req.requestId = id;
+  res.setHeader('x-request-id', id);
+  next();
+});
+
 // Request logging
-app.use(morgan(':method :url :status :response-time ms'));
+const morganFormat = ':method :url :status :response-time ms [:req[x-request-id]]';
+app.use(morgan(morganFormat));
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -235,7 +245,14 @@ app.use((err, req, res, next) => {
 
 const server = http.createServer(app);
 
-// Enable SO_REUSEADDR and aggressive socket reuse for development
+// Production-grade connection management (Cineworld pattern)
+// Keep connections alive between requests instead of re-handshaking each time
+// keepAliveTimeout must be > any upstream load-balancer idle timeout (usually 60s)
+server.keepAliveTimeout = 65_000;
+server.headersTimeout = 66_000; // must be > keepAliveTimeout
+server.maxConnections = 1000; // Allow many concurrent connections per process
+
+// Enable SO_REUSEADDR to reuse port immediately after restart
 server.setsockopt = server.setsockopt || ((level, optname, value) => {
   if (level === 'socket' && optname === 'SO_REUSEADDR') {
     // Force address reuse
@@ -284,5 +301,25 @@ const gracefulShutdown = () => {
 
 process.on('SIGTERM', gracefulShutdown);
 process.on('SIGINT', gracefulShutdown);
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', {
+    reason: String(reason),
+    timestamp: new Date().toISOString(),
+  });
+  // Don't exit - keep the process alive but log the error
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', {
+    message: err.message,
+    stack: err.stack,
+    timestamp: new Date().toISOString(),
+  });
+  // Exit after logging - uncaught exceptions are critical
+  process.exit(1);
+});
 
 export default app;
