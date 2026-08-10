@@ -15,7 +15,10 @@ export default function UserProfile() {
     navigate('/login');
   };
 
-  if (!user) return null;
+  const userName = user?.full_name || 'User';
+  const userEmail = user?.email || 'user@example.com';
+  const userRole = user?.role || 'VIEWER';
+  const initials = userName?.[0]?.toUpperCase() || 'U';
 
   return (
     <div className="relative">
@@ -24,9 +27,9 @@ export default function UserProfile() {
         className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white transition"
       >
         <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center">
-          <span className="text-sm font-bold">{user?.full_name?.[0]?.toUpperCase()}</span>
+          <span className="text-sm font-bold">{initials}</span>
         </div>
-        <span className="text-sm truncate max-w-[100px]">{user?.full_name?.split(' ')[0]}</span>
+        <span className="text-sm truncate max-w-[100px]">{userName.split(' ')[0]}</span>
         <ChevronDown size={16} />
       </button>
 
@@ -36,12 +39,12 @@ export default function UserProfile() {
           <div className="px-4 py-3 border-b border-white/10">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center">
-                <span className="text-sm font-bold text-white">{user?.full_name?.[0]?.toUpperCase()}</span>
+                <span className="text-sm font-bold text-white">{initials}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">{user?.full_name}</p>
-                <p className="text-xs text-gray-400 truncate">{user?.email}</p>
-                <p className="text-xs text-blue-300 mt-1 capitalize">{user?.role || 'User'}</p>
+                <p className="text-sm font-semibold text-white truncate">{userName}</p>
+                <p className="text-xs text-gray-400 truncate">{userEmail}</p>
+                <p className="text-xs text-blue-300 mt-1 capitalize">{userRole}</p>
               </div>
             </div>
           </div>
