@@ -1,5 +1,6 @@
 import { useMemo, useEffect, useState } from 'react';
 import { TrendingUp, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import PerformanceBadge from './PerformanceBadge';
 
 export default function KPICard({ kpi, schemeCode, data: initialData }) {
   const [data, setData] = useState(initialData);
@@ -80,10 +81,17 @@ export default function KPICard({ kpi, schemeCode, data: initialData }) {
       {/* Header */}
       <div className="flex justify-between items-start mb-4 gap-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-white font-semibold text-lg mb-1 line-clamp-2">
+          <h3 className="text-white font-semibold text-lg mb-2 line-clamp-2">
             {data.kpi_name}
           </h3>
-          <p className="text-gray-300 text-xs">{data.unit}</p>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-gray-300 text-xs">{data.unit}</p>
+            <PerformanceBadge
+              value={data.current_value}
+              target={data.target_value}
+              status={data.status}
+            />
+          </div>
         </div>
         <div className={`p-2 rounded-full ${config.bg}`}>
           <StatusIcon size={20} className={config.text} />
