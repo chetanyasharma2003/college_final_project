@@ -26,12 +26,25 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle token refresh on 401
+// Handle rate limiting (429) and token refresh on 401
 client.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    // Retry on 429 (Too Many Requests) with exponential backoff
+    if (error.response?.status === 429) {
+      originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
+      const maxRetries = 3;
+
+      if (originalRequest._retryCount <= maxRetries) {
+        const delay = Math.pow(2, originalRequest._retryCount) * 1000; // 2s, 4s, 8s
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return client(originalRequest);
+      }
+    }
+
+    // Handle token refresh on 401
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
