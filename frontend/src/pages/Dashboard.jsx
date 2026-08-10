@@ -7,6 +7,7 @@ import KPIDashboard from '../components/KPIDashboard';
 import SchemeSelector from '../components/SchemeSelector';
 import StateSelector from '../components/StateSelector';
 import DateRangeSelector from '../components/DateRangeSelector';
+import UserProfile from '../components/UserProfile';
 import TrendChart from '../components/TrendChart';
 import TopPerformers from '../components/TopPerformers';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -94,6 +95,7 @@ export default function Dashboard() {
                 Advanced
               </Link>
               <div className="text-4xl">📊</div>
+              <UserProfile />
             </div>
           </div>
 
