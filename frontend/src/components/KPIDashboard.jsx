@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { RefreshCw, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 import client from '../api/client';
 import KPICard from './KPICard';
+import ExportButton from './ExportButton';
 
 export default function KPIDashboard({ schemeCode, schemeName, stateId = null }) {
   const [kpiData, setKpiData] = useState([]);
@@ -67,14 +68,17 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
           <h2 className="text-3xl font-bold text-white mb-1">{schemeName}</h2>
           <p className="text-gray-400">Real-time KPI Performance Tracking</p>
         </div>
-        <button
-          onClick={fetchAllKPIs}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg text-blue-400 transition disabled:opacity-50"
-        >
-          <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
-          Refresh
-        </button>
+        <div className="flex gap-3">
+          <ExportButton kpiData={kpiData} schemeName={schemeName} />
+          <button
+            onClick={fetchAllKPIs}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg text-blue-400 transition disabled:opacity-50"
+          >
+            <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Summary Stats */}
