@@ -6,6 +6,7 @@ import { setSchemes, setKPIValues, setSelectedScheme } from '../store/dataSlice'
 import KPIDashboard from '../components/KPIDashboard';
 import SchemeSelector from '../components/SchemeSelector';
 import StateSelector from '../components/StateSelector';
+import DateRangeSelector from '../components/DateRangeSelector';
 import TrendChart from '../components/TrendChart';
 import TopPerformers from '../components/TopPerformers';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -104,6 +105,10 @@ export default function Dashboard() {
               selected={selectedStateForFilter}
               onChange={setSelectedStateForFilter}
             />
+            <DateRangeSelector onDateRangeChange={(range) => {
+              // Date range is now available - can be used for future API filtering
+              console.log('Date range selected:', range);
+            }} />
           </div>
         </div>
       </div>
