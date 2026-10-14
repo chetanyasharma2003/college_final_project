@@ -8,7 +8,6 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
   const [kpiData, setKpiData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [lastRefresh, setLastRefresh] = useState(null);
 
   useEffect(() => {
     fetchAllKPIs();
@@ -24,7 +23,6 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
         : `/kpis/status/${schemeCode}`;
       const response = await client.get(url);
       setKpiData(response.data.kpi_status || []);
-      setLastRefresh(new Date());
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -39,8 +37,15 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
     achieved: kpiData.filter(k => k.status === 'achieved').length,
     on_track: kpiData.filter(k => k.status === 'on_track').length,
     at_risk: kpiData.filter(k => k.status === 'at_risk').length,
-    avg_progress: kpiData.length > 0 ? Math.round(kpiData.reduce((sum, k) => sum + k.progress_percentage, 0) / kpiData.length) : 0,
+    no_data: kpiData.filter(k => k.status === 'no_data').length,
+    avg_progress: kpiData.some(k => k.progress_percentage != null)
+      ? Math.round(kpiData.filter(k => k.progress_percentage != null).reduce((sum, k) => sum + k.progress_percentage, 0) / kpiData.filter(k => k.progress_percentage != null).length)
+      : null,
   };
+  const latestSourceUpdate = kpiData
+    .map(kpi => kpi.last_updated ? new Date(kpi.last_updated) : null)
+    .filter(date => date && !Number.isNaN(date.getTime()))
+    .reduce((latest, date) => (!latest || date > latest ? date : latest), null);
 
   if (error) {
     return (
@@ -66,7 +71,7 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
       <div className="flex justify-between items-start">
         <div>
           <h2 className="text-3xl font-bold text-white mb-1">{schemeName}</h2>
-          <p className="text-gray-400">Real-time KPI Performance Tracking</p>
+          <p className="text-gray-400">Latest reported KPI status</p>
         </div>
         <div className="flex gap-3">
           <ExportButton kpiData={kpiData} schemeName={schemeName} />
@@ -82,7 +87,7 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <div className="bg-white/5 border border-white/10 rounded-lg p-4">
           <p className="text-gray-400 text-sm mb-1">Total KPIs</p>
           <p className="text-3xl font-bold text-white">{stats.total}</p>
@@ -99,9 +104,13 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
           <p className="text-yellow-400 text-sm mb-1">At Risk</p>
           <p className="text-3xl font-bold text-yellow-400">{stats.at_risk}</p>
         </div>
+        <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+          <p className="text-gray-400 text-sm mb-1">No Data</p>
+          <p className="text-3xl font-bold text-gray-300">{stats.no_data}</p>
+        </div>
         <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
           <p className="text-purple-400 text-sm mb-1">Avg Progress</p>
-          <p className="text-3xl font-bold text-purple-400">{stats.avg_progress}%</p>
+          <p className="text-3xl font-bold text-purple-400">{stats.avg_progress == null ? 'N/A' : `${stats.avg_progress}%`}</p>
         </div>
       </div>
 
@@ -144,9 +153,9 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
       )}
 
       {/* Footer */}
-      {lastRefresh && (
+      {latestSourceUpdate && (
         <p className="text-xs text-gray-500 text-center">
-          Last updated: {lastRefresh.toLocaleTimeString('en-IN')}
+          Latest source record: {latestSourceUpdate.toLocaleString('en-IN')}
         </p>
       )}
     </div>

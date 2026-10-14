@@ -27,10 +27,11 @@ router.get('/list', verifyAuth, async (req, res) => {
 router.get('/detailed/:schemeId', verifyAuth, async (req, res) => {
   try {
     const { schemeId } = req.params;
+    const stateId = req.stateAccess || null;
 
     const report = await ReportService.generateExecutiveSummary(
       Number(schemeId),
-      null,
+      stateId,
       30
     );
 
@@ -51,10 +52,14 @@ router.get('/executive-summary/:schemeId', verifyAuth, async (req, res) => {
   try {
     const { schemeId } = req.params;
     const { state_id, days } = req.query;
+    const requestedStateId = state_id ? Number(state_id) : null;
+    if (req.stateAccess && requestedStateId && requestedStateId !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
+    }
 
     const summary = await ReportService.generateExecutiveSummary(
       Number(schemeId),
-      state_id ? Number(state_id) : null,
+      req.stateAccess || requestedStateId,
       Number(days) || 30
     );
 
@@ -75,10 +80,14 @@ router.get('/csv/:schemeId', verifyAuth, async (req, res) => {
   try {
     const { schemeId } = req.params;
     const { state_id, start_date, end_date } = req.query;
+    const requestedStateId = state_id ? Number(state_id) : null;
+    if (req.stateAccess && requestedStateId && requestedStateId !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
+    }
 
     const report = await ReportService.generateCSV(
       Number(schemeId),
-      state_id ? Number(state_id) : null,
+      req.stateAccess || requestedStateId,
       start_date ? new Date(start_date) : null,
       end_date ? new Date(end_date) : null
     );
@@ -105,10 +114,14 @@ router.get('/json/:schemeId', verifyAuth, async (req, res) => {
   try {
     const { schemeId } = req.params;
     const { state_id, start_date, end_date } = req.query;
+    const requestedStateId = state_id ? Number(state_id) : null;
+    if (req.stateAccess && requestedStateId && requestedStateId !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
+    }
 
     const report = await ReportService.generateJSON(
       Number(schemeId),
-      state_id ? Number(state_id) : null,
+      req.stateAccess || requestedStateId,
       start_date ? new Date(start_date) : null,
       end_date ? new Date(end_date) : null
     );
@@ -171,9 +184,13 @@ router.get('/comparative', verifyAuth, async (req, res) => {
     }
 
     const schemeIds = scheme_ids.split(',').map(Number);
+    const requestedStateId = state_id ? Number(state_id) : null;
+    if (req.stateAccess && requestedStateId && requestedStateId !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
+    }
     const report = await ReportService.generateComparativeReport(
       schemeIds,
-      state_id ? Number(state_id) : null
+      req.stateAccess || requestedStateId
     );
 
     res.json({

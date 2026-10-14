@@ -168,7 +168,7 @@ https://frontend-eta-smoky-88.vercel.app
 ### 3. Login
 ```
 Email: admin@govschemes.in
-Password: Admin@12345
+Password: <provisioned-password>
 ```
 
 ### 4. Verify Dashboard Shows:
@@ -293,7 +293,7 @@ The system is **100% PRODUCTION READY** when ALL of these are true:
 **Solution:**
 1. Run seed script again: `node prisma/seed.js`
 2. Verify admin user is created
-3. Use credentials exactly: `admin@govschemes.in` / `Admin@12345`
+3. Use credentials exactly: `admin@govschemes.in` / `<provisioned-password>`
 
 ---
 
@@ -347,14 +347,14 @@ Render Dashboard → PostgreSQL → college-final-project-db
 ### Admin Account
 ```
 Email: admin@govschemes.in
-Password: Admin@12345
+Password: <provisioned-password>
 Role: ADMIN (full access)
 ```
 
 ### Analyst Account
 ```
 Email: analyst@govschemes.in
-Password: Admin@12345
+Password: <provisioned-password>
 Role: ANALYST (read-only)
 ```
 

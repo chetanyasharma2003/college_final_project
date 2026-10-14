@@ -1,19 +1,15 @@
 import express from 'express';
 import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
 import PMAYDataService from '../services/pmay-data.service.js';
+import DataSyncService from '../services/data-sync.service.js';
 
 const router = express.Router();
 
 // POST - Sync PMAY data from government API
 router.post('/sync', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
   try {
-    const { apiKey } = req.body;
-
-    const result = await PMAYDataService.syncPMAYData(
-      apiKey || process.env.PMAY_API_KEY
-    );
-
-    const statusCode = result.status === 'success' ? 200 : 400;
+    const result = await DataSyncService.syncSchemeData('PMAY');
+    const statusCode = result.status === 'success' ? 200 : 502;
 
     res.status(statusCode).json({
       status: result.status,

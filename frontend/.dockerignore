@@ -9,6 +9,4 @@ README.md
 build
 coverage
 .next
-src
-public
-vite.config.js
+dist

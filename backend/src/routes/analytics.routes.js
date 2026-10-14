@@ -1,12 +1,19 @@
 import express from 'express';
 import prisma from '../config/prisma.js';
-import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
+import { verifyAuth } from '../middleware/auth.middleware.js';
 import AnalyticsService from '../services/analytics.service.js';
 
 const router = express.Router();
+router.use(verifyAuth);
+
+const scopedStateId = (req, requestedValue) => {
+  const requested = requestedValue ? Number(requestedValue) : null;
+  if (req.stateAccess && requested && requested !== req.stateAccess) return { denied: true };
+  return { stateId: req.stateAccess || requested };
+};
 
 // GET - Compare schemes
-router.get('/compare-schemes', verifyAuth, async (req, res) => {
+router.get('/compare-schemes', async (req, res) => {
   try {
     const { scheme_ids, state_id, days } = req.query;
 
@@ -18,7 +25,9 @@ router.get('/compare-schemes', verifyAuth, async (req, res) => {
     }
 
     const schemeIds = scheme_ids.split(',').map(Number);
-    const stateId = state_id ? Number(state_id) : null;
+    const scope = scopedStateId(req, state_id);
+    if (scope.denied) return res.status(403).json({ status: 'error', message: 'State access denied' });
+    const stateId = scope.stateId;
     const duration = days ? Number(days) : 30;
 
     const comparison = await AnalyticsService.compareSchemes(
@@ -45,7 +54,7 @@ router.get('/compare-schemes', verifyAuth, async (req, res) => {
 });
 
 // GET - Compare states
-router.get('/compare-states', verifyAuth, async (req, res) => {
+router.get('/compare-states', async (req, res) => {
   try {
     const { scheme_id, days } = req.query;
 
@@ -56,10 +65,14 @@ router.get('/compare-states', verifyAuth, async (req, res) => {
       });
     }
 
-    const comparison = await AnalyticsService.compareStates(
+    let comparison = await AnalyticsService.compareStates(
       Number(scheme_id),
       Number(days) || 30
     );
+    if (req.stateAccess) {
+      const state = await prisma.state.findUnique({ where: { id: req.stateAccess } });
+      comparison = comparison.filter(item => item.state_id === req.stateAccess || item.name === state?.name);
+    }
 
     res.json({
       status: 'success',
@@ -74,7 +87,7 @@ router.get('/compare-states', verifyAuth, async (req, res) => {
 });
 
 // GET - Compare two states detail
-router.get('/compare-states-detail', verifyAuth, async (req, res) => {
+router.get('/compare-states-detail', async (req, res) => {
   try {
     const { scheme_id, state1_id, state2_id, days } = req.query;
 
@@ -83,6 +96,9 @@ router.get('/compare-states-detail', verifyAuth, async (req, res) => {
         status: 'error',
         message: 'scheme_id, state1_id, and state2_id required',
       });
+    }
+    if (req.stateAccess && (Number(state1_id) !== req.stateAccess || Number(state2_id) !== req.stateAccess)) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
     }
 
     const comparison = await AnalyticsService.compareStateDetails(
@@ -105,10 +121,14 @@ router.get('/compare-states-detail', verifyAuth, async (req, res) => {
 });
 
 // GET - Get rankings
-router.get('/rankings', verifyAuth, async (req, res) => {
+router.get('/rankings', async (req, res) => {
   try {
     const { days } = req.query;
-    const rankings = await AnalyticsService.getRankings(Number(days) || 30);
+    let rankings = await AnalyticsService.getRankings(Number(days) || 30);
+    if (req.stateAccess) {
+      const state = await prisma.state.findUnique({ where: { id: req.stateAccess } });
+      rankings = rankings.filter(item => item.state_name === state?.name);
+    }
 
     res.json({
       status: 'success',
@@ -124,7 +144,7 @@ router.get('/rankings', verifyAuth, async (req, res) => {
 });
 
 // GET - Performance gaps
-router.get('/performance-gaps', verifyAuth, async (req, res) => {
+router.get('/performance-gaps', async (req, res) => {
   try {
     const { scheme_id, state_id, days } = req.query;
 
@@ -135,9 +155,11 @@ router.get('/performance-gaps', verifyAuth, async (req, res) => {
       });
     }
 
+    const scope = scopedStateId(req, state_id);
+    if (scope.denied) return res.status(403).json({ status: 'error', message: 'State access denied' });
     const gaps = await AnalyticsService.getPerformanceGaps(
       Number(scheme_id),
-      state_id ? Number(state_id) : null,
+      scope.stateId,
       Number(days) || 30
     );
 
@@ -155,14 +177,16 @@ router.get('/performance-gaps', verifyAuth, async (req, res) => {
 });
 
 // GET - Trend analysis
-router.get('/trend/:kpiId', verifyAuth, async (req, res) => {
+router.get('/trend/:kpiId', async (req, res) => {
   try {
     const { kpiId } = req.params;
     const { state_id, days } = req.query;
 
+    const scope = scopedStateId(req, state_id);
+    if (scope.denied) return res.status(403).json({ status: 'error', message: 'State access denied' });
     const trend = await AnalyticsService.getTrendAnalysis(
       Number(kpiId),
-      state_id ? Number(state_id) : null,
+      scope.stateId,
       Number(days) || 90
     );
 
@@ -178,7 +202,7 @@ router.get('/trend/:kpiId', verifyAuth, async (req, res) => {
   }
 });
 
-// GET - State ranking for a scheme (public endpoint)
+// GET - State ranking for a scheme
 router.get('/state-ranking/:scheme', async (req, res) => {
   try {
     const { scheme } = req.params;
@@ -197,7 +221,10 @@ router.get('/state-ranking/:scheme', async (req, res) => {
       schemeId = parseInt(scheme);
     }
 
-    const rankings = await AnalyticsService.compareStates(schemeId, 30);
+    let rankings = await AnalyticsService.compareStates(schemeId, 30);
+    if (req.stateAccess) {
+      rankings = rankings.filter(item => item.state_id === req.stateAccess);
+    }
     res.json({ status: 'success', data: rankings });
   } catch (error) {
     res.status(400).json({ status: 'error', message: error.message });

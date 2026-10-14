@@ -49,7 +49,7 @@ http://localhost:5173/login
 
 # Test Credentials
 Email: admin@govschemes.in
-Password: Admin@12345
+Password: <provisioned-password>
 ```
 
 ---

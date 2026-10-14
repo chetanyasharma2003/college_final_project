@@ -50,7 +50,7 @@ http://localhost:5173
 ### 3. Login
 ```
 Email:    admin@govschemes.in
-Password: Admin@12345
+Password: <provisioned-password>
 ```
 
 **Done!** ✨
@@ -135,7 +135,7 @@ docker-compose logs -f postgres
 - **KPIs**: http://localhost:5001/api/v1/kpis
 
 ### Database (Internal)
-- **PostgreSQL**: `postgres://govschemes:devpassword@postgres:5432/gov_schemes`
+- **PostgreSQL**: `postgres://govschemes:<set-strong-db-password>@postgres:5432/gov_schemes`
 - **Redis**: `redis://redis:6379`
 
 ---
@@ -148,7 +148,7 @@ Located in `docker-compose.yml`:
 ```yaml
 Database:
   DB_USER: govschemes
-  DB_PASSWORD: devpassword
+  DB_PASSWORD: <set-strong-db-password>
   DB_NAME: gov_schemes
 
 Application:

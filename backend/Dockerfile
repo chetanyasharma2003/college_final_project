@@ -13,7 +13,7 @@ RUN npm ci
 COPY . .
 
 # Generate Prisma client
-RUN npm run prisma:generate || npx prisma generate
+RUN npm run build
 
 # Production stage
 FROM node:18-alpine

@@ -9,11 +9,15 @@ router.get('/kpi/:kpiId', verifyAuth, async (req, res) => {
   try {
     const { kpiId } = req.params;
     const { months, state_id } = req.query;
+    const requestedStateId = state_id ? Number(state_id) : null;
+    if (req.stateAccess && requestedStateId && requestedStateId !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
+    }
 
     const prediction = await PredictionService.predictKPI(
       Number(kpiId),
       Number(months) || 3,
-      state_id ? Number(state_id) : null
+      req.stateAccess || requestedStateId
     );
 
     res.json({
@@ -33,10 +37,14 @@ router.get('/target-completion/:kpiId', verifyAuth, async (req, res) => {
   try {
     const { kpiId } = req.params;
     const { state_id } = req.query;
+    const requestedStateId = state_id ? Number(state_id) : null;
+    if (req.stateAccess && requestedStateId && requestedStateId !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
+    }
 
     const prediction = await PredictionService.predictTargetCompletion(
       Number(kpiId),
-      state_id ? Number(state_id) : null
+      req.stateAccess || requestedStateId
     );
 
     res.json({
@@ -59,7 +67,8 @@ router.get('/scheme/:schemeId', verifyAuth, async (req, res) => {
 
     const forecasts = await PredictionService.getSchemeForecasts(
       Number(schemeId),
-      Number(months) || 3
+      Number(months) || 3,
+      req.stateAccess || null
     );
 
     res.json({

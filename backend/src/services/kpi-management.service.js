@@ -18,8 +18,9 @@ class KPIManagementService {
     const results = [];
 
     for (const kpiDef of kpiDefinitions) {
-      let calculatedValue = 0;
+      let calculatedValue = null;
       const latestDate = new Date();
+      latestDate.setHours(0, 0, 0, 0);
 
       // Calculate based on scheme type
       if (schemeCode === 'PMAY') {
@@ -36,29 +37,58 @@ class KPIManagementService {
         calculatedValue = await this.calculateSAGYKPI(kpiDef.kpi_name);
       }
 
-      // Store KPI value in database
-      await prisma.kPIValue.create({
-        data: {
+      if (calculatedValue == null || !Number.isFinite(Number(calculatedValue))) {
+        results.push({
+          kpi_name: kpiDef.kpi_name,
+          value: null,
+          target: kpiDef.target_value,
+          unit: kpiDef.unit,
+          status: 'unavailable',
+        });
+        continue;
+      }
+
+      const target = Number(kpiDef.target_value) || 0;
+      const percentage = target > 0 ? (calculatedValue / target) * 100 : 0;
+      const status = percentage >= 80 ? 'on_track' : percentage >= 50 ? 'at_risk' : 'critical';
+      const existing = await prisma.kPIValue.findFirst({
+        where: {
           kpi_id: kpiDef.id,
-          state_id: 1,
-          district_id: 0,
-          block_id: 0,
-          village_id: 0,
-          value: calculatedValue,
+          state_id: null,
+          district_id: null,
+          block_id: null,
+          village_id: null,
           date: latestDate,
-          target_value: kpiDef.target_value,
-          status: calculatedValue >= kpiDef.target_value ? 'on_track' : 'at_risk',
         },
-      }).catch((err) => {
-        console.error(`Failed to insert KPI value for ${kpiDef.kpi_name}:`, err.message);
       });
+      const valueData = {
+        value: calculatedValue,
+        target_value: kpiDef.target_value,
+        status,
+      };
+
+      if (existing) {
+        await prisma.kPIValue.update({ where: { id: existing.id }, data: valueData });
+      } else {
+        await prisma.kPIValue.create({
+          data: {
+            kpi_id: kpiDef.id,
+            state_id: null,
+            district_id: null,
+            block_id: null,
+            village_id: null,
+            date: latestDate,
+            ...valueData,
+          },
+        });
+      }
 
       results.push({
         kpi_name: kpiDef.kpi_name,
         value: calculatedValue,
         target: kpiDef.target_value,
         unit: kpiDef.unit,
-        status: calculatedValue >= kpiDef.target_value ? 'on_track' : 'at_risk',
+        status,
       });
     }
 
@@ -68,7 +98,7 @@ class KPIManagementService {
   // PMAY KPI Calculations
   static async calculatePMAYKPI(kpiName) {
     const data = await prisma.pMAYData.findMany({ orderBy: { date: 'desc' }, take: 10 });
-    if (data.length === 0) return 0;
+    if (data.length === 0) return null;
 
     switch (kpiName) {
       case 'Houses Sanctioned':
@@ -85,14 +115,14 @@ class KPIManagementService {
       case 'Budget Spent':
         return data[0]?.budget_spent || 0;
       default:
-        return 0;
+        return null;
     }
   }
 
   // MGNREGS KPI Calculations
   static async calculateMGNREGSKPI(kpiName) {
     const data = await prisma.mGNREGSData.findMany({ orderBy: { date: 'desc' }, take: 10 });
-    if (data.length === 0) return 0;
+    if (data.length === 0) return null;
 
     switch (kpiName) {
       case 'Person Days Created':
@@ -107,14 +137,14 @@ class KPIManagementService {
         if (data[0]?.person_days_created === 0) return 0;
         return ((data[0]?.person_days_completed || 0) / (data[0]?.person_days_created || 1)) * 100;
       default:
-        return 0;
+        return null;
     }
   }
 
   // PMGSY KPI Calculations
   static async calculatePMGSYKPI(kpiName) {
     const data = await prisma.pMGSYData.findMany({ orderBy: { date: 'desc' }, take: 10 });
-    if (data.length === 0) return 0;
+    if (data.length === 0) return null;
 
     switch (kpiName) {
       case 'Road Length Planned':
@@ -129,14 +159,14 @@ class KPIManagementService {
       case 'Quality Score':
         return data[0]?.completion_rate || 0;
       default:
-        return 0;
+        return null;
     }
   }
 
   // NRLM KPI Calculations
   static async calculateNRLMKPI(kpiName) {
     const data = await prisma.nRLMData.findMany({ orderBy: { date: 'desc' }, take: 10 });
-    if (data.length === 0) return 0;
+    if (data.length === 0) return null;
 
     switch (kpiName) {
       case 'SHGs Formed':
@@ -150,14 +180,14 @@ class KPIManagementService {
       case 'Women Empowerment Index':
         return data[0]?.women_empowerment_index || 0;
       default:
-        return 0;
+        return null;
     }
   }
 
   // DDU-GKY KPI Calculations
   static async calculateDDUGKYKPI(kpiName) {
     const data = await prisma.dDUGKYData.findMany({ orderBy: { date: 'desc' }, take: 10 });
-    if (data.length === 0) return 0;
+    if (data.length === 0) return null;
 
     switch (kpiName) {
       case 'Candidates Trained':
@@ -170,16 +200,16 @@ class KPIManagementService {
       case 'Average Salary':
         return Math.round(data.reduce((sum, d) => sum + Number(d.avg_salary || 0), 0) / data.length);
       case 'Retention Rate':
-        return 75;
+        return null;
       default:
-        return 0;
+        return null;
     }
   }
 
   // SAGY KPI Calculations
   static async calculateSAGYKPI(kpiName) {
     const data = await prisma.sAGYData.findMany({ orderBy: { date: 'desc' }, take: 10 });
-    if (data.length === 0) return 0;
+    if (data.length === 0) return null;
 
     switch (kpiName) {
       case 'Villages Adopted':
@@ -191,9 +221,9 @@ class KPIManagementService {
       case 'Community Satisfaction':
         return Math.round(data.reduce((sum, d) => sum + Number(d.community_satisfaction || 0), 0) / data.length);
       case 'Livelihood Improvement':
-        return 60;
+        return null;
       default:
-        return 0;
+        return null;
     }
   }
 
@@ -208,18 +238,43 @@ class KPIManagementService {
 
     const status = [];
     for (const kpi of kpis) {
-      // Filter by state if provided, otherwise get latest across all states
-      const latestValue = await prisma.kPIValue.findFirst({
-        where: {
-          kpi_id: kpi.id,
-          ...(stateId && { state_id: stateId })
-        },
-        orderBy: { date: 'desc' },
-      });
+      const locationWhere = {
+        kpi_id: kpi.id,
+        district_id: null,
+        block_id: null,
+        village_id: null,
+      };
+      let latestValues;
 
-      const value = latestValue?.value || 0;
-      const target = kpi.target_value || 0;
-      const percentage = target > 0 ? (value / target) * 100 : 0;
+      if (stateId) {
+        const latestValue = await prisma.kPIValue.findFirst({
+          where: { ...locationWhere, state_id: stateId },
+          orderBy: { date: 'desc' },
+        });
+        latestValues = latestValue ? [latestValue] : [];
+      } else {
+        const nationalValue = await prisma.kPIValue.findFirst({
+          where: { ...locationWhere, state_id: null },
+          orderBy: { date: 'desc' },
+        });
+
+        latestValues = nationalValue ? [nationalValue] : await prisma.kPIValue.findMany({
+          where: { ...locationWhere, state_id: { not: null } },
+          orderBy: { date: 'desc' },
+          distinct: ['state_id'],
+        });
+      }
+
+      const values = latestValues.map(value => Number(value.value));
+      const targets = latestValues.map(value => Number(value.target_value ?? kpi.target_value) || 0);
+      const value = values.length ? values.reduce((sum, current) => sum + current, 0) / values.length : null;
+      const percentage = latestValues.length
+        ? latestValues.reduce((sum, item, index) => sum + (targets[index] > 0 ? (values[index] / targets[index]) * 100 : 0), 0) / latestValues.length
+        : 0;
+      const target = Number(kpi.target_value) || 0;
+      const latestUpdated = latestValues.reduce((latest, item) => (
+        !latest || item.date > latest ? item.date : latest
+      ), null);
 
       status.push({
         kpi_id: kpi.id,
@@ -227,9 +282,13 @@ class KPIManagementService {
         current_value: value,
         target_value: target,
         unit: kpi.unit,
-        progress_percentage: Math.round(percentage),
-        status: percentage >= 100 ? 'achieved' : percentage >= 80 ? 'on_track' : 'at_risk',
-        last_updated: latestValue?.date || null,
+        progress_percentage: latestValues.length ? Math.round(percentage) : null,
+        status: latestValues.length === 0
+          ? 'no_data'
+          : percentage >= 100 ? 'achieved' : percentage >= 80 ? 'on_track' : 'at_risk',
+        last_updated: latestUpdated,
+        states_covered: stateId ? 1 : latestValues.filter(item => item.state_id != null).length,
+        aggregation: !stateId && !latestValues.some(item => item.state_id == null) ? 'state_average' : 'latest',
       });
     }
 

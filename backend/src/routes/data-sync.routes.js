@@ -40,6 +40,7 @@ router.get('/status', verifyAuth, async (req, res) => {
         (SELECT COUNT(*) FROM "State") as total_states,
         (SELECT COUNT(*) FROM "KPIDefinition") as total_kpis,
         (SELECT COUNT(*) FROM "KPIValue") as total_kpi_values,
+        (SELECT COUNT(*) FROM "SchemeDataGeneric") as generic_records,
         (SELECT COUNT(*) FROM "PMAYData") as pmay_records,
         (SELECT COUNT(*) FROM "MGNREGSData") as mgnregs_records
     `;

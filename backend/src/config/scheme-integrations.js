@@ -6,7 +6,7 @@ export const SCHEME_CONFIGS = {
     name: 'Pradhan Mantri Awas Yojana',
     code: 'PMAY',
     ministry: 'Ministry of Housing & Urban Affairs',
-    apiKey: process.env.PMAY_API_KEY || '579b464db66ec23bdd00000137315bca8f43477a5aff96ccc41e4d52',
+    apiKey: process.env.PMAY_API_KEY,
     apiEndpoint: 'https://pmay-urban.gov.in/api/v1',
     endpoints: {
       houses: '/houses/state-wise',
@@ -85,7 +85,7 @@ export const SCHEME_CONFIGS = {
     syncFrequency: '0 1 * * *', // 1 AM daily
   },
 
-  DDUGKY: {
+  'DDU-GKY': {
     name: 'Deen Dayal Upadhyaya Gram Jyoti Yojana',
     code: 'DDU-GKY',
     ministry: 'Ministry of Skill Development',
@@ -149,7 +149,7 @@ export const DATA_VALIDATION_RULES = {
     loan_disbursed: { type: 'number', min: 0 },
     women_empowerment_index: { type: 'number', min: 0, max: 100 },
   },
-  DDUGKY: {
+  'DDU-GKY': {
     candidates_trained: { type: 'number', min: 0 },
     placement_count: { type: 'number', min: 0 },
     placement_rate: { type: 'number', min: 0, max: 100 },
@@ -188,7 +188,7 @@ export const DATA_SCHEMAS = {
     timestamp: 'data_month',
     metrics: 'livelihood_data'
   },
-  DDUGKY: {
+  'DDU-GKY': {
     state: 'state',
     district: 'district',
     timestamp: 'month',

@@ -12,7 +12,7 @@ export const extractToken = (req) => {
 };
 
 // Verify JWT middleware
-export const verifyAuth = (req, res, next) => {
+export const verifyAuth = async (req, res, next) => {
   try {
     const token = extractToken(req);
 
@@ -32,8 +32,17 @@ export const verifyAuth = (req, res, next) => {
       });
     }
 
-    // Attach user ID to request
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { id: true, role: true, state_access: true, is_active: true },
+    });
+    if (!user || !user.is_active) {
+      return res.status(401).json({ status: 'error', message: 'User account is unavailable' });
+    }
+
     req.userId = decoded.userId;
+    req.userRole = user.role;
+    req.stateAccess = user.state_access;
     next();
   } catch (error) {
     return res.status(401).json({
@@ -47,44 +56,27 @@ export const verifyAuth = (req, res, next) => {
 export const checkRole = (allowedRoles) => {
   return async (req, res, next) => {
     try {
-      const token = extractToken(req);
-      if (!token) {
-        return res.status(401).json({
-          status: 'error',
-          message: 'No token provided',
-        });
+      let userRole = req.userRole;
+      if (!userRole) {
+        const token = extractToken(req);
+        const decoded = token && AuthService.verifyToken(token);
+        const user = decoded ? await prisma.user.findUnique({ where: { id: decoded.userId } }) : null;
+        if (!user || !user.is_active) {
+          return res.status(401).json({ status: 'error', message: 'User not found or inactive' });
+        }
+        req.userId = user.id;
+        req.stateAccess = user.state_access;
+        userRole = user.role;
       }
 
-      const decoded = AuthService.verifyToken(token);
-      if (!decoded) {
-        return res.status(401).json({
-          status: 'error',
-          message: 'Invalid token',
-        });
-      }
-
-      // Get user from database to check role
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
-      });
-
-      if (!user) {
-        return res.status(401).json({
-          status: 'error',
-          message: 'User not found',
-        });
-      }
-
-      if (!allowedRoles.includes(user.role)) {
+      if (!allowedRoles.includes(userRole)) {
         return res.status(403).json({
           status: 'error',
           message: 'Insufficient permissions for this action',
         });
       }
 
-      req.userId = user.id;
-      req.userRole = user.role;
-      req.stateAccess = user.state_access;
+      req.userRole = userRole;
       next();
     } catch (error) {
       return res.status(500).json({

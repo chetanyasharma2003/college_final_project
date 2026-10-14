@@ -33,8 +33,9 @@ router.post('/sync/:schemeCode', verifyAuth, checkRole(['ADMIN']), async (req, r
 
     const result = await ETLService.runETLPipeline(schemeCode, config);
 
-    res.json({
-      status: 'success',
+    const statusCode = result.status === 'success' ? 200 : result.status === 'partial' ? 207 : 502;
+    res.status(statusCode).json({
+      status: result.status,
       data: result,
     });
   } catch (error) {
@@ -144,6 +145,7 @@ router.get('/sync-status', verifyAuth, checkRole(['ADMIN']), async (req, res) =>
     const statusSummary = {
       total_imports: recentImports.length,
       successful: recentImports.filter((i) => i.status === 'completed').length,
+      partial: recentImports.filter((i) => i.status === 'partial').length,
       failed: recentImports.filter((i) => i.status === 'failed').length,
       total_records_imported: recentImports.reduce(
         (sum, i) => sum + (i.records_imported || 0),

@@ -106,8 +106,9 @@ app.use('/api/v1/auth/register', authLimiter);
 
 // Comprehensive health check
 app.get('/health', (req, res) => {
-  res.json({
-    status: res.locals.dbHealthy ? 'ok' : 'degraded',
+  const healthy = Boolean(res.locals.dbHealthy);
+  res.status(healthy ? 200 : 503).json({
+    status: healthy ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     database: res.locals.dbHealthy ? 'connected' : 'disconnected',
@@ -121,12 +122,13 @@ app.get('/health', (req, res) => {
 
 // System status endpoint for monitoring
 app.get('/api/v1/system/status', (req, res) => {
+  const healthy = Boolean(res.locals.dbHealthy);
   res.json({
-    status: 'healthy',
+    status: healthy ? 'healthy' : 'degraded',
     services: {
-      database: res.locals.dbHealthy ? 'online' : 'offline',
+      database: healthy ? 'online' : 'offline',
       api: 'online',
-      cache: 'online',
+      cache: 'not_integrated',
     },
     timestamp: new Date().toISOString(),
     uptime: Math.floor(process.uptime()),

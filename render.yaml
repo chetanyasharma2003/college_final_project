@@ -3,7 +3,7 @@ services:
     name: college-final-project-backend
     env: node
     plan: starter
-    buildCommand: "cd backend && npm install && npm run build"
+    buildCommand: "cd backend && npm ci && npm run build"
     startCommand: "cd backend && npm start"
     autoDeploy: true
 
@@ -22,12 +22,6 @@ services:
           name: college-final-project-db
           property: connectionString
 
-      # Redis (will be set in Render dashboard)
-      - key: REDIS_URL
-        fromDatabase:
-          name: college-final-project-redis
-          property: connectionString
-
       # JWT Secrets
       - key: JWT_SECRET
         sync: false
@@ -40,7 +34,7 @@ services:
 
     # Health check
     healthCheckPath: /health
-    preDeployCommand: "cd backend && npx prisma migrate deploy"
+    preDeployCommand: "cd backend && npm run migrate"
 
     # Region
     region: singapore
@@ -51,7 +45,3 @@ databases:
     plan: starter
     version: 16
 
-  - name: college-final-project-redis
-    provider: redis
-    plan: starter
-    region: singapore

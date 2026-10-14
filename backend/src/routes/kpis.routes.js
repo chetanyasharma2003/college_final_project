@@ -1,8 +1,10 @@
 import express from 'express';
 import prisma from '../config/prisma.js';
 import KPIManagementService from '../services/kpi-management.service.js';
+import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
+router.use(verifyAuth);
 
 // Get all KPIs (compatibility endpoint for old frontend)
 router.get('/', async (req, res) => {
@@ -24,6 +26,30 @@ router.get('/latest', async (req, res) => {
     const schemeId = req.query.schemeId ? Number(req.query.schemeId) : null;
     const schemeCode = req.query.scheme ? req.query.scheme.toUpperCase() : null;
     const limit = req.query.limit ? Number(req.query.limit) : 100;
+    const { startDate, endDate, stateId } = req.query;
+
+    const parseDate = (value, endOfDay = false) => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+      const date = new Date(`${value}T${endOfDay ? '23:59:59.999' : '00:00:00.000'}Z`);
+      return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
+        ? date
+        : null;
+    };
+
+    const start = startDate ? parseDate(startDate) : null;
+    const end = endDate ? parseDate(endDate, true) : null;
+    if ((startDate && !start) || (endDate && !end) || (start && end && start > end)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid date range' });
+    }
+
+    const requestedStateId = stateId ? Number(stateId) : null;
+    if (req.stateAccess && requestedStateId && requestedStateId !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
+    }
+    const parsedStateId = req.stateAccess || requestedStateId;
+    if (stateId && (!Number.isInteger(parsedStateId) || parsedStateId < 1)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid state ID' });
+    }
 
     // Build where clause
     let where = {};
@@ -31,6 +57,13 @@ router.get('/latest', async (req, res) => {
       where.kpi = { scheme_id: schemeId };
     } else if (schemeCode) {
       where.kpi = { scheme: { code: schemeCode } };
+    }
+    if (parsedStateId) where.state_id = parsedStateId;
+    if (start || end) {
+      where.date = {
+        ...(start && { gte: start }),
+        ...(end && { lte: end }),
+      };
     }
 
     const values = await prisma.kPIValue.findMany({
@@ -75,7 +108,11 @@ router.get('/definitions/:scheme', async (req, res) => {
 // Get KPI status for a scheme (comparison with targets) - with optional state filter
 router.get('/status/:scheme', async (req, res) => {
   try {
-    const stateId = req.query.stateId ? Number(req.query.stateId) : null;
+    const requestedStateId = req.query.stateId ? Number(req.query.stateId) : null;
+    if (req.stateAccess && requestedStateId && requestedStateId !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
+    }
+    const stateId = req.stateAccess || requestedStateId;
     const status = await KPIManagementService.getKPIStatus(req.params.scheme, stateId);
     res.json({ status: 'success', scheme: req.params.scheme, kpi_status: status });
   } catch (error) {
@@ -84,7 +121,7 @@ router.get('/status/:scheme', async (req, res) => {
 });
 
 // Calculate all schemes KPI values (batch)
-router.post('/calculate-all', async (req, res) => {
+router.post('/calculate-all', checkRole(['ADMIN']), async (req, res) => {
   try {
     const startTime = Date.now();
     const results = await KPIManagementService.calculateAllKPIs();
@@ -97,7 +134,7 @@ router.post('/calculate-all', async (req, res) => {
 });
 
 // Calculate current KPI values for a scheme
-router.post('/calculate/:scheme', async (req, res) => {
+router.post('/calculate/:scheme', checkRole(['ADMIN']), async (req, res) => {
   try {
     const values = await KPIManagementService.calculateKPIValues(req.params.scheme);
     res.json({ status: 'success', scheme: req.params.scheme, values });
@@ -107,7 +144,7 @@ router.post('/calculate/:scheme', async (req, res) => {
 });
 
 // Update KPI target
-router.put('/definition/:id/target', async (req, res) => {
+router.put('/definition/:id/target', checkRole(['ADMIN']), async (req, res) => {
   try {
     const { target_value } = req.body;
     if (!target_value || target_value < 0) {
@@ -134,6 +171,7 @@ router.get('/:kpiId/trend', async (req, res) => {
     const trend = await prisma.kPIValue.findMany({
       where: {
         kpi_id: parseInt(kpiId),
+        ...(req.stateAccess && { state_id: req.stateAccess }),
         date: { gte: startDate }
       },
       include: { state: true },
@@ -154,7 +192,7 @@ router.get('/:kpiId/top', async (req, res) => {
     const { limit = 5 } = req.query;
 
     const topPerformers = await prisma.kPIValue.findMany({
-      where: { kpi_id: parseInt(kpiId) },
+      where: { kpi_id: parseInt(kpiId), ...(req.stateAccess && { state_id: req.stateAccess }) },
       include: {
         state: true,
         kpi: true
@@ -175,7 +213,7 @@ router.get('/:kpiId/statistics', async (req, res) => {
     const { kpiId } = req.params;
 
     const values = await prisma.kPIValue.findMany({
-      where: { kpi_id: parseInt(kpiId) }
+      where: { kpi_id: parseInt(kpiId), ...(req.stateAccess && { state_id: req.stateAccess }) }
     });
 
     if (values.length === 0) {

@@ -12,7 +12,7 @@
 
 set -e
 
-PROJECT_DIR="/Users/chetanya/Documents/college_final_project"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_PORT=5001
 FRONTEND_PORT=5173
 LOG_DIR="$PROJECT_DIR/logs"
@@ -51,8 +51,11 @@ kill_port() {
 # Cleanup function on exit
 cleanup() {
     echo -e "${YELLOW}Shutting down services...${NC}"
-    pkill -f "node.*index.js" || true
-    pkill -f "vite" || true
+    for port in "$BACKEND_PORT" "$FRONTEND_PORT"; do
+        for pid in $(lsof -ti:"$port" 2>/dev/null); do
+            kill "$pid" 2>/dev/null || true
+        done
+    done
     sleep 1
     echo -e "${GREEN}Shutdown complete${NC}"
 }
@@ -64,14 +67,6 @@ trap cleanup EXIT
 # ============================================================================
 
 echo -e "${YELLOW}[1/3] Cleaning up existing processes...${NC}"
-
-# Kill any existing processes (aggressive cleanup)
-echo -e "${YELLOW}Killing all Node processes...${NC}"
-pkill -9 -f "node" 2>/dev/null || true
-pkill -9 -f "vite" 2>/dev/null || true
-pkill -9 -f "frontend" 2>/dev/null || true
-pkill -9 -f "backend" 2>/dev/null || true
-sleep 3
 
 # Kill ports if still in use
 if check_port $BACKEND_PORT; then

@@ -113,12 +113,12 @@ redis://default:PASSWORD@HOSTNAME:PORT
 
 **JWT_SECRET:**
 ```
-MyJWTSecretABC12345XYZ789MyJWTSecretABC12345XYZ789
+<generate-unique-jwt-secret>XYZ789<generate-unique-jwt-secret>XYZ789
 ```
 
 **JWT_REFRESH_SECRET:**
 ```
-MyRefreshSecretXYZ789ABC12345MyRefreshSecretXYZ789ABC12345
+<generate-unique-refresh-secret>ABC12345<generate-unique-refresh-secret>ABC12345
 ```
 
 **CORS_ORIGIN:**
@@ -202,7 +202,7 @@ https://frontend-eta-smoky-88.vercel.app
 ### 6.2 Try Login
 ```
 Email: admin@govschemes.in
-Password: Admin@12345
+Password: <provisioned-password>
 ```
 
 ### 6.3 Verify Dashboard
@@ -249,7 +249,7 @@ Cache: Redis on Render
 **Test Credentials:**
 ```
 Email: admin@govschemes.in
-Password: Admin@12345
+Password: <provisioned-password>
 ```
 
 ---

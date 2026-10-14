@@ -6,7 +6,7 @@ const http = require('http');
 const FRONTEND_URL = 'https://frontend-ae3v.onrender.com';
 const BACKEND_URL = 'https://college-final-project-backend-m86r.onrender.com';
 
-async function checkHealth(url, name) {
+async function checkHealth(url, path, name) {
   return new Promise((resolve) => {
     const protocol = url.startsWith('https') ? https : http;
     const timeout = setTimeout(() => {
@@ -14,7 +14,7 @@ async function checkHealth(url, name) {
       resolve({ name, status: 'timeout', healthy: false });
     }, 10000);
 
-    protocol.get(url + '/api/v1/health', (res) => {
+    protocol.get(url + path, (res) => {
       clearTimeout(timeout);
       const healthy = res.statusCode === 200;
       const status = res.statusCode;
@@ -32,8 +32,8 @@ async function runHealthCheck() {
   console.log('🏥 Starting Health Check...\n');
 
   const results = await Promise.all([
-    checkHealth(FRONTEND_URL, 'Frontend'),
-    checkHealth(BACKEND_URL, 'Backend'),
+    checkHealth(FRONTEND_URL, '/', 'Frontend'),
+    checkHealth(BACKEND_URL, '/health', 'Backend'),
   ]);
 
   console.log('\n📊 Health Check Summary:');

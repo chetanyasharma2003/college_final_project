@@ -141,11 +141,11 @@ cd gov-schemes-analytics
 
 # Install backend dependencies
 cd backend
-npm install
+npm ci
 
 # Install frontend dependencies
 cd ../frontend
-npm install
+npm ci
 
 # Return to root
 cd ..
@@ -154,8 +154,10 @@ cd ..
 ### 2. Environment Configuration
 
 ```bash
-# Copy environment template
+# Copy environment templates
 cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 
 # Edit .env with your values
 nano .env
@@ -163,13 +165,13 @@ nano .env
 
 **Key variables to set:**
 ```bash
-DB_PASSWORD=your_secure_password
-JWT_SECRET=your_random_secret_key
+DB_PASSWORD=replace-with-a-strong-local-password
+JWT_SECRET=replace-with-a-random-secret-at-least-32-characters
+JWT_REFRESH_SECRET=replace-with-a-different-random-secret-at-least-32-characters
 NODE_ENV=development
-VITE_API_URL=http://localhost:5000/api/v1
 ```
 
-### 3. Start Infrastructure (PostgreSQL + Redis)
+### 3. Start Infrastructure (PostgreSQL)
 
 ```bash
 # Start Docker containers
@@ -177,7 +179,7 @@ docker-compose up -d
 
 # Verify containers are running
 docker-compose ps
-# Expected: postgres and redis should be 'running'
+# Expected: postgres should be 'running'
 ```
 
 ### 4. Database Setup
@@ -187,8 +189,8 @@ docker-compose ps
 cd backend
 npm run migrate
 
-# Seed initial data (optional)
-npm run seed
+# Optional synthetic demo data for local development only. Never use as official scheme data.
+ALLOW_SYNTHETIC_SEED=true SEED_ADMIN_PASSWORD='your-admin-password' SEED_ANALYST_PASSWORD='your-analyst-password' npm run seed
 
 cd ..
 ```
@@ -196,22 +198,17 @@ cd ..
 ### 5. Start Development Servers
 
 ```bash
-# Terminal 1: Start backend (from backend/)
-cd backend
+# Start both development servers from the project root
 npm run dev
-# Expected: "Server running on port 5000"
-
-# Terminal 2: Start frontend (from frontend/)
-cd frontend
-npm run dev
-# Expected: "Local: http://localhost:5173"
+# Frontend: http://localhost:5173
+# Backend: http://localhost:5001
 ```
 
 ### 6. Access the Application
 
 - **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:5000/api/v1
-- **API Docs:** http://localhost:5000/api/v1/docs (after implementing Swagger)
+- **Backend API:** http://localhost:5001/api/v1
+- **Backend health:** http://localhost:5001/health
 
 ---
 
@@ -331,7 +328,7 @@ gov-schemes-analytics/
 
 ## 🔐 Security Features
 
-- ✅ JWT authentication with refresh tokens
+- ✅ JWT authentication with role-gated writes
 - ✅ Rate limiting on all endpoints
 - ✅ Input validation & sanitization
 - ✅ SQL injection prevention (Prisma ORM)
@@ -361,11 +358,11 @@ npm run test:coverage     # Coverage report
 
 ## 📊 Database
 
-**PostgreSQL 16** with comprehensive schema for:
+**PostgreSQL 16** with schema for:
 - User management & authentication
 - Scheme & KPI definitions
 - Geographic data (states, districts, blocks, villages)
-- Real-time KPI values with timestamps
+- Reported KPI values with timestamps
 - Scheme-specific data (PMAY, MGNREGS, etc.)
 - Predictions & forecasts
 - Reports & exports
@@ -380,16 +377,14 @@ pg_dump gov_schemes_analytics > backup.sql
 psql gov_schemes_analytics < backup.sql
 
 # Run migrations
-cd backend
-npm run migrate
-```
+# Build the frontend and run backend regression tests
+npm test
 
----
+# Backend tests only
+cd backend && npm test
 
-## 🚢 Deployment
-
-### Frontend (Vercel)
-```bash
+# Frontend production build only
+cd frontend && npm run build
 # Configure vercel.json
 # Deploy
 vercel deploy --prod

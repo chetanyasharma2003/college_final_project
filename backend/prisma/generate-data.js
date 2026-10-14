@@ -37,6 +37,10 @@ const schemeKPIs = {
 };
 
 async function generateData() {
+  if (process.env.NODE_ENV === 'production' || process.env.ALLOW_SYNTHETIC_SEED !== 'true') {
+    throw new Error('Synthetic data generation is disabled unless ALLOW_SYNTHETIC_SEED=true in development.');
+  }
+
   console.log('📊 Generating realistic 30-day data...');
 
   try {

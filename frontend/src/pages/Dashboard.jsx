@@ -24,10 +24,19 @@ export default function Dashboard() {
   const { schemes: schemesData, loading: schemesLoading } = useSchemes();
   const [selectedSchemeCode, setSelectedSchemeCode] = useState('PMAY');
   const [selectedSchemeName, setSelectedSchemeName] = useState('PMAY - Pradhan Mantri Awas Yojana');
-  // Pass scheme code to useKPIs for proper scheme-specific filtering
-  const { kpiValues: kpiValuesData, loading: kpiLoading } = useKPIs(selectedSchemeCode);
-  const { states } = useGeographic();
   const [selectedStateForFilter, setSelectedStateForFilter] = useState(null);
+  const [selectedDateRange, setSelectedDateRange] = useState(() => {
+    const end = new Date();
+    const start = new Date(end);
+    start.setFullYear(start.getFullYear() - 1);
+    return {
+      startDate: start.toISOString().split('T')[0],
+      endDate: end.toISOString().split('T')[0],
+    };
+  });
+  // Pass scheme code to useKPIs for proper scheme-specific filtering
+  const { kpiValues: kpiValuesData, loading: kpiLoading } = useKPIs(selectedSchemeCode, selectedStateForFilter);
+  const { states } = useGeographic();
   const { kpiStatus, loading: kpiStatusLoading } = useKPIStatus(selectedSchemeCode);
 
   useEffect(() => {
@@ -58,9 +67,7 @@ export default function Dashboard() {
     }
   }, [kpiValuesData, dispatch]);
 
-  const filteredKPIValues = selectedStateForFilter
-    ? kpiValuesData.filter((kpi) => kpi.state_id === selectedStateForFilter)
-    : kpiValuesData;
+  const filteredKPIValues = kpiValuesData;
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -79,7 +86,7 @@ export default function Dashboard() {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
                 {getGreeting()}, <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{user?.full_name?.split(' ')[0]}</span>
               </h1>
-              <p className="text-blue-200 text-sm sm:text-base">Government Schemes Real-time Analytics</p>
+              <p className="text-blue-200 text-sm sm:text-base">Government scheme performance analytics</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <Link
@@ -114,9 +121,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex-1 min-w-[150px] sm:flex-none">
-              <DateRangeSelector onDateRangeChange={(range) => {
-                console.log('Date range selected:', range);
-              }} />
+              <DateRangeSelector onDateRangeChange={setSelectedDateRange} />
             </div>
           </div>
         </div>
@@ -137,7 +142,7 @@ export default function Dashboard() {
           <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 sm:p-6">
             <p className="text-purple-200 text-xs sm:text-sm mb-2">KPI Metrics</p>
             <p className="text-3xl sm:text-4xl font-bold text-white">{filteredKPIValues.length}</p>
-            <p className="text-purple-300 text-xs mt-2">Real-time Performance Indicators</p>
+            <p className="text-purple-300 text-xs mt-2">Latest reported indicators</p>
           </div>
 
           <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
@@ -188,10 +193,10 @@ export default function Dashboard() {
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <ErrorBoundary>
-            <TrendChart />
+            <TrendChart dateRange={selectedDateRange} stateId={selectedStateForFilter} />
           </ErrorBoundary>
           <ErrorBoundary>
-            <TopPerformers />
+            <TopPerformers schemeCode={selectedSchemeCode} />
           </ErrorBoundary>
         </div>
 

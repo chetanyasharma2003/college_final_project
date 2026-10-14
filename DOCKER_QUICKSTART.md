@@ -46,7 +46,7 @@ After startup, open these links:
 ### Login Credentials
 ```
 Email: admin@govschemes.in
-Password: Admin@12345
+Password: <provisioned-password>
 ```
 
 ---
@@ -139,7 +139,7 @@ Create `.env` file if you want to customize:
 ```bash
 # Database
 DB_USER=govschemes
-DB_PASSWORD=devpassword
+DB_PASSWORD=<set-strong-db-password>
 DB_NAME=gov_schemes
 
 # Node

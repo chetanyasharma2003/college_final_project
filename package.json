@@ -8,11 +8,13 @@
     "auto:fix": "node scripts/auto-fix.js",
     "health:check": "node scripts/health-check.js",
     "frontend:build": "cd frontend && npm run build",
+    "frontend:test": "cd frontend && npm test",
     "frontend:dev": "cd frontend && npm run dev",
     "backend:dev": "cd backend && npm run dev",
     "dev": "concurrently \"npm run frontend:dev\" \"npm run backend:dev\"",
     "build": "npm run frontend:build",
-    "test": "npm run frontend:build && npm run auto:fix"
+    "test": "npm run frontend:build && npm run frontend:test && npm run backend:test",
+    "backend:test": "cd backend && npm test"
   },
   "keywords": [
     "government",

@@ -1,5 +1,6 @@
 import express from 'express';
 import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
+import DataSyncService from '../services/data-sync.service.js';
 import MGNREGSDataService from '../services/mgnregs-data.service.js';
 import PMGSYDataService from '../services/pmgsy-data.service.js';
 import NRLMDataService from '../services/nrlm-data.service.js';
@@ -10,8 +11,8 @@ const router = express.Router();
 
 // MGNREGS
 router.post('/mgnregs/sync', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
-  const result = await MGNREGSDataService.syncMGNREGSData();
-  res.json({ status: result.status, data: result });
+  const result = await DataSyncService.syncSchemeData('MGNREGS');
+  res.status(result.status === 'success' ? 200 : 502).json({ status: result.status, data: result });
 });
 
 router.get('/mgnregs/summary', verifyAuth, async (req, res) => {
@@ -21,8 +22,8 @@ router.get('/mgnregs/summary', verifyAuth, async (req, res) => {
 
 // PMGSY
 router.post('/pmgsy/sync', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
-  const result = await PMGSYDataService.syncPMGSYData();
-  res.json({ status: result.status, data: result });
+  const result = await DataSyncService.syncSchemeData('PMGSY');
+  res.status(result.status === 'success' ? 200 : 502).json({ status: result.status, data: result });
 });
 
 router.get('/pmgsy/summary', verifyAuth, async (req, res) => {
@@ -32,8 +33,8 @@ router.get('/pmgsy/summary', verifyAuth, async (req, res) => {
 
 // NRLM
 router.post('/nrlm/sync', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
-  const result = await NRLMDataService.syncNRLMData();
-  res.json({ status: result.status, data: result });
+  const result = await DataSyncService.syncSchemeData('NRLM');
+  res.status(result.status === 'success' ? 200 : 502).json({ status: result.status, data: result });
 });
 
 router.get('/nrlm/summary', verifyAuth, async (req, res) => {
@@ -43,8 +44,8 @@ router.get('/nrlm/summary', verifyAuth, async (req, res) => {
 
 // DDU-GKY
 router.post('/ddugky/sync', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
-  const result = await DDUGKYDataService.syncDDUGKYData();
-  res.json({ status: result.status, data: result });
+  const result = await DataSyncService.syncSchemeData('DDU-GKY');
+  res.status(result.status === 'success' ? 200 : 502).json({ status: result.status, data: result });
 });
 
 router.get('/ddugky/summary', verifyAuth, async (req, res) => {
@@ -54,8 +55,8 @@ router.get('/ddugky/summary', verifyAuth, async (req, res) => {
 
 // SAGY
 router.post('/sagy/sync', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
-  const result = await SAGYDataService.syncSAGYData();
-  res.json({ status: result.status, data: result });
+  const result = await DataSyncService.syncSchemeData('SAGY');
+  res.status(result.status === 'success' ? 200 : 502).json({ status: result.status, data: result });
 });
 
 router.get('/sagy/summary', verifyAuth, async (req, res) => {
@@ -65,18 +66,15 @@ router.get('/sagy/summary', verifyAuth, async (req, res) => {
 
 // Sync All Schemes at Once
 router.post('/sync-all', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
-  const results = await Promise.all([
-    MGNREGSDataService.syncMGNREGSData(),
-    PMGSYDataService.syncPMGSYData(),
-    NRLMDataService.syncNRLMData(),
-    DDUGKYDataService.syncDDUGKYData(),
-    SAGYDataService.syncSAGYData(),
-  ]);
+  const results = await Promise.all(['MGNREGS', 'PMGSY', 'NRLM', 'DDU-GKY', 'SAGY']
+    .map(schemeCode => DataSyncService.syncSchemeData(schemeCode)));
+  const failed = results.filter(result => result.status !== 'success').length;
 
-  res.json({
-    status: 'success',
+  res.status(failed === 0 ? 200 : 207).json({
+    status: failed === 0 ? 'success' : 'partial',
     data: {
       synced_schemes: results.length,
+      failed_schemes: failed,
       results: results,
     },
   });

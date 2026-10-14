@@ -132,7 +132,7 @@ class ETLService {
         import_type: 'api',
         records_imported: imported,
         records_failed: failed,
-        status: failed === 0 ? 'completed' : 'completed',
+        status: failed === 0 ? 'completed' : imported > 0 ? 'partial' : 'failed',
         error_message: errors.length > 0 ? errors.slice(0, 10).join('; ') : null,
       },
     });
@@ -187,7 +187,7 @@ class ETLService {
       const result = await this.loadData(transformedData, schemeCode);
 
       return {
-        status: 'success',
+        status: result.failed === 0 ? 'success' : result.imported > 0 ? 'partial' : 'error',
         ...result,
         execution_time: Date.now() - startTime,
       };

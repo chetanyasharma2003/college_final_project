@@ -79,7 +79,7 @@ After opening http://localhost:5173:
 ### Login Credentials
 ```
 Email:    admin@govschemes.in
-Password: Admin@12345
+Password: <provisioned-password>
 ```
 
 ---

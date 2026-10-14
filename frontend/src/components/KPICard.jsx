@@ -50,13 +50,15 @@ export default function KPICard({ kpi, schemeCode, data: initialData }) {
     achieved: { bg: 'bg-green-500/10', text: 'text-green-400', border: 'border-green-500/30', icon: CheckCircle, label: '✓ Achieved' },
     on_track: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30', icon: TrendingUp, label: '↑ On Track' },
     at_risk: { bg: 'bg-yellow-500/10', text: 'text-yellow-400', border: 'border-yellow-500/30', icon: AlertCircle, label: '⚠ At Risk' },
+    no_data: { bg: 'bg-white/5', text: 'text-gray-400', border: 'border-white/10', icon: Clock, label: 'No Data' },
   };
 
   const config = statusConfig[data.status] || statusConfig.at_risk;
   const percentage = Math.min(data.progress_percentage || 0, 100);
 
   const formatValue = (val, unit) => {
-    if (!val) return '0';
+    if (val === null || val === undefined) return 'N/A';
+    if (val === 0) return '0';
     const num = parseFloat(val);
     if (isNaN(num)) return '0';
 
@@ -139,7 +141,7 @@ export default function KPICard({ kpi, schemeCode, data: initialData }) {
           {config.label}
         </span>
         <span className={`font-bold ${config.text}`}>
-          {percentage}%
+          {data.progress_percentage == null ? 'N/A' : `${percentage}%`}
         </span>
       </div>
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { FileText, Download, Mail, AlertCircle, Loader } from 'lucide-react';
+import { FileText, Download, AlertCircle, Loader } from 'lucide-react';
 import client from '../api/client';
 
-export default function ReportGenerator({ schemeCode = 'PMAY', schemeName = 'PMAY' }) {
+export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode = 'PMAY', schemeName = 'PMAY' }) {
   const [reportType, setReportType] = useState('executive');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -15,52 +15,46 @@ export default function ReportGenerator({ schemeCode = 'PMAY', schemeName = 'PMA
     { id: 'comparison', label: 'Comparison Report', icon: '⚖️', description: 'Compare multiple schemes' },
   ];
 
-  const SCHEME_ID_MAP = {
-    'PMAY': 2, 'MGNREGS': 5, 'PMGSY': 1, 'NRLM': 3, 'DDU-GKY': 4, 'SAGY': 6
-  };
-
   const handleGenerateReport = async () => {
     try {
+      if (!schemeId) throw new Error('Select a scheme before generating a report.');
       setLoading(true);
       setError(null);
       setSuccess(false);
 
-      const schemeId = SCHEME_ID_MAP[schemeCode] || 2;
       const timestamp = new Date().toISOString().split('T')[0];
+      let response;
+      let filename;
 
       if (reportType === 'csv') {
-        const response = await client.get(`/reports/csv/${schemeId}`, {
+        response = await client.get(`/reports/csv/${schemeId}`, {
           responseType: 'blob'
         });
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `${schemeCode}_report_${timestamp}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode.removeChild(link);
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 3000);
-      } else if (reportType === 'executive') {
-        const response = await client.get(`/reports/executive-summary/${schemeId}`);
-        // Download the JSON report
-        const dataStr = JSON.stringify(response.data.data || response.data, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = window.URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `${schemeCode}_executive_summary_${timestamp}.json`);
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode.removeChild(link);
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 3000);
+        filename = `${schemeCode}_report_${timestamp}.csv`;
+      } else if (reportType === 'executive' || reportType === 'detailed') {
+        response = await client.get(`/reports/${reportType === 'executive' ? 'executive-summary' : 'detailed'}/${schemeId}`);
+        filename = `${schemeCode}_${reportType}_${timestamp}.json`;
       } else {
-        // For other report types, just fetch and show success
-        await client.get(`/reports/${reportType}/${schemeId}`);
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 3000);
+        if (schemeIds.length < 2) throw new Error('Comparison reports require at least two schemes.');
+        response = await client.get('/reports/comparative', {
+          params: { scheme_ids: schemeIds.join(',') },
+        });
+        filename = `scheme_comparison_${timestamp}.json`;
       }
+
+      const blob = reportType === 'csv'
+        ? new Blob([response.data], { type: 'text/csv' })
+        : new Blob([JSON.stringify(response.data?.data ?? response.data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error('Report generation error:', err);
       setError(err.response?.status === 429 ? 'Too many requests. Please wait a moment.' : (err.message || 'Failed to generate report'));
@@ -162,13 +156,6 @@ export default function ReportGenerator({ schemeCode = 'PMAY', schemeName = 'PMA
           )}
         </button>
 
-        <button
-          disabled={loading}
-          className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white font-semibold transition disabled:opacity-50"
-        >
-          <Mail size={20} />
-          Email Report
-        </button>
       </div>
 
       {/* Quick Actions */}

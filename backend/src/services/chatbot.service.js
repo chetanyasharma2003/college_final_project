@@ -6,7 +6,7 @@ class ChatbotService {
   /**
    * Parse natural language query and execute
    */
-  static async processQuery(userQuery) {
+  static async processQuery(userQuery, userContext = {}) {
     const query = userQuery.toLowerCase().trim();
     const intent = this.extractIntent(query);
 
@@ -14,19 +14,19 @@ class ChatbotService {
 
     switch (intent.type) {
       case 'performance':
-        response = await this.handlePerformanceQuery(intent, query);
+        response = await this.handlePerformanceQuery(intent, query, userContext.stateAccess);
         break;
       case 'comparison':
-        response = await this.handleComparisonQuery(intent, query);
+        response = await this.handleComparisonQuery(intent, query, userContext.stateAccess);
         break;
       case 'forecast':
-        response = await this.handleForecastQuery(intent, query);
+        response = await this.handleForecastQuery(intent, query, userContext.stateAccess);
         break;
       case 'ranking':
-        response = await this.handleRankingQuery(intent, query);
+        response = await this.handleRankingQuery(intent, query, userContext.stateAccess);
         break;
       case 'status':
-        response = await this.handleStatusQuery(intent, query);
+        response = await this.handleStatusQuery(intent, query, userContext.stateAccess);
         break;
       default:
         response = {
@@ -44,7 +44,7 @@ class ChatbotService {
     }
 
     // Save query history
-    await this.saveQuery(userQuery, response, intent.type);
+    await this.saveQuery(userContext.userId, userQuery, response, intent.type);
 
     return response;
   }
@@ -84,7 +84,7 @@ class ChatbotService {
   /**
    * Handle performance queries
    */
-  static async handlePerformanceQuery(intent, query) {
+  static async handlePerformanceQuery(intent, query, stateAccess = null) {
     // Extract scheme and state names
     const schemes = await prisma.scheme.findMany();
     const states = await prisma.state.findMany();
@@ -99,12 +99,9 @@ class ChatbotService {
       }
     }
 
-    for (const state of states) {
-      if (query.includes(state.name.toLowerCase()) || query.includes(state.code.toLowerCase())) {
-        stateMatch = state;
-        break;
-      }
-    }
+    stateMatch = stateAccess
+      ? states.find(state => state.id === stateAccess)
+      : states.find(state => query.includes(state.name.toLowerCase()) || query.includes(state.code.toLowerCase()));
 
     if (!schemeMatch) {
       return {
@@ -158,7 +155,7 @@ class ChatbotService {
   /**
    * Handle comparison queries
    */
-  static async handleComparisonQuery(intent, query) {
+  static async handleComparisonQuery(intent, query, stateAccess = null) {
     const schemes = await prisma.scheme.findMany();
     const states = await prisma.state.findMany();
 
@@ -175,7 +172,8 @@ class ChatbotService {
     }
 
     const comparison = await AnalyticsService.compareSchemes(
-      mentionedSchemes.map((s) => s.id)
+      mentionedSchemes.map((s) => s.id),
+      stateAccess
     );
 
     return {
@@ -190,7 +188,7 @@ class ChatbotService {
   /**
    * Handle forecast queries
    */
-  static async handleForecastQuery(intent, query) {
+  static async handleForecastQuery(intent, query, stateAccess = null) {
     const schemes = await prisma.scheme.findMany();
 
     const scheme = schemes.find(
@@ -215,7 +213,7 @@ class ChatbotService {
       };
     }
 
-    const prediction = await PredictionService.predictKPI(kpiDef.id, 3);
+    const prediction = await PredictionService.predictKPI(kpiDef.id, 3, stateAccess);
 
     if (prediction.status !== 'success') {
       return {
@@ -237,8 +235,12 @@ class ChatbotService {
   /**
    * Handle ranking queries
    */
-  static async handleRankingQuery(intent, query) {
-    const rankings = await AnalyticsService.getRankings();
+  static async handleRankingQuery(intent, query, stateAccess = null) {
+    let rankings = await AnalyticsService.getRankings();
+    if (stateAccess) {
+      const state = await prisma.state.findUnique({ where: { id: stateAccess } });
+      rankings = rankings.filter(item => item.state_name === state?.name);
+    }
 
     const isStates = /state/.test(query);
     const isSchemes = /scheme/.test(query);
@@ -291,7 +293,7 @@ class ChatbotService {
   /**
    * Handle status queries
    */
-  static async handleStatusQuery(intent, query) {
+  static async handleStatusQuery(intent, query, stateAccess = null) {
     const schemes = await prisma.scheme.findMany();
 
     const scheme = schemes.find(
@@ -301,6 +303,7 @@ class ChatbotService {
     if (!scheme) {
       // Overall status
       const allKPIs = await prisma.kPIValue.findMany({
+        where: { ...(stateAccess && { state_id: stateAccess }) },
         take: 100,
         orderBy: { date: 'desc' },
       });
@@ -316,7 +319,7 @@ class ChatbotService {
     }
 
     const kpiValues = await prisma.kPIValue.findMany({
-      where: { kpi: { scheme_id: scheme.id } },
+      where: { kpi: { scheme_id: scheme.id }, ...(stateAccess && { state_id: stateAccess }) },
       include: { kpi: true },
       take: 20,
       orderBy: { date: 'desc' },
@@ -337,9 +340,10 @@ class ChatbotService {
   /**
    * Save query history
    */
-  static async saveQuery(queryText, response, queryType) {
+  static async saveQuery(userId, queryText, response, queryType) {
     await prisma.chatbotQuery.create({
       data: {
+        user_id: userId || null,
         query_text: queryText,
         response_text: JSON.stringify(response),
         query_type: queryType,

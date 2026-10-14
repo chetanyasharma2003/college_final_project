@@ -28,7 +28,7 @@ Go to: https://frontend-eta-smoky-88.vercel.app
 Login with:
 ```
 Email: admin@govschemes.in
-Password: Admin@12345
+Password: <provisioned-password>
 ```
 
 ### Step 2: Open Browser Console
@@ -106,7 +106,7 @@ LOGIN=$(curl -s -X POST https://college-final-project-backend-m86r.onrender.com/
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@govschemes.in",
-    "password": "Admin@12345"
+    "password": "<provisioned-password>"
   }')
 
 TOKEN=$(echo $LOGIN | jq -r '.data.token')
@@ -144,7 +144,7 @@ Expected output:
    ```json
    {
      "email": "admin@govschemes.in",
-     "password": "Admin@12345"
+     "password": "<provisioned-password>"
    }
    ```
    - Copy the `token` from response

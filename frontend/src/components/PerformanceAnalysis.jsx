@@ -19,6 +19,7 @@ export default function PerformanceAnalysis({ schemeCode = 'PMAY' }) {
   const fetchPerformanceGaps = async () => {
     try {
       setLoading(true);
+      setError(null);
       const schemeId = SCHEME_ID_MAP[schemeCode] || 2;
 
       const response = await client.get(`/analytics/performance-gaps?scheme_id=${schemeId}&days=30`);
@@ -28,15 +29,8 @@ export default function PerformanceAnalysis({ schemeCode = 'PMAY' }) {
       setError(null);
     } catch (err) {
       console.error('Error fetching performance gaps:', err);
-      // Fallback to mock data
-      const mockGaps = [
-        { kpi_name: 'Houses Sanctioned', gap_percentage: 45, gap: 120000, current_value: 278597, target_value: 398597 },
-        { kpi_name: 'Completion Rate', gap_percentage: 70, gap: 56.5, current_value: 23.5, target_value: 80 },
-        { kpi_name: 'Budget Spent', gap_percentage: 109, gap: -439282844, current_value: 839282844, target_value: 400000 },
-        { kpi_name: 'Houses Occupied', gap_percentage: 34, gap: 85000, current_value: 185339, target_value: 270339 },
-        { kpi_name: 'Houses Completed', gap_percentage: 37, gap: 63564, current_value: 216436, target_value: 280000 },
-      ];
-      setGaps(mockGaps);
+      setGaps([]);
+      setError('Unable to load performance gaps. Check data availability and try again.');
     } finally {
       setLoading(false);
     }

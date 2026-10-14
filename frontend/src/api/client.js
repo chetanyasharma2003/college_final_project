@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
 if (!API_BASE_URL && typeof window !== 'undefined') {
   console.warn(
@@ -11,7 +11,7 @@ if (!API_BASE_URL && typeof window !== 'undefined') {
 }
 
 const client = axios.create({
-  baseURL: API_BASE_URL || 'http://localhost:5001/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -45,7 +45,9 @@ client.interceptors.response.use(
     }
 
     // Handle token refresh on 401
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401
+      && !originalRequest._retry
+      && !originalRequest.url?.includes('/auth/refresh-token')) {
       originalRequest._retry = true;
 
       try {
