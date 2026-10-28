@@ -16,6 +16,8 @@ import MLInsights from '../components/MLInsights';
 import KPIAlerts from '../components/KPIAlerts';
 import KPIComparison from '../components/KPIComparison';
 import { BarChart3, FileText, TrendingUp } from 'lucide-react';
+import AdminMonitoring from '../components/AdminMonitoring';
+import GeographicExplorer from '../components/GeographicExplorer';
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -128,6 +130,8 @@ export default function Dashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {user?.role === 'ADMIN' && <AdminMonitoring />}
+        <GeographicExplorer />
         {/* Smart Alerts System */}
         <KPIAlerts kpiValues={filteredKPIValues} />
 

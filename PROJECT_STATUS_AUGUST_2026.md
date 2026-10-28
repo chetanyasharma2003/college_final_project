@@ -40,7 +40,7 @@ Your project is **COMPLETE, DEPLOYED, AND FULLY AUTOMATED**. Everything mentione
 - MGNREGS (Mahatma Gandhi National Rural Employment)
 - PMGSY (Pradhan Mantri Gram Sadak Yojana)
 - NRLM (National Rural Livelihood Mission)
-- DDU-GKY (Deen Dayal Upadhyaya Gram Jyoti Yojana)
+- DDU-GKY (Deen Dayal Upadhyaya Grameen Kaushalya Yojana)
 - SAGY (Sansad Adarsh Gram Yojana)
 
 ### **31 States Tracking**

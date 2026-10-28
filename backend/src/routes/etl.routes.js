@@ -9,26 +9,35 @@ const router = express.Router();
 router.post('/sync/:schemeCode', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
   try {
     const { schemeCode } = req.params;
-    const { resourceId, apiKey, filters, mapping } = req.body;
+    const { resourceId: bodyResourceId, filters, mapping } = req.body;
+    const schemeKey = schemeCode.replace(/[^A-Z0-9]/gi, '_').toUpperCase();
+    const resourceId = bodyResourceId || process.env[`DATA_GOV_RESOURCE_ID_${schemeKey}`];
+    const apiKey = process.env.DATA_GOV_API_KEY;
 
-    if (!apiKey) {
+    if (!apiKey || !resourceId) {
       return res.status(400).json({
         status: 'error',
-        message: 'API key required. Set DATA_GOV_API_KEY in environment.',
+        message: 'Configure DATA_GOV_API_KEY and a verified resource ID in the server environment.',
       });
     }
+    const configuredMappingValue = process.env[`DATA_GOV_FIELD_MAP_${schemeKey}`];
+    let configuredMapping = null;
+    try { configuredMapping = configuredMappingValue ? JSON.parse(configuredMappingValue) : null; } catch {
+      return res.status(500).json({ status: 'error', message: 'Configured field mapping is invalid JSON.' });
+    }
+    if (!mapping && !configuredMapping) {
+      return res.status(400).json({ status: 'error', message: 'A verified source field mapping is required.' });
+    }
+    const requestedMapping = mapping || configuredMapping;
+    const etlMapping = Array.isArray(requestedMapping.metrics)
+      ? requestedMapping
+      : { ...requestedMapping, metrics: Object.entries(requestedMapping.metrics || {}).map(([name, field]) => ({ name, field })) };
 
     const config = {
       apiKey,
-      resourceId: resourceId || schemeCode,
+      resourceId,
       filters: filters || {},
-      mapping:
-        mapping || {
-          state: 'state_name',
-          district: 'district_name',
-          date: 'date',
-          metrics: [],
-        },
+      mapping: etlMapping,
     };
 
     const result = await ETLService.runETLPipeline(schemeCode, config);

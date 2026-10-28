@@ -44,10 +44,10 @@ const SCHEMES = [
     budget: 200000000000,
   },
   {
-    name: 'DDU-GKY - Deen Dayal Upadhyaya Scheme',
+    name: 'DDU-GKY - Deen Dayal Upadhyaya Grameen Kaushalya Yojana',
     code: 'DDU-GKY',
     description: 'Skill development and youth training',
-    ministry: 'Ministry of Skill Development',
+    ministry: 'Ministry of Rural Development',
     budget: 100000000000,
   },
   {

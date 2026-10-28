@@ -1,8 +1,42 @@
 import express from 'express';
 import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
 import ReportService from '../services/report.service.js';
+import { createTextPDF } from '../services/pdf.service.js';
 
 const router = express.Router();
+
+router.get('/pdf/:schemeId', verifyAuth, async (req, res) => {
+  try {
+    const schemeId = Number.parseInt(req.params.schemeId, 10);
+    if (!Number.isInteger(schemeId) || schemeId <= 0) return res.status(400).json({ status: 'error', message: 'Invalid scheme id' });
+    const requestedStateId = req.query.stateId ? Number(req.query.stateId) : null;
+    if (req.stateAccess && requestedStateId && requestedStateId !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
+    }
+    const report = await ReportService.generateExecutiveSummary(schemeId, req.stateAccess || requestedStateId);
+
+    const lines = [
+      `Scheme: ${report.scheme_name} (${report.scheme_code})`,
+      `Ministry: ${report.ministry || 'Not provided'}`,
+      `Period: ${report.period}`,
+      `Generated: ${report.generated_date}`,
+      `KPI observations: ${report.total_kpis}`,
+      `Overall completion: ${report.overall_completion}%`,
+      `On track: ${report.on_track} | At risk: ${report.at_risk} | Critical: ${report.critical}`,
+      '',
+      'Key metrics:',
+      ...report.key_metrics.map((metric) => `${metric.name}: ${metric.value} / ${metric.target} (${metric.status})`),
+    ];
+    const pdf = createTextPDF(lines, { title: `${report.scheme_code} Executive Summary` });
+    res.setHeader('Content-Type', 'application/pdf');
+    const safeSchemeCode = report.scheme_code.replace(/[^A-Za-z0-9_-]/g, '_');
+    res.setHeader('Content-Disposition', `attachment; filename="${safeSchemeCode}_executive_summary.pdf"`);
+    return res.send(pdf);
+  } catch (error) {
+    console.error('PDF report generation failed:', error.message);
+    return res.status(error.statusCode || 500).json({ status: 'error', message: error.statusCode === 404 ? 'Scheme not found' : 'Unable to generate PDF report' });
+  }
+});
 
 // GET - List all reports
 router.get('/list', verifyAuth, async (req, res) => {

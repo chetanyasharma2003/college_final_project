@@ -6,6 +6,9 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import 'express-async-errors';
 import dotenv from 'dotenv';
+import { redisResponseCache } from './middleware/redis-cache.middleware.js';
+import redisCache from './services/redis-cache.service.js';
+import { startDataSyncScheduler } from './services/sync-scheduler.service.js';
 import {
   healthCheck,
   requestTimeout,
@@ -76,6 +79,7 @@ app.use(requestTimeout);
 app.use(healthCheck);
 app.use(validateResponse);
 app.use(deduplicateRequests);
+app.use(redisResponseCache);
 app.use(databaseCircuitBreaker);
 
 // General API rate limiting (relaxed for development)
@@ -121,14 +125,16 @@ app.get('/health', (req, res) => {
 });
 
 // System status endpoint for monitoring
-app.get('/api/v1/system/status', (req, res) => {
+app.get('/api/v1/system/status', async (req, res) => {
   const healthy = Boolean(res.locals.dbHealthy);
+  let cache = 'not_configured';
+  try { cache = await redisCache.ping(); } catch { cache = 'unavailable'; }
   res.json({
     status: healthy ? 'healthy' : 'degraded',
     services: {
       database: healthy ? 'online' : 'offline',
       api: 'online',
-      cache: 'not_integrated',
+      cache: cache === 'PONG' ? 'online' : cache,
     },
     timestamp: new Date().toISOString(),
     uptime: Math.floor(process.uptime()),
@@ -247,6 +253,7 @@ app.use((err, req, res, next) => {
 // ============= SERVER STARTUP =============
 
 const server = http.createServer(app);
+const stopDataSyncScheduler = startDataSyncScheduler();
 
 // Production-grade connection management (Cineworld pattern)
 // Keep connections alive between requests instead of re-handshaking each time
@@ -292,6 +299,7 @@ server.listen({ port: PORT, host: HOST, exclusive: false, backlog: 511 }, () => 
 // Graceful shutdown handler
 const gracefulShutdown = () => {
   console.log('\nShutting down gracefully...');
+  stopDataSyncScheduler();
   server.close(() => {
     console.log('Server closed');
     process.exit(0);

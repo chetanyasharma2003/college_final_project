@@ -31,6 +31,12 @@ class ReportService {
       include: { kpi_definitions: true },
     });
 
+    if (!scheme) {
+      const error = new Error('Scheme not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
     const kpiValues = await prisma.kPIValue.findMany({
       where: {
         kpi: { scheme_id: schemeId },

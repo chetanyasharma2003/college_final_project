@@ -1,19 +1,34 @@
 // Scheme-specific data source configurations
-// Only the 6 core schemes from project specification
+// Source records use the OGD API only after a resource ID and field mapping are
+// supplied from verified dataset metadata. Never guess a source endpoint/schema.
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const DATA_GOV_RESOURCE_ROOT = 'https://api.data.gov.in/resource';
+const dataGovSource = (schemeCode) => {
+  const envCode = schemeCode.replace(/[^A-Z0-9]/gi, '_').toUpperCase();
+  let fieldMapping = null;
+  const configuredMapping = process.env[`DATA_GOV_FIELD_MAP_${envCode}`];
+  if (configuredMapping) {
+    try { fieldMapping = JSON.parse(configuredMapping); } catch {
+      console.error(`Invalid DATA_GOV_FIELD_MAP_${envCode}; source sync is disabled for ${schemeCode}.`);
+    }
+  }
+  return {
+    name: 'Open Government Data Platform India',
+    apiEndpoint: DATA_GOV_RESOURCE_ROOT,
+    resourceId: process.env[`DATA_GOV_RESOURCE_ID_${envCode}`] || null,
+    fieldMapping,
+  };
+};
 
 export const SCHEME_CONFIGS = {
   PMAY: {
+    ...dataGovSource('PMAY'),
     name: 'Pradhan Mantri Awas Yojana',
     code: 'PMAY',
     ministry: 'Ministry of Housing & Urban Affairs',
-    apiKey: process.env.PMAY_API_KEY,
-    apiEndpoint: 'https://pmay-urban.gov.in/api/v1',
-    endpoints: {
-      houses: '/houses/state-wise',
-      sanctioned: '/houses/sanctioned',
-      completed: '/houses/completed',
-      performance: '/performance/state'
-    },
     dataPoints: [
       { id: 'houses_sanctioned', name: 'Houses Sanctioned', unit: 'units', type: 'numeric' },
       { id: 'houses_completed', name: 'Houses Completed', unit: 'units', type: 'numeric' },
@@ -26,15 +41,10 @@ export const SCHEME_CONFIGS = {
   },
 
   MGNREGS: {
+    ...dataGovSource('MGNREGS'),
     name: 'Mahatma Gandhi National Rural Employment Guarantee',
     code: 'MGNREGS',
     ministry: 'Ministry of Rural Development',
-    apiEndpoint: 'https://nrega.nic.in/api/v1',
-    endpoints: {
-      employment: '/employment/state-wise',
-      personDays: '/person-days/state',
-      wages: '/wages/state'
-    },
     dataPoints: [
       { id: 'person_days_created', name: 'Person Days Created', unit: 'days', type: 'numeric' },
       { id: 'person_days_completed', name: 'Person Days Completed', unit: 'days', type: 'numeric' },
@@ -46,15 +56,10 @@ export const SCHEME_CONFIGS = {
   },
 
   PMGSY: {
+    ...dataGovSource('PMGSY'),
     name: 'Pradhan Mantri Gram Sadak Yojana',
     code: 'PMGSY',
     ministry: 'Ministry of Rural Development',
-    apiEndpoint: 'https://pmgsy.dord.gov.in/api/v1',
-    endpoints: {
-      roads: '/roads/state-wise',
-      connectivity: '/connectivity/state',
-      progress: '/progress/state'
-    },
     dataPoints: [
       { id: 'road_length_planned', name: 'Road Length Planned', unit: 'km', type: 'numeric' },
       { id: 'road_length_constructed', name: 'Road Length Constructed', unit: 'km', type: 'numeric' },
@@ -66,15 +71,10 @@ export const SCHEME_CONFIGS = {
   },
 
   NRLM: {
+    ...dataGovSource('NRLM'),
     name: 'National Rural Livelihood Mission',
     code: 'NRLM',
     ministry: 'Ministry of Rural Development',
-    apiEndpoint: 'https://nrlm.gov.in/api/v1',
-    endpoints: {
-      shgs: '/shgs/state-wise',
-      loans: '/loans/state',
-      empowerment: '/empowerment/state'
-    },
     dataPoints: [
       { id: 'shgs_formed', name: 'SHGs Formed', unit: 'groups', type: 'numeric' },
       { id: 'members_registered', name: 'Members Registered', unit: 'people', type: 'numeric' },
@@ -86,15 +86,10 @@ export const SCHEME_CONFIGS = {
   },
 
   'DDU-GKY': {
-    name: 'Deen Dayal Upadhyaya Gram Jyoti Yojana',
+    ...dataGovSource('DDU-GKY'),
+    name: 'Deen Dayal Upadhyaya Grameen Kaushalya Yojana',
     code: 'DDU-GKY',
-    ministry: 'Ministry of Skill Development',
-    apiEndpoint: 'https://ddusky.nic.in/api/v1',
-    endpoints: {
-      training: '/training/state-wise',
-      placements: '/placements/state',
-      performance: '/performance/state'
-    },
+    ministry: 'Ministry of Rural Development',
     dataPoints: [
       { id: 'candidates_trained', name: 'Candidates Trained', unit: 'people', type: 'numeric' },
       { id: 'placement_count', name: 'Placements Done', unit: 'people', type: 'numeric' },
@@ -106,15 +101,10 @@ export const SCHEME_CONFIGS = {
   },
 
   SAGY: {
+    ...dataGovSource('SAGY'),
     name: 'Sansad Adarsh Gram Yojana',
     code: 'SAGY',
     ministry: 'Ministry of Rural Development',
-    apiEndpoint: 'https://sagy.gov.in/api/v1',
-    endpoints: {
-      villages: '/villages/state-wise',
-      development: '/development-index/village',
-      progress: '/progress/village'
-    },
     dataPoints: [
       { id: 'villages_adopted', name: 'Villages Adopted', unit: 'villages', type: 'numeric' },
       { id: 'development_index', name: 'Development Index', unit: 'score', type: 'numeric' },

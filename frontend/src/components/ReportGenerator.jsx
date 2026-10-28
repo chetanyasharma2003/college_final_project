@@ -12,6 +12,7 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
     { id: 'executive', label: 'Executive Summary', icon: '📋', description: 'High-level overview (1-2 pages)' },
     { id: 'detailed', label: 'Detailed Report', icon: '📊', description: 'Complete analysis with recommendations' },
     { id: 'csv', label: 'CSV Export', icon: '📥', description: 'Spreadsheet format for analysis' },
+    { id: 'pdf', label: 'PDF Summary', icon: '📄', description: 'Downloadable executive summary' },
     { id: 'comparison', label: 'Comparison Report', icon: '⚖️', description: 'Compare multiple schemes' },
   ];
 
@@ -26,11 +27,12 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
       let response;
       let filename;
 
-      if (reportType === 'csv') {
-        response = await client.get(`/reports/csv/${schemeId}`, {
+      if (reportType === 'csv' || reportType === 'pdf') {
+        const extension = reportType === 'csv' ? 'csv' : 'pdf';
+        response = await client.get(`/reports/${reportType === 'csv' ? 'csv' : 'pdf'}/${schemeId}`, {
           responseType: 'blob'
         });
-        filename = `${schemeCode}_report_${timestamp}.csv`;
+        filename = `${schemeCode}_report_${timestamp}.${extension}`;
       } else if (reportType === 'executive' || reportType === 'detailed') {
         response = await client.get(`/reports/${reportType === 'executive' ? 'executive-summary' : 'detailed'}/${schemeId}`);
         filename = `${schemeCode}_${reportType}_${timestamp}.json`;
@@ -42,8 +44,8 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
         filename = `scheme_comparison_${timestamp}.json`;
       }
 
-      const blob = reportType === 'csv'
-        ? new Blob([response.data], { type: 'text/csv' })
+      const blob = reportType === 'csv' || reportType === 'pdf'
+        ? new Blob([response.data], { type: reportType === 'csv' ? 'text/csv' : 'application/pdf' })
         : new Blob([JSON.stringify(response.data?.data ?? response.data, null, 2)], { type: 'application/json' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -130,7 +132,7 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
           <div className="flex justify-between">
             <span>Format:</span>
             <span className="text-white font-semibold">
-              {reportType === 'csv' ? 'CSV' : 'JSON'}
+              {reportType === 'csv' ? 'CSV' : reportType === 'pdf' ? 'PDF' : 'JSON'}
             </span>
           </div>
         </div>

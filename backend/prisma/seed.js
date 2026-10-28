@@ -56,7 +56,7 @@ async function main() {
     { code: 'MGNREGS', name: 'Mahatma Gandhi National Rural Employment Guarantee Scheme', ministry: 'Ministry of Rural Development', description: 'Rural employment guarantee scheme' },
     { code: 'PMGSY', name: 'Pradhan Mantri Gram Sadak Yojana', ministry: 'Ministry of Rural Development', description: 'Rural roads development scheme' },
     { code: 'NRLM', name: 'National Rural Livelihood Mission', ministry: 'Ministry of Rural Development', description: 'Rural livelihoods and poverty reduction' },
-    { code: 'DDU-GKY', name: 'Deen Dayal Upadhyaya Gram Jyoti Yojana', ministry: 'Ministry of Skill Development', description: 'Skill development and employment scheme' },
+    { code: 'DDU-GKY', name: 'Deen Dayal Upadhyaya Grameen Kaushalya Yojana', ministry: 'Ministry of Rural Development', description: 'Rural skill development and employment scheme' },
     { code: 'SAGY', name: 'Sansad Adarsh Gram Yojana', ministry: 'Ministry of Rural Development', description: 'Model villages development program' },
   ];
 

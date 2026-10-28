@@ -11,13 +11,13 @@ class ETLService {
    */
   static async fetchFromDataGov(apiKey, resourceId, filters = {}) {
     try {
-      const baseUrl = 'https://api.data.gov.in/resource';
+      if (!apiKey || !resourceId) throw new Error('A data.gov.in API key and resource ID are required');
+      const baseUrl = `https://api.data.gov.in/resource/${encodeURIComponent(resourceId)}`;
       const query = new URLSearchParams({
         'api-key': apiKey,
-        'resource_id': resourceId,
         'format': 'json',
         'limit': 1000,
-        ...filters,
+        ...Object.fromEntries(Object.entries(filters).filter(([key]) => !['api-key', 'format', 'limit', 'resource_id'].includes(key.toLowerCase()))),
       });
 
       const response = await axios.get(`${baseUrl}?${query.toString()}`, {
@@ -26,8 +26,10 @@ class ETLService {
 
       return response.data.records || [];
     } catch (error) {
-      console.error('Data.gov.in fetch error:', error.message);
-      throw new Error(`Failed to fetch from data.gov.in: ${error.message}`);
+      const status = error.response?.status;
+      console.error('Data.gov.in fetch failed', { status: status || 'network_error' });
+      // Axios errors can contain the complete URL, including the API key query value.
+      throw new Error(status ? `Data.gov.in request failed with HTTP ${status}` : 'Data.gov.in request failed due to a network error');
     }
   }
 
@@ -39,19 +41,23 @@ class ETLService {
    * @returns {Promise<array>} Transformed records
    */
   static async transformData(records, schemeCode, mapping) {
-    return records.map((record) => ({
-      scheme_code: schemeCode,
-      state: record[mapping.state] || null,
-      district: record[mapping.district] || null,
-      date: new Date(record[mapping.date] || Date.now()),
-      metrics: mapping.metrics.reduce(
-        (acc, metricMap) => ({
-          ...acc,
-          [metricMap.name]: parseFloat(record[metricMap.field]) || 0,
-        }),
-        {}
-      ),
-    }));
+    return records.map((record) => {
+      const rawDate = record[mapping.date];
+      const date = rawDate ? new Date(rawDate) : null;
+      const metrics = Object.fromEntries(mapping.metrics.flatMap((metricMap) => {
+        const rawValue = record[metricMap.field];
+        if (rawValue == null || rawValue === '') return [];
+        const value = Number(String(rawValue).replace(/,/g, ''));
+        return Number.isFinite(value) ? [[metricMap.name, value]] : [];
+      }));
+      return {
+        scheme_code: schemeCode,
+        state: record[mapping.state] || null,
+        district: mapping.district ? record[mapping.district] || null : null,
+        date: date && !Number.isNaN(date.getTime()) ? date : null,
+        metrics,
+      };
+    });
   }
 
   /**
@@ -75,6 +81,11 @@ class ETLService {
 
     for (const record of transformedData) {
       try {
+        if (!record.date || !Object.keys(record.metrics).length) {
+          failed++;
+          errors.push('Record omitted: no valid source date or numeric metric');
+          continue;
+        }
         const state = await prisma.state.findUnique({
           where: { name: record.state },
         });
@@ -97,10 +108,12 @@ class ETLService {
         // Store generic scheme data
         await prisma.schemeDataGeneric.upsert({
           where: {
-            scheme_id_state_id_district_id_date: {
+            scheme_id_state_id_district_id_block_id_village_id_date: {
               scheme_id: scheme.id,
               state_id: state.id,
               district_id: district?.id || null,
+              block_id: null,
+              village_id: null,
               date: record.date,
             },
           },
@@ -108,6 +121,8 @@ class ETLService {
             scheme_id: scheme.id,
             state_id: state.id,
             district_id: district?.id || null,
+            block_id: null,
+            village_id: null,
             data: record.metrics,
             date: record.date,
           },

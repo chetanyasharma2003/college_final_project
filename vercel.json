@@ -5,7 +5,7 @@
   "framework": "vite",
   "outputDirectory": "frontend/dist",
   "env": {
-    "VITE_API_URL": "https://college-final-project-backend.onrender.com/api/v1"
+    "VITE_API_URL": "https://college-final-project-backend-m86r.onrender.com/api/v1"
   },
   "git": {
     "deploymentEnabled": {

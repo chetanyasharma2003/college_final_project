@@ -1,5 +1,6 @@
 import express from 'express';
 import GeographicService from '../services/geographic.service.js';
+import prisma from '../config/prisma.js';
 
 const router = express.Router();
 
@@ -132,6 +133,90 @@ router.get('/hierarchy', async (req, res) => {
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ status: 'error', message: 'Failed to fetch hierarchy' });
+  }
+});
+
+// KPI heatmap data is grouped by district; coordinates are intentionally not
+// used because the legacy seed data contains non-geographic random coordinates.
+router.get('/performance-heatmap', async (req, res) => {
+  try {
+    const schemeId = Number.parseInt(req.query.schemeId, 10);
+    const stateId = Number.parseInt(req.query.stateId, 10);
+    if (!Number.isInteger(schemeId) || schemeId <= 0 || !Number.isInteger(stateId) || stateId <= 0) {
+      return res.status(400).json({ status: 'error', message: 'Valid schemeId and stateId are required' });
+    }
+
+    const [definitions, rows] = await Promise.all([
+      prisma.kPIDefinition.findMany({
+        where: { scheme_id: schemeId },
+        orderBy: { kpi_name: 'asc' },
+        select: { id: true, kpi_name: true, unit: true },
+      }),
+      prisma.kPIValue.findMany({
+        where: { state_id: stateId, district_id: { not: null }, block_id: null, village_id: null, kpi: { scheme_id: schemeId } },
+        orderBy: { date: 'desc' },
+        take: 10000,
+        include: { district: { select: { id: true, name: true } }, kpi: { select: { id: true, kpi_name: true, target_value: true } } },
+      }),
+    ]);
+
+    const districts = new Map();
+    for (const row of rows) {
+      const item = districts.get(row.district_id) || { district_id: row.district_id, district_name: row.district.name, values: {} };
+      if (!item.values[row.kpi_id]) {
+        item.values[row.kpi_id] = {
+          value: Number(row.value),
+          target: Number(row.target_value),
+          status: row.status,
+          date: row.date,
+        };
+      }
+      districts.set(row.district_id, item);
+    }
+    return res.json({ status: 'success', data: { kpis: definitions, districts: Array.from(districts.values()) } });
+  } catch (error) {
+    console.error('District heatmap query failed:', error.message);
+    return res.status(500).json({ status: 'error', message: 'Unable to load district KPI heatmap' });
+  }
+});
+
+router.get('/location-kpis', async (req, res) => {
+  try {
+    const id = Number.parseInt(req.query.id, 10);
+    const schemeId = Number.parseInt(req.query.schemeId, 10);
+    const level = req.query.level;
+    const locationField = { state: 'state_id', district: 'district_id', block: 'block_id', village: 'village_id' }[level];
+    if (!locationField || !Number.isInteger(id) || id <= 0 || !Number.isInteger(schemeId) || schemeId <= 0) {
+      return res.status(400).json({ status: 'error', message: 'Valid level, id and schemeId are required' });
+    }
+
+    const where = { kpi: { scheme_id: schemeId } };
+    if (level === 'state') Object.assign(where, { state_id: id, district_id: null, block_id: null, village_id: null });
+    if (level === 'district') Object.assign(where, { district_id: id, block_id: null, village_id: null });
+    if (level === 'block') Object.assign(where, { block_id: id, village_id: null });
+    if (level === 'village') where.village_id = id;
+    const rows = await prisma.kPIValue.findMany({
+      where,
+      orderBy: { date: 'desc' },
+      take: 5000,
+      include: { kpi: { select: { id: true, kpi_name: true, unit: true } } },
+    });
+    const latest = new Map();
+    for (const row of rows) {
+      if (!latest.has(row.kpi_id)) latest.set(row.kpi_id, {
+        kpi_id: row.kpi_id,
+        kpi_name: row.kpi.kpi_name,
+        unit: row.kpi.unit,
+        value: Number(row.value),
+        target: Number(row.target_value),
+        status: row.status,
+        date: row.date,
+      });
+    }
+    return res.json({ status: 'success', data: Array.from(latest.values()) });
+  } catch (error) {
+    console.error('Location KPI query failed:', error.message);
+    return res.status(500).json({ status: 'error', message: 'Unable to load location KPIs' });
   }
 });
 

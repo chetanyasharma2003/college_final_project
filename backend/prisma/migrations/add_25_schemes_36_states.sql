@@ -50,7 +50,7 @@ INSERT INTO "Scheme" (name, code, description, ministry, launch_date, budget) VA
 ('Mahatma Gandhi National Rural Employment Guarantee', 'MGNREGS', 'Rural employment guarantee program', 'Ministry of Rural Development', '2006-02-02', 300000000000),
 ('Pradhan Mantri Gram Sadak Yojana', 'PMGSY', 'Rural road connectivity program', 'Ministry of Rural Development & Panchayati Raj', '2000-12-25', 250000000000),
 ('National Rural Livelihood Mission', 'NRLM', 'Rural livelihood and women empowerment', 'Ministry of Rural Development', '2011-06-01', 200000000000),
-('Deen Dayal Upadhyaya Gram Jyoti Yojana', 'DDU-GKY', 'Skill development and youth training', 'Ministry of Skill Development', '2014-07-25', 100000000000),
+('Deen Dayal Upadhyaya Grameen Kaushalya Yojana', 'DDU-GKY', 'Rural skill development and youth training', 'Ministry of Rural Development', '2014-07-25', 100000000000),
 ('Sansad Adarsh Gram Yojana', 'SAGY', 'Model villages development program', 'Ministry of Rural Development', '2014-10-11', 50000000000),
 
 -- New 19 schemes (Agriculture & Food Security - 6)
