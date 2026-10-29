@@ -1,6 +1,10 @@
 import express from 'express';
 import GeographicService from '../services/geographic.service.js';
 import prisma from '../config/prisma.js';
+import { verifyAuth } from '../middleware/auth.middleware.js';
+import { createLocationScope } from '../services/location-scope.js';
+
+const stateIdOfLocation = createLocationScope(prisma);
 
 const router = express.Router();
 
@@ -138,12 +142,15 @@ router.get('/hierarchy', async (req, res) => {
 
 // KPI heatmap data is grouped by district; coordinates are intentionally not
 // used because the legacy seed data contains non-geographic random coordinates.
-router.get('/performance-heatmap', async (req, res) => {
+router.get('/performance-heatmap', verifyAuth, async (req, res) => {
   try {
     const schemeId = Number.parseInt(req.query.schemeId, 10);
     const stateId = Number.parseInt(req.query.stateId, 10);
     if (!Number.isInteger(schemeId) || schemeId <= 0 || !Number.isInteger(stateId) || stateId <= 0) {
       return res.status(400).json({ status: 'error', message: 'Valid schemeId and stateId are required' });
+    }
+    if (req.stateAccess && stateId !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
     }
 
     const [definitions, rows] = await Promise.all([
@@ -180,7 +187,7 @@ router.get('/performance-heatmap', async (req, res) => {
   }
 });
 
-router.get('/location-kpis', async (req, res) => {
+router.get('/location-kpis', verifyAuth, async (req, res) => {
   try {
     const id = Number.parseInt(req.query.id, 10);
     const schemeId = Number.parseInt(req.query.schemeId, 10);
@@ -188,6 +195,9 @@ router.get('/location-kpis', async (req, res) => {
     const locationField = { state: 'state_id', district: 'district_id', block: 'block_id', village: 'village_id' }[level];
     if (!locationField || !Number.isInteger(id) || id <= 0 || !Number.isInteger(schemeId) || schemeId <= 0) {
       return res.status(400).json({ status: 'error', message: 'Valid level, id and schemeId are required' });
+    }
+    if (req.stateAccess && (await stateIdOfLocation(level, id)) !== req.stateAccess) {
+      return res.status(403).json({ status: 'error', message: 'State access denied' });
     }
 
     const where = { kpi: { scheme_id: schemeId } };

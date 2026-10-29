@@ -15,7 +15,7 @@ import Chatbot from '../components/Chatbot';
 import MLInsights from '../components/MLInsights';
 import KPIAlerts from '../components/KPIAlerts';
 import KPIComparison from '../components/KPIComparison';
-import { BarChart3, FileText, TrendingUp } from 'lucide-react';
+import { BarChart3, FileText, TrendingUp, Map as MapIcon } from 'lucide-react';
 import AdminMonitoring from '../components/AdminMonitoring';
 import GeographicExplorer from '../components/GeographicExplorer';
 
@@ -97,6 +97,13 @@ export default function Dashboard() {
               >
                 <BarChart3 size={16} className="sm:w-5 sm:h-5" />
                 <span className="hidden sm:inline">Analytics</span>
+              </Link>
+              <Link
+                to="/heatmap"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 rounded-lg text-white font-semibold transition text-xs sm:text-sm whitespace-nowrap"
+              >
+                <MapIcon size={16} className="sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Heatmap</span>
               </Link>
               <Link
                 to="/features"

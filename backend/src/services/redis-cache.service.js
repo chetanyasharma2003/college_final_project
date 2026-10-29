@@ -2,6 +2,8 @@ import net from 'node:net';
 import tls from 'node:tls';
 
 const redisUrl = process.env.REDIS_URL;
+const BACKOFF_MS = Number(process.env.REDIS_BACKOFF_MS || 30000);
+let downUntil = 0; // after a failure, skip Redis for a while instead of making each request wait
 
 function encodeCommand(parts) {
   return `*${parts.length}\r\n${parts.map((part) => `$${Buffer.byteLength(String(part))}\r\n${part}\r\n`).join('')}`;
@@ -27,6 +29,7 @@ function parseReply(buffer, offset = 0) {
 
 function command(parts) {
   if (!redisUrl) return Promise.reject(new Error('REDIS_URL is not configured'));
+  if (Date.now() < downUntil) return Promise.reject(new Error('Redis temporarily skipped after an earlier failure'));
   const url = new URL(redisUrl);
   const secure = url.protocol === 'rediss:';
   const port = Number(url.port || (secure ? 6380 : 6379));
@@ -40,6 +43,7 @@ function command(parts) {
     const finish = (error, value) => {
       if (settled) return;
       settled = true;
+      downUntil = error ? Date.now() + BACKOFF_MS : 0;
       socket.destroy();
       error ? reject(error) : resolve(value);
     };

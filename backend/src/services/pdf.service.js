@@ -5,9 +5,29 @@ const ascii = (value) => String(value ?? '')
   .replace(/\(/g, '\\(')
   .replace(/\)/g, '\\)');
 
+const MAX_CHARS = 85; // keeps Helvetica 11pt text inside the A4 margins
+
+// Wrap one line at spaces (hard-split very long words) so nothing is cut off at the page edge.
+export function wrapLine(text, width = MAX_CHARS) {
+  const out = [];
+  let rest = String(text ?? '');
+  if (rest.length <= width) return [rest];
+  let indent = '';
+  while (rest.length > width - indent.length) {
+    const room = width - indent.length;
+    let cut = rest.lastIndexOf(' ', room);
+    if (cut <= 0) cut = room;
+    out.push(indent + rest.slice(0, cut).trimEnd());
+    rest = rest.slice(cut).trimStart();
+    indent = '  ';
+  }
+  if (rest) out.push(indent + rest);
+  return out;
+}
+
 export function createTextPDF(lines, { title = 'Government Scheme Report' } = {}) {
   const safeTitle = ascii(title).slice(0, 100);
-  const contentLines = [safeTitle, '', ...lines.map((line) => ascii(line).slice(0, 110))];
+  const contentLines = [safeTitle, '', ...lines.flatMap((line) => wrapLine(String(line ?? '').normalize('NFKD').replace(/[^\x20-\x7E]/g, '?')).map(ascii))];
   const chunks = [];
   for (let index = 0; index < contentLines.length; index += 45) chunks.push(contentLines.slice(index, index + 45));
   if (!chunks.length) chunks.push([safeTitle]);
@@ -44,4 +64,4 @@ export function createTextPDF(lines, { title = 'Government Scheme Report' } = {}
   return Buffer.from(document, 'ascii');
 }
 
-export default { createTextPDF };
+export default { createTextPDF, wrapLine };
