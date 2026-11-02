@@ -91,7 +91,7 @@ curl https://college-final-project-backend-m86r.onrender.com/api/v1/kpis/status/
 
 1. Open frontend: https://frontend-eta-smoky-88.vercel.app
 2. Hard refresh browser: `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
-3. Login: `admin@govschemes.in` / `Admin@12345`
+3. Login: `admin@govschemes.in` / `<provisioned-password>`
 4. Dashboard should now show:
    - ✅ Health Score (50-70%)
    - ✅ 30-Day Trend Graph
@@ -136,8 +136,8 @@ node prisma/seed.js
 When you run the seed script, it creates:
 
 ### Users (2)
-- admin@govschemes.in / Admin@12345
-- analyst@govschemes.in / Admin@12345
+- admin@govschemes.in / <provisioned-password>
+- analyst@govschemes.in / <provisioned-password>
 
 ### Schemes (6)
 1. PMAY - Pradhan Mantri Awas Yojana

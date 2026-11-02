@@ -1,38 +1,23 @@
 import { useEffect, useState } from 'react';
 import client from '../api/client';
 
-export default function TopPerformers() {
+export default function TopPerformers({ schemeCode = 'PMAY' }) {
   const [topPerformers, setTopPerformers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchTopPerformers();
-  }, []);
+  }, [schemeCode]);
 
   const fetchTopPerformers = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Get top KPI values
-      const response = await client.get('/kpis/latest?limit=100');
-      const kpiValues = response.data?.data || [];
-
-      if (kpiValues.length === 0) {
-        throw new Error('No data available');
-      }
-
-      // Sort by value and get top 5
-      const sorted = kpiValues
-        .sort((a, b) => (parseFloat(b.value) || 0) - (parseFloat(a.value) || 0))
-        .slice(0, 5)
-        .map((kv, idx) => ({
-          ...kv,
-          rank: idx + 1
-        }));
-
-      setTopPerformers(sorted);
+      const response = await client.get(`/analytics/state-ranking/${encodeURIComponent(schemeCode)}`);
+      const rankings = Array.isArray(response.data?.data) ? response.data.data : [];
+      setTopPerformers(rankings.slice(0, 5).map((state, index) => ({ ...state, rank: index + 1 })));
     } catch (err) {
       console.error('Error fetching top performers:', err);
       setError('Failed to load top performers');
@@ -57,7 +42,7 @@ export default function TopPerformers() {
 
   return (
     <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
-      <h3 className="text-xl font-bold text-white mb-4">🏆 Top Performing States</h3>
+      <h3 className="text-xl font-bold text-white mb-4">Top States: {schemeCode}</h3>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -76,14 +61,14 @@ export default function TopPerformers() {
                 <span className="text-2xl">{getMedalEmoji(performer.rank)}</span>
                 <div className="flex-1">
                   <p className="text-white font-semibold">{performer.state?.name || 'State'}</p>
-                  <p className="text-gray-400 text-sm">{performer.kpi?.kpi_name || 'KPI'}</p>
+                  <p className="text-gray-400 text-sm">Average KPI progress</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  {formatValue(performer.value || 0)}
+                  {Number(performer.progress || 0).toFixed(1)}%
                 </p>
-                <p className="text-gray-400 text-xs text-green-400">✓ On Track</p>
+                <p className="text-gray-400 text-xs">{performer.status || 'Status unavailable'}</p>
               </div>
             </div>
           ))}

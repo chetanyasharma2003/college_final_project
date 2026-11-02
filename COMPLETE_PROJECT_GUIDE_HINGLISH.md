@@ -650,7 +650,7 @@ STEP 1: USER TYPES CREDENTIALS
 
 ┌──────────────────────────┐
 │ Email: admin@gov.in      │
-│ Password: Admin@12345    │
+│ Password: <provisioned-password>    │
 │ [Login Button]           │
 └──────────────────────────┘
 
@@ -671,7 +671,7 @@ STEP 3: SEND TO BACKEND
 POST /auth/login
 {
   email: "admin@gov.in",
-  password: "Admin@12345"
+  password: "<provisioned-password>"
 }
 
     ↓ (Backend - Express)
@@ -693,10 +693,10 @@ Result:
 
 STEP 5: COMPARE PASSWORDS
 
-bcrypt.compare("Admin@12345", "$2a$10$N9qo8uLO...")
+bcrypt.compare("<provisioned-password>", "$2a$10$N9qo8uLO...")
 
 ```
-Original Password: Admin@12345
+Original Password: <provisioned-password>
 Stored Hash: $2a$10$N9qo8uLO... (one-way encrypted)
 
 How bcrypt compares:
@@ -955,7 +955,7 @@ MINUTE 0.5: LOGIN PAGE SHOWS
 MINUTE 1: USER TYPES CREDENTIALS & CLICKS LOGIN
 
 ├─ Email: admin@gov.in
-├─ Password: Admin@12345
+├─ Password: <provisioned-password>
 └─ [Login clicked]
 
     ↓
@@ -972,7 +972,7 @@ MINUTE 1.2: FRONTEND SENDS TO BACKEND
 POST /auth/login
 {
   email: "admin@gov.in",
-  password: "Admin@12345"
+  password: "<provisioned-password>"
 }
 
     ↓

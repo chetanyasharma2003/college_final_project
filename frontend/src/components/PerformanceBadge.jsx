@@ -1,6 +1,24 @@
 import { CheckCircle, AlertCircle, Clock } from 'lucide-react';
 
 export default function PerformanceBadge({ value = 0, target = 1, status = 'on-track' }) {
+  if (status === 'no_target') {
+    return (
+      <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full border text-xs font-semibold bg-white/5 text-gray-400 border-white/10">
+        <Clock size={14} />
+        <span>Not rated (no target)</span>
+      </div>
+    );
+  }
+
+  if (status === 'no_data' || value === null || value === undefined) {
+    return (
+      <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full border text-xs font-semibold bg-white/5 text-gray-400 border-white/10">
+        <Clock size={14} />
+        <span>No data</span>
+      </div>
+    );
+  }
+
   const safeValue = Number(value) || 0;
   const safeTarget = Number(target) || 1;
   const percentage = safeTarget > 0 ? (safeValue / safeTarget) * 100 : 0;

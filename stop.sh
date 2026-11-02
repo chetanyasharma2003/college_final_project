@@ -2,16 +2,13 @@
 
 echo "🛑 Stopping all services..."
 
-# Kill all node processes
-pkill -9 -f "node" 2>/dev/null || true
-
-# Kill vite
-pkill -9 -f "vite" 2>/dev/null || true
-
-# Clean ports
+# Stop only this application's configured ports.
 echo "Cleaning ports 5001 and 5173..."
-lsof -ti:5001 | xargs kill -9 2>/dev/null || true
-lsof -ti:5173 | xargs kill -9 2>/dev/null || true
+for port in 5001 5173; do
+	for pid in $(lsof -ti:"$port" 2>/dev/null); do
+		kill "$pid" 2>/dev/null || true
+	done
+done
 
 sleep 1
 echo "✓ All services stopped"

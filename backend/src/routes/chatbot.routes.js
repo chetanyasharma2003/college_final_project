@@ -16,7 +16,10 @@ router.post('/query', verifyAuth, async (req, res) => {
       });
     }
 
-    const response = await ChatbotService.processQuery(query);
+    const response = await ChatbotService.processQuery(query, {
+      userId: req.userId,
+      stateAccess: req.stateAccess,
+    });
 
     res.json({
       status: 'success',

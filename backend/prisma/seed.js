@@ -6,15 +6,25 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
+  if (process.env.NODE_ENV === 'production' || process.env.ALLOW_SYNTHETIC_SEED !== 'true') {
+    throw new Error('Synthetic seed data is disabled unless ALLOW_SYNTHETIC_SEED=true in development.');
+  }
+
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+  const analystPassword = process.env.SEED_ANALYST_PASSWORD;
+  if (!adminPassword || !analystPassword) {
+    throw new Error('Set SEED_ADMIN_PASSWORD and SEED_ANALYST_PASSWORD before seeding.');
+  }
+
   // Create admin user
-  const hashedPassword = await bcrypt.hash('Admin@12345', 10);
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
 
   const admin = await prisma.user.upsert({
     where: { email: 'admin@govschemes.in' },
     update: {},
     create: {
       email: 'admin@govschemes.in',
-      password_hash: hashedPassword,
+      password_hash: adminPasswordHash,
       full_name: 'Admin',
       role: 'ADMIN',
       state_access: null,
@@ -24,12 +34,13 @@ async function main() {
 
   console.log('✅ Admin user created:', admin.email);
 
+  const analystPasswordHash = await bcrypt.hash(analystPassword, 10);
   const analyst = await prisma.user.upsert({
     where: { email: 'analyst@govschemes.in' },
     update: {},
     create: {
       email: 'analyst@govschemes.in',
-      password_hash: hashedPassword,
+      password_hash: analystPasswordHash,
       full_name: 'Analyst',
       role: 'ANALYST',
       state_access: null,
@@ -45,7 +56,7 @@ async function main() {
     { code: 'MGNREGS', name: 'Mahatma Gandhi National Rural Employment Guarantee Scheme', ministry: 'Ministry of Rural Development', description: 'Rural employment guarantee scheme' },
     { code: 'PMGSY', name: 'Pradhan Mantri Gram Sadak Yojana', ministry: 'Ministry of Rural Development', description: 'Rural roads development scheme' },
     { code: 'NRLM', name: 'National Rural Livelihood Mission', ministry: 'Ministry of Rural Development', description: 'Rural livelihoods and poverty reduction' },
-    { code: 'DDU-GKY', name: 'Deen Dayal Upadhyaya Gram Jyoti Yojana', ministry: 'Ministry of Skill Development', description: 'Skill development and employment scheme' },
+    { code: 'DDU-GKY', name: 'Deen Dayal Upadhyaya Grameen Kaushalya Yojana', ministry: 'Ministry of Rural Development', description: 'Rural skill development and employment scheme' },
     { code: 'SAGY', name: 'Sansad Adarsh Gram Yojana', ministry: 'Ministry of Rural Development', description: 'Model villages development program' },
   ];
 

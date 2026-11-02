@@ -2,6 +2,7 @@ import express from 'express';
 import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
 import ETLService from '../services/etl.service.js';
 import prisma from '../config/prisma.js';
+import { getDataGovApiKey } from '../config/scheme-integrations.js';
 
 const router = express.Router();
 
@@ -9,32 +10,42 @@ const router = express.Router();
 router.post('/sync/:schemeCode', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
   try {
     const { schemeCode } = req.params;
-    const { resourceId, apiKey, filters, mapping } = req.body;
+    const { resourceId: bodyResourceId, filters, mapping } = req.body;
+    const schemeKey = schemeCode.replace(/[^A-Z0-9]/gi, '_').toUpperCase();
+    const resourceId = bodyResourceId || process.env[`DATA_GOV_RESOURCE_ID_${schemeKey}`];
+    const apiKey = getDataGovApiKey(schemeCode);
 
-    if (!apiKey) {
+    if (!apiKey || !resourceId) {
       return res.status(400).json({
         status: 'error',
-        message: 'API key required. Set DATA_GOV_API_KEY in environment.',
+        message: `Configure DATA_GOV_API_KEY_${schemeKey} and a verified resource ID in the server environment.`,
       });
     }
+    const configuredMappingValue = process.env[`DATA_GOV_FIELD_MAP_${schemeKey}`];
+    let configuredMapping = null;
+    try { configuredMapping = configuredMappingValue ? JSON.parse(configuredMappingValue) : null; } catch {
+      return res.status(500).json({ status: 'error', message: 'Configured field mapping is invalid JSON.' });
+    }
+    if (!mapping && !configuredMapping) {
+      return res.status(400).json({ status: 'error', message: 'A verified source field mapping is required.' });
+    }
+    const requestedMapping = mapping || configuredMapping;
+    const etlMapping = Array.isArray(requestedMapping.metrics)
+      ? requestedMapping
+      : { ...requestedMapping, metrics: Object.entries(requestedMapping.metrics || {}).map(([name, field]) => ({ name, field })) };
 
     const config = {
       apiKey,
-      resourceId: resourceId || schemeCode,
+      resourceId,
       filters: filters || {},
-      mapping:
-        mapping || {
-          state: 'state_name',
-          district: 'district_name',
-          date: 'date',
-          metrics: [],
-        },
+      mapping: etlMapping,
     };
 
     const result = await ETLService.runETLPipeline(schemeCode, config);
 
-    res.json({
-      status: 'success',
+    const statusCode = result.status === 'success' ? 200 : result.status === 'partial' ? 207 : 502;
+    res.status(statusCode).json({
+      status: result.status,
       data: result,
     });
   } catch (error) {
@@ -144,6 +155,7 @@ router.get('/sync-status', verifyAuth, checkRole(['ADMIN']), async (req, res) =>
     const statusSummary = {
       total_imports: recentImports.length,
       successful: recentImports.filter((i) => i.status === 'completed').length,
+      partial: recentImports.filter((i) => i.status === 'partial').length,
       failed: recentImports.filter((i) => i.status === 'failed').length,
       total_records_imported: recentImports.reduce(
         (sum, i) => sum + (i.records_imported || 0),

@@ -104,6 +104,10 @@ export const deduplicateRequests = (req, res, next) => {
     return next();
   }
 
+  if (req.headers.authorization) {
+    return next();
+  }
+
   const key = `${req.method}:${req.path}:${JSON.stringify(req.query)}`;
   const cached = recentRequests.get(key);
 
@@ -137,7 +141,7 @@ export const deduplicateRequests = (req, res, next) => {
 let dbFailureCount = 0;
 let dbCircuitBreakerOpen = false;
 
-export const databaseCircuitBreaker = async (req, res, next) => {
+export const databaseCircuitBreaker = (req, res, next) => {
   if (dbCircuitBreakerOpen) {
     return res.status(503).json({
       status: 'error',
@@ -146,11 +150,7 @@ export const databaseCircuitBreaker = async (req, res, next) => {
     });
   }
 
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    dbFailureCount = 0; // Reset on success
-    next();
-  } catch (err) {
+  if (!res.locals.dbHealthy) {
     dbFailureCount++;
 
     if (dbFailureCount >= 3) {
@@ -162,14 +162,20 @@ export const databaseCircuitBreaker = async (req, res, next) => {
         console.log('✅ Circuit breaker reset - retrying database connection');
       }, 30000);
 
-      return res.status(503).json({
-        status: 'error',
-        message: 'Database circuit breaker opened - too many failures',
-      });
+      if (req.path === '/health' || req.path === '/api/v1/system/status') return next();
+      return res.status(503).json({ status: 'error', message: 'Database circuit breaker opened - too many failures' });
     }
 
-    next();
+    if (req.path === '/health' || req.path === '/api/v1/system/status') return next();
+    return res.status(503).json({
+      status: 'error',
+      message: 'Database service temporarily unavailable',
+      retry_after: '30s',
+    });
   }
+
+  dbFailureCount = 0;
+  next();
 };
 
 export default {

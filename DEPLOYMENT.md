@@ -101,7 +101,7 @@ VITE_API_URL=https://college-final-project-backend.onrender.com/api/v1
    - **Runtime:** Node
    - **Region:** Singapore
    - **Branch:** main
-   - **Build Command:** `cd backend && npm install`
+   - **Build Command:** `cd backend && npm ci && npm run build`
    - **Start Command:** `cd backend && npm start`
 
 #### Step 4: Add Environment Variables
@@ -116,12 +116,9 @@ HOST=0.0.0.0
 # Database (from PostgreSQL)
 DATABASE_URL=postgresql://govschemes:PASSWORD@host:5432/gov_schemes
 
-# Redis (from Redis)
-REDIS_URL=redis://default:PASSWORD@host:port
-
 # JWT Secrets
-JWT_SECRET=MyJWTSecretABC12345
-JWT_REFRESH_SECRET=MyRefreshSecretXYZ789
+JWT_SECRET=<unique random secret>
+JWT_REFRESH_SECRET=<different unique random secret>
 
 # CORS
 CORS_ORIGIN=https://college-final-project.vercel.app,http://localhost:5173
@@ -133,9 +130,7 @@ CORS_ORIGIN=https://college-final-project.vercel.app,http://localhost:5173
 2. Run migrations:
    ```bash
    cd backend
-   npx prisma migrate deploy
-   npx prisma db push
-   node prisma/seed.js
+   npm run migrate
    ```
 
 ### 3. Update Frontend with Backend URL
@@ -150,11 +145,11 @@ After backend is deployed, update frontend:
    ```
 4. Redeploy frontend (Settings > Deployments > Redeploy)
 
-## 📊 Production Credentials
+## Production Access
 
 ### Frontend
 - **URL:** https://college-final-project.vercel.app
-- **Login:** admin@govschemes.in / Admin@12345
+- **Login:** Create or provision an account securely; never use a shared demo password.
 
 ### Backend
 - **URL:** https://college-final-project-backend.onrender.com/api/v1
@@ -165,10 +160,6 @@ After backend is deployed, update frontend:
 - **Host:** provided by Render
 - **Database:** gov_schemes
 - **User:** govschemes
-
-### Cache
-- **Type:** Redis on Render
-- **Host:** provided by Render
 
 ## 🔍 Verification
 
@@ -190,19 +181,19 @@ curl https://college-final-project-backend.onrender.com/health
 # API status
 curl https://college-final-project-backend.onrender.com/api/v1
 
-# Login test
+# Login test (use an account provisioned by your administrator)
 curl -X POST https://college-final-project-backend.onrender.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email":"admin@govschemes.in",
-    "password":"Admin@12345"
+      "email":"<provisioned-email>",
+      "password":"<provisioned-password>"
   }'
 ```
 
 ### Full End-to-End Test
 
 1. Open https://college-final-project.vercel.app
-2. Login with admin@govschemes.in / Admin@12345
+2. Login with an account provisioned by the administrator
 3. Dashboard should load with:
    - Health score 50-55%
    - 30-day trend graph

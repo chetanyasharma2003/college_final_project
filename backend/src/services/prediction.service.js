@@ -182,7 +182,7 @@ class PredictionService {
   /**
    * Get all predictions for a scheme
    */
-  static async getSchemeForecasts(schemeId, months = 3) {
+  static async getSchemeForecasts(schemeId, months = 3, stateId = null) {
     const kpiDefinitions = await prisma.kPIDefinition.findMany({
       where: { scheme_id: schemeId },
     });
@@ -190,7 +190,7 @@ class PredictionService {
     const forecasts = [];
 
     for (const kpi of kpiDefinitions) {
-      const prediction = await this.predictKPI(kpi.id, months);
+      const prediction = await this.predictKPI(kpi.id, months, stateId);
       if (prediction.status === 'success') {
         forecasts.push({
           kpi_name: kpi.kpi_name,

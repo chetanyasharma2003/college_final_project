@@ -6,6 +6,13 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsDir = path.join(__dirname, '../../uploads');
 
+export const escapeCSVField = (value) => {
+  if (value == null) return '""';
+  let text = String(value);
+  if (typeof value === 'string' && /^[\s\u0000-\u001f]*[=+\-@]/.test(text)) text = `'${text}`;
+  return `"${text.replace(/"/g, '""')}"`;
+};
+
 // Ensure uploads directory exists
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
@@ -23,6 +30,12 @@ class ReportService {
       where: { id: schemeId },
       include: { kpi_definitions: true },
     });
+
+    if (!scheme) {
+      const error = new Error('Scheme not found');
+      error.statusCode = 404;
+      throw error;
+    }
 
     const kpiValues = await prisma.kPIValue.findMany({
       where: {
@@ -88,22 +101,26 @@ class ReportService {
       orderBy: { date: 'asc' },
     });
 
-    const csvHeader =
-      'Date,KPI Name,State,Value,Target,Completion %,Status\n';
-    const csvRows = kpiValues
-      .map((kpi) => {
+    const csvHeader = ['Date', 'KPI Name', 'State', 'Value', 'Target', 'Completion %', 'Status']
+      .map(escapeCSVField)
+      .join(',');
+    const csvRows = kpiValues.map((kpi) => {
         const completion = Math.round(
           (Number(kpi.value) / Number(kpi.target_value || 100)) * 100
         );
-        return `${kpi.date.toISOString().split('T')[0]},"${kpi.kpi.kpi_name}","${
-          kpi.state?.name || 'National'
-        }",${Number(kpi.value)},${Number(kpi.target_value)},${completion}%,${
-          kpi.status
-        }`;
+        return [
+          kpi.date.toISOString().split('T')[0],
+          kpi.kpi.kpi_name,
+          kpi.state?.name || 'National',
+          Number(kpi.value),
+          Number(kpi.target_value),
+          `${completion}%`,
+          kpi.status,
+        ].map(escapeCSVField).join(',');
       })
       .join('\n');
 
-    const csv = csvHeader + csvRows;
+    const csv = `${csvHeader}\r\n${csvRows}`;
     const filename = `report_${schemeId}_${Date.now()}.csv`;
     const filepath = path.join(uploadsDir, filename);
 

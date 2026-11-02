@@ -15,6 +15,7 @@ const SCHEME_COLORS = {
 export default function SchemeComparison() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchComparisonData();
@@ -23,77 +24,42 @@ export default function SchemeComparison() {
   const fetchComparisonData = async () => {
     try {
       setLoading(true);
-
       const schemes = ['PMAY', 'MGNREGS', 'PMGSY', 'NRLM', 'DDU-GKY', 'SAGY'];
-      const schemeData = {};
+      const comparisons = await Promise.all(schemes.map(async (scheme) => {
+        const response = await client.get(`/kpis/latest?scheme=${encodeURIComponent(scheme)}&limit=2000`);
+        const values = Array.isArray(response.data?.data) ? response.data.data : [];
+        const latestByLocation = new Map();
 
-      // Fetch data for each scheme
-      for (const scheme of schemes) {
-        try {
-          const valuesRes = await client.get(`/kpis/latest?scheme=${scheme}&limit=500`);
-          const schemeValues = valuesRes.data?.data || [];
+        values.forEach((item) => {
+          const locationKey = `${item.kpi_id}:${item.state_id ?? 'national'}:${item.district_id ?? ''}`;
+          if (!latestByLocation.has(locationKey)) latestByLocation.set(locationKey, item);
+        });
 
-          if (schemeValues.length > 0) {
-            // Calculate performance based on actual vs target
-            let totalPerformance = 0;
-            let countAchieved = 0;
-            const kpiIds = new Set();
+        const observations = Array.from(latestByLocation.values()).map((item) => {
+          const value = Number(item.value);
+          const target = Number(item.target_value);
+          return Number.isFinite(value) && Number.isFinite(target) && target > 0
+            ? Math.min(Math.max((value / target) * 100, 0), 100)
+            : null;
+        }).filter(value => value != null);
 
-            schemeValues.forEach(v => {
-              kpiIds.add(v.kpi_id);
-              const actual = parseFloat(v.value) || 0;
-              const target = parseFloat(v.target_value) || 1;
-              const kpiPerformance = (actual / target) * 100;
-              totalPerformance += Math.min(kpiPerformance, 100);
+        return {
+          name: scheme,
+          performance: observations.length
+            ? Math.round(observations.reduce((sum, value) => sum + value, 0) / observations.length)
+            : null,
+          kpis: new Set(Array.from(latestByLocation.values(), item => item.kpi_id)).size,
+          values: observations.length,
+          color: SCHEME_COLORS[scheme],
+        };
+      }));
 
-              if (kpiPerformance >= 80) {
-                countAchieved++;
-              }
-            });
-
-            const avgPerformance = Math.round(totalPerformance / schemeValues.length);
-
-            schemeData[scheme] = {
-              name: scheme,
-              performance: Math.min(Math.max(avgPerformance, 0), 100),
-              kpis: kpiIds.size,
-              values: schemeValues.length,
-              achieved: countAchieved,
-              color: SCHEME_COLORS[scheme],
-            };
-          }
-        } catch (err) {
-          console.error(`Error fetching ${scheme}:`, err);
-        }
-      }
-
-      // Fill missing schemes with realistic defaults
-      Object.keys(SCHEME_COLORS).forEach(scheme => {
-        if (!schemeData[scheme]) {
-          schemeData[scheme] = {
-            name: scheme,
-            performance: Math.floor(Math.random() * 40) + 40,
-            kpis: 4,
-            values: 5,
-            color: SCHEME_COLORS[scheme],
-          };
-        }
-      });
-
-      const chartData = Object.values(schemeData).sort((a, b) => b.performance - a.performance);
-      setData(chartData);
+      setData(comparisons.sort((first, second) => (second.performance ?? -1) - (first.performance ?? -1)));
+      setError(null);
     } catch (err) {
       console.error('Error fetching comparison:', err);
-      // Fallback data
-      const fallback = [
-        { name: 'MGNREGS', performance: 72, kpis: 4, values: 10, color: SCHEME_COLORS.MGNREGS },
-        { name: 'DDU-GKY', performance: 68, kpis: 3, values: 8, color: SCHEME_COLORS['DDU-GKY'] },
-        { name: 'PMAY', performance: 65, kpis: 4, values: 8, color: SCHEME_COLORS.PMAY },
-        { name: 'PMGSY', performance: 62, kpis: 3, values: 7, color: SCHEME_COLORS.PMGSY },
-        { name: 'NRLM', performance: 55, kpis: 3, values: 5, color: SCHEME_COLORS.NRLM },
-        { name: 'SAGY', performance: 58, kpis: 2, values: 2, color: SCHEME_COLORS.SAGY },
-      ];
-      setData(fallback);
+      setData([]);
+      setError('Unable to load scheme comparisons. Check data availability and try again.');
     } finally {
       setLoading(false);
     }
@@ -121,33 +87,32 @@ export default function SchemeComparison() {
             <div className="flex justify-between items-start mb-3">
               <h4 className="text-lg font-bold text-white">{scheme.name}</h4>
               <span className="text-2xl font-bold" style={{ color: scheme.color }}>
-                {scheme.performance}%
+                  {scheme.performance == null ? 'N/A' : `${scheme.performance}%`}
               </span>
             </div>
             <div className="space-y-2 text-sm text-gray-300">
               <p>KPI Metrics: <span className="text-white font-semibold">{scheme.kpis}</span></p>
               <p>Data Points: <span className="text-white font-semibold">{scheme.values}</span></p>
+              {scheme.performance == null && <p className="text-gray-400">No comparable observations</p>}
             </div>
-            <div className="mt-3 w-full bg-white/10 rounded-full h-2 overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all"
-                style={{
-                  width: `${scheme.performance}%`,
-                  backgroundColor: scheme.color,
-                }}
-              />
-            </div>
+              {scheme.performance != null && (
+                <div className="mt-3 w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                  <div className="h-full rounded-full transition-all" style={{ width: `${scheme.performance}%`, backgroundColor: scheme.color }} />
+                </div>
+              )}
           </div>
         ))}
       </div>
 
       {/* Bar Chart */}
-      {data.length > 0 && (
+      {error && <p role="alert" className="text-center text-red-300">{error}</p>}
+
+      {data.some(scheme => scheme.performance != null) && (
         <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 mt-6">
           <h4 className="text-lg font-bold text-white mb-4">Performance Score by Scheme</h4>
           <div className="w-full h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data}>
+              <BarChart data={data.filter(scheme => scheme.performance != null)}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <XAxis dataKey="name" stroke="rgba(255,255,255,0.7)" />
                 <YAxis stroke="rgba(255,255,255,0.7)" />

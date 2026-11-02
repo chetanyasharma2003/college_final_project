@@ -8,6 +8,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const AdvancedFeatures = lazy(() => import('./pages/AdvancedFeatures'));
+const Heatmap = lazy(() => import('./pages/Heatmap'));
 const NotFound = lazy(() => import('./pages/NotFound').catch(() => ({ default: () => <Navigate to="/dashboard" replace /> })));
 
 // Full-screen spinner shown while a lazy chunk is loading
@@ -40,6 +41,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Analytics />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/heatmap"
+          element={
+            <ProtectedRoute>
+              <Heatmap />
             </ProtectedRoute>
           }
         />

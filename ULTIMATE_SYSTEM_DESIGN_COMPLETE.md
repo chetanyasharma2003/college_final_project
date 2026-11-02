@@ -1870,7 +1870,7 @@ Rate Limited: Yes (20 attempts/15 min)
 REQUEST:
 {
   "email": "admin@gov.in",
-  "password": "Admin@12345"
+  "password": "<provisioned-password>"
 }
 
 Validation:
@@ -2074,7 +2074,7 @@ KEY FEATURES:
 
 STEP 1: User enters credentials in login form
 ├─ Email: admin@gov.in
-├─ Password: Admin@12345
+├─ Password: <provisioned-password>
 └─ Frontend validates (email format, password length)
 
     ↓
@@ -2083,7 +2083,7 @@ STEP 2: Frontend sends to backend
 POST /api/v1/auth/login
 {
   "email": "admin@gov.in",
-  "password": "Admin@12345"
+  "password": "<provisioned-password>"
 }
 
     ↓
@@ -2111,10 +2111,10 @@ Result:
     ↓
 
 STEP 5: Password verification
-bcrypt.compare("Admin@12345", "$2a$10$N9qo8uLO...")
+bcrypt.compare("<provisioned-password>", "$2a$10$N9qo8uLO...")
 
 Process:
-├─ Take input: "Admin@12345"
+├─ Take input: "<provisioned-password>"
 ├─ Apply bcrypt algorithm with stored salt
 ├─ Generate hash: "$2a$10$..."
 ├─ Compare with stored hash
@@ -2447,13 +2447,13 @@ DEFENSE LAYER 5: Password Security
 Database NEVER stores plain passwords:
 
 ❌ WRONG:
-password: "Admin@12345"  ← Never do this!
+password: "<provisioned-password>"  ← Never do this!
 
 ✅ RIGHT:
 password_hash: "$2a$10$N9qo8uLO..."  ← Bcrypt hash
 
 How bcrypt works:
-├─ Hash input: Admin@12345
+├─ Hash input: <provisioned-password>
 ├─ Add salt: Random value
 ├─ Apply 10 rounds: Make it slow
 ├─ Result: One-way encryption

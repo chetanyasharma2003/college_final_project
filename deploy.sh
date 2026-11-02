@@ -1,19 +1,16 @@
 #!/bin/bash
 
 # Government Schemes Analytics - Production Deployment Script
-# Usage: ./deploy.sh <VERCEL_TOKEN> <RENDER_API_KEY>
+# Usage: ./deploy.sh <VERCEL_TOKEN>
 
 set -e
 
 VERCEL_TOKEN="${1:-}"
-RENDER_API_KEY="${2:-}"
-
-if [ -z "$VERCEL_TOKEN" ] || [ -z "$RENDER_API_KEY" ]; then
-  echo "❌ Usage: ./deploy.sh <VERCEL_TOKEN> <RENDER_API_KEY>"
+if [ -z "$VERCEL_TOKEN" ]; then
+  echo "❌ Usage: ./deploy.sh <VERCEL_TOKEN>"
   echo ""
   echo "Get tokens from:"
   echo "  Vercel: https://vercel.com/account/tokens"
-  echo "  Render: https://dashboard.render.com/account/api-keys"
   exit 1
 fi
 
@@ -21,27 +18,15 @@ echo "🚀 Starting deployment process..."
 echo ""
 
 # ============================================
-# Step 1: Deploy Backend to Render
+# Step 1: Validate Backend Build
 # ============================================
-echo "📦 Step 1: Preparing Backend Deployment"
+echo "📦 Step 1: Validating Backend Build"
 echo "======================================"
 
 cd backend
-
-# Install dependencies
 echo "📥 Installing backend dependencies..."
-npm install --production
-
-# Create .env for Render
-echo "Creating .env for Render production..."
-cat > .env.render << 'ENVFILE'
-NODE_ENV=production
-PORT=5001
-HOST=0.0.0.0
-JWT_SECRET=MyJWTSecretABC12345
-JWT_REFRESH_SECRET=MyRefreshSecretXYZ789
-CORS_ORIGIN=https://college-final-project.vercel.app,http://localhost:5173
-ENVFILE
+npm ci
+npm run build
 
 cd ..
 
@@ -58,6 +43,7 @@ cd frontend
 
 # Build frontend
 echo "🔨 Building frontend..."
+npm ci
 npm run build
 
 # Deploy to Vercel
@@ -77,7 +63,7 @@ echo ""
 cd ..
 
 # ============================================
-# Step 3: Create Render Service (Manual via API)
+# Step 3: Configure Render Backend (manual)
 # ============================================
 echo "⚙️  Step 3: Backend Deployment Instructions"
 echo "========================================="
@@ -88,14 +74,13 @@ echo "2. Click 'Create New' > 'Web Service'"
 echo "3. Connect GitHub: chetanyasharma2003/college_final_project"
 echo "4. Service name: college-final-project-backend"
 echo "5. Runtime: Node"
-echo "6. Build command: cd backend && npm install"
+echo "6. Build command: cd backend && npm ci && npm run build"
 echo "7. Start command: cd backend && npm start"
 echo "8. Add environment variables:"
 echo "   - NODE_ENV=production"
 echo "   - DATABASE_URL=<postgres-connection-string>"
-echo "   - REDIS_URL=<redis-connection-string>"
-echo "   - JWT_SECRET=MyJWTSecretABC12345"
-echo "   - JWT_REFRESH_SECRET=MyRefreshSecretXYZ789"
+echo "   - JWT_SECRET=<generate a unique random secret>"
+echo "   - JWT_REFRESH_SECRET=<generate a different random secret>"
 echo "   - CORS_ORIGIN=https://college-final-project.vercel.app"
 echo ""
 

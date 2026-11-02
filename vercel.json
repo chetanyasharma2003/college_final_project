@@ -1,24 +1,16 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run frontend:build",
   "devCommand": "npm run dev",
-  "installCommand": "npm install",
+  "installCommand": "npm ci --prefix frontend",
   "framework": "vite",
-  "outputDirectory": "dist",
+  "outputDirectory": "frontend/dist",
   "env": {
-    "VITE_API_URL": {
-      "description": "Backend API URL",
-      "example": "https://college-final-project-backend.onrender.com/api/v1"
-    }
+    "VITE_API_URL": "https://college-final-project-backend-m86r.onrender.com/api/v1"
   },
   "git": {
     "deploymentEnabled": {
       "main": true
     }
   },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "${VITE_API_URL}/$1"
-    }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

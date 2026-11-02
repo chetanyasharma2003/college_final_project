@@ -113,9 +113,9 @@ The application comes with pre-seeded data:
 Key variables configured in docker-compose.yml:
 ```
 NODE_ENV: development
-JWT_SECRET: MyJWTSecretABC12345
-JWT_REFRESH_SECRET: MyRefreshSecretXYZ789
-DATABASE_URL: postgresql://govschemes:devpassword@postgres:5432/gov_schemes
+JWT_SECRET: <generate-unique-jwt-secret>
+JWT_REFRESH_SECRET: <generate-unique-refresh-secret>
+DATABASE_URL: postgresql://govschemes:<set-strong-db-password>@postgres:5432/gov_schemes
 REDIS_URL: redis://redis:6379
 ```
 

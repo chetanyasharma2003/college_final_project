@@ -1,6 +1,10 @@
 import prisma from '../config/prisma.js';
 
 async function addMissingKPIs() {
+  if (process.env.NODE_ENV === 'production' || process.env.ALLOW_SYNTHETIC_SEED !== 'true') {
+    throw new Error('Synthetic KPI generation is disabled unless ALLOW_SYNTHETIC_SEED=true in development.');
+  }
+
   console.log('Adding missing KPI definitions...\n');
 
   try {

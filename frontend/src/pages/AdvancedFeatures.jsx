@@ -3,18 +3,26 @@ import { useSelector } from 'react-redux';
 import ReportGenerator from '../components/ReportGenerator';
 import Forecasting from '../components/Forecasting';
 import Chatbot from '../components/Chatbot';
+import KPIAlerts from '../components/KPIAlerts';
+import { useKPIs } from '../api/hooks';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { FileText, TrendingUp, Zap, MessageSquare } from 'lucide-react';
 
 export default function AdvancedFeatures() {
-  const { user } = useSelector(state => state.auth);
+  const { schemes, selectedScheme } = useSelector(state => state.data);
   const [activeTab, setActiveTab] = useState('reports');
+  const activeScheme = schemes.find(scheme => scheme.id === selectedScheme)
+    || schemes.find(scheme => scheme.code === 'PMAY');
+  const schemeCode = activeScheme?.code || 'PMAY';
+  const schemeName = activeScheme?.name || 'PMAY';
+  const schemeIds = schemes.map(scheme => scheme.id);
+  const { kpiValues } = useKPIs(schemeCode, activeScheme ? null : undefined);
 
   const tabs = [
     { id: 'reports', label: 'Report Generation', icon: FileText },
     { id: 'forecasts', label: 'Predictive Forecasting', icon: TrendingUp },
-    { id: 'alerts', label: 'Real-time Alerts', icon: Zap },
-    { id: 'chatbot', label: 'AI Assistant', icon: MessageSquare },
+    { id: 'alerts', label: 'Dashboard Alerts', icon: Zap },
+    { id: 'chatbot', label: 'Performance Assistant', icon: MessageSquare },
   ];
 
   return (
@@ -56,14 +64,14 @@ export default function AdvancedFeatures() {
           {/* Reports Tab */}
           {activeTab === 'reports' && (
             <ErrorBoundary>
-              <ReportGenerator schemeCode="PMAY" schemeName="PMAY - Pradhan Mantri Awas Yojana" />
+              <ReportGenerator schemeId={activeScheme?.id} schemeIds={schemeIds} schemeCode={schemeCode} schemeName={schemeName} />
             </ErrorBoundary>
           )}
 
           {/* Forecasting Tab */}
           {activeTab === 'forecasts' && (
             <ErrorBoundary>
-              <Forecasting schemeCode="PMAY" schemeName="PMAY" />
+              <Forecasting schemeCode={schemeCode} schemeName={schemeName} />
             </ErrorBoundary>
           )}
 
@@ -71,88 +79,11 @@ export default function AdvancedFeatures() {
           {activeTab === 'alerts' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-2xl font-bold text-white mb-4">Real-time Alerts Configuration</h3>
-                <p className="text-gray-400 mb-6">Set up notifications for KPI milestones and anomalies</p>
+                <h3 className="text-2xl font-bold text-white mb-4">KPI Alerts</h3>
+                <p className="text-gray-400 mb-6">Alerts are generated from the latest available KPI values for {schemeName}.</p>
               </div>
-
-              {/* Alert Types */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-                  <h4 className="text-lg font-semibold text-white mb-4">🎯 Target Achievement Alerts</h4>
-                  <div className="space-y-3">
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      <span className="text-gray-300">When KPI reaches 50% of target</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      <span className="text-gray-300">When KPI reaches 80% of target</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      <span className="text-gray-300">When KPI reaches 100% of target</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-                  <h4 className="text-lg font-semibold text-white mb-4">⚠️ Risk Threshold Alerts</h4>
-                  <div className="space-y-3">
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      <span className="text-gray-300">Below 60% of target</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      <span className="text-gray-300">Sudden drop in value (&gt;10%)</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      <span className="text-gray-300">Anomaly detected by AI</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-                  <h4 className="text-lg font-semibold text-white mb-4">📧 Notification Channels</h4>
-                  <div className="space-y-3">
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      <span className="text-gray-300">Email notifications</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      <span className="text-gray-300">Dashboard alerts</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input type="checkbox" className="w-4 h-4" />
-                      <span className="text-gray-300">SMS notifications (optional)</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-                  <h4 className="text-lg font-semibold text-white mb-4">🔔 Alert Frequency</h4>
-                  <div className="space-y-3">
-                    <label className="flex items-center gap-3">
-                      <input type="radio" name="frequency" defaultChecked className="w-4 h-4" />
-                      <span className="text-gray-300">Immediate</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input type="radio" name="frequency" className="w-4 h-4" />
-                      <span className="text-gray-300">Daily digest</span>
-                    </label>
-                    <label className="flex items-center gap-3">
-                      <input type="radio" name="frequency" className="w-4 h-4" />
-                      <span className="text-gray-300">Weekly summary</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <button className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 rounded-lg text-white font-semibold transition">
-                Save Alert Configuration
-              </button>
+              <KPIAlerts kpiValues={kpiValues} />
+              <p className="text-sm text-gray-400">Email and SMS delivery are not configured.</p>
             </div>
           )}
 
@@ -161,7 +92,7 @@ export default function AdvancedFeatures() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-2xl font-bold text-white mb-4">AI Assistant Guide</h3>
-                <p className="text-gray-400 mb-6">Ask the chatbot (bottom right) anything about scheme performance</p>
+                <p className="text-gray-400 mb-6">Ask questions about stored scheme performance data</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -209,12 +140,9 @@ export default function AdvancedFeatures() {
               <div className="bg-white/5 border border-white/10 rounded-lg p-6">
                 <h4 className="text-lg font-semibold text-white mb-4">🤖 AI Assistant Capabilities</h4>
                 <ul className="space-y-2 text-gray-300">
-                  <li>✓ Natural language understanding - Ask questions in plain English</li>
-                  <li>✓ Real-time data access - Gets latest KPI values and trends</li>
-                  <li>✓ Contextual responses - Understands scheme/state context</li>
-                  <li>✓ Predictive insights - Forecasts and trend analysis</li>
-                  <li>✓ Comparative analysis - Ranks and compares schemes</li>
-                  <li>✓ Recommendations - Provides actionable suggestions</li>
+                  <li>✓ Rule-based matching for common performance questions</li>
+                  <li>✓ Reads stored scheme and KPI records</li>
+                  <li>✓ Supports basic scheme comparisons and state rankings</li>
                 </ul>
               </div>
             </div>
@@ -226,25 +154,25 @@ export default function AdvancedFeatures() {
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 text-center">
             <FileText size={32} className="mx-auto mb-2 text-blue-400" />
             <h4 className="text-lg font-semibold text-white mb-1">Reports</h4>
-            <p className="text-sm text-blue-200">PDF/CSV export</p>
+            <p className="text-sm text-blue-200">JSON/CSV export</p>
           </div>
 
           <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-6 text-center">
             <TrendingUp size={32} className="mx-auto mb-2 text-green-400" />
             <h4 className="text-lg font-semibold text-white mb-1">Forecasting</h4>
-            <p className="text-sm text-green-200">30-90 day predictions</p>
+            <p className="text-sm text-green-200">Historical-data forecasts</p>
           </div>
 
           <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-6 text-center">
             <Zap size={32} className="mx-auto mb-2 text-amber-400" />
             <h4 className="text-lg font-semibold text-white mb-1">Alerts</h4>
-            <p className="text-sm text-amber-200">Real-time notifications</p>
+            <p className="text-sm text-amber-200">In-dashboard threshold alerts</p>
           </div>
 
           <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-6 text-center">
             <MessageSquare size={32} className="mx-auto mb-2 text-purple-400" />
             <h4 className="text-lg font-semibold text-white mb-1">Chatbot</h4>
-            <p className="text-sm text-purple-200">AI-powered Q&A</p>
+            <p className="text-sm text-purple-200">Rule-based data Q&amp;A</p>
           </div>
         </div>
 

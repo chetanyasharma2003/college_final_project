@@ -70,7 +70,7 @@ model District {
   name          String
   state_id      Int
   population    Int?
-  area_km2      Decimal         @db.Decimal(10, 2)
+  area_km2      Decimal?        @db.Decimal(10, 2)
   created_at    DateTime        @default(now())
 
   // Relations
@@ -100,6 +100,7 @@ model Block {
   district      District        @relation(fields: [district_id], references: [id], onDelete: Cascade)
   villages      Village[]
   kpi_values    KPIValue[]
+  generic_data  SchemeDataGeneric[] @relation("GenericSchemeBlock")
 
   @@unique([district_id, name])
   @@index([district_id])
@@ -117,6 +118,7 @@ model Village {
   // Relations
   block         Block           @relation(fields: [block_id], references: [id], onDelete: Cascade)
   kpi_values    KPIValue[]
+  generic_data  SchemeDataGeneric[] @relation("GenericSchemeVillage")
   sagy_data     SAGYData[]
 
   @@unique([block_id, name])
@@ -432,6 +434,8 @@ model SchemeDataGeneric {
   scheme_id               Int
   state_id                Int?
   district_id             Int?
+  block_id                Int?
+  village_id              Int?
   data                    Json            // Flexible JSONB storage for any metrics
   date                    DateTime
   created_at              DateTime        @default(now())
@@ -441,11 +445,15 @@ model SchemeDataGeneric {
   scheme                  Scheme          @relation(fields: [scheme_id], references: [id], onDelete: Cascade)
   state                   State?          @relation("GenericSchemeState", fields: [state_id], references: [id], onDelete: SetNull)
   district                District?       @relation("GenericSchemeDistrict", fields: [district_id], references: [id], onDelete: SetNull)
+  block                   Block?          @relation("GenericSchemeBlock", fields: [block_id], references: [id], onDelete: SetNull)
+  village                 Village?        @relation("GenericSchemeVillage", fields: [village_id], references: [id], onDelete: SetNull)
 
-  @@unique([scheme_id, state_id, district_id, date])
+  @@unique([scheme_id, state_id, district_id, block_id, village_id, date])
   @@index([scheme_id, date])
   @@index([state_id, date])
   @@index([district_id, date])
+  @@index([block_id, date])
+  @@index([village_id, date])
 }
 
 // ============= DATA SOURCE TRACKING =============

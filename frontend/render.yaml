@@ -2,8 +2,11 @@ services:
   - type: static
     name: frontend
     rootDir: frontend
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://college-final-project-backend-m86r.onrender.com/api/v1
     routes:
       - path: /*
         file: dist/index.html

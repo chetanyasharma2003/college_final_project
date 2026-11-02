@@ -1,3 +1,23 @@
+export const serializeCSV = (data) => {
+  if (!Array.isArray(data) || data.length === 0) return '';
+  const headers = Object.keys(data[0] || {});
+  if (headers.length === 0) return '';
+
+  const escapeField = (value) => {
+    if (value == null) return '""';
+    let text = String(value);
+    if (typeof value === 'string' && /^[\s\u0000-\u001f]*[=+\-@]/.test(text)) {
+      text = `'${text}`;
+    }
+    return `"${text.replace(/"/g, '""')}"`;
+  };
+
+  return [
+    headers.map(escapeField).join(','),
+    ...data.map(row => headers.map(header => escapeField(row[header])).join(',')),
+  ].join('\r\n');
+};
+
 export const exportToCSV = (data, filename = 'export.csv') => {
   if (!data || data.length === 0) {
     alert('No data to export');
@@ -5,24 +25,11 @@ export const exportToCSV = (data, filename = 'export.csv') => {
   }
 
   try {
-    const headers = Object.keys(data[0] || {});
-    if (headers.length === 0) {
+    const csvContent = serializeCSV(data);
+    if (!csvContent) {
       alert('No data to export');
       return;
     }
-
-    const csvContent = [
-      headers.join(','),
-      ...data.map(row =>
-        headers.map(header => {
-          const value = row[header];
-          if (typeof value === 'string' && value.includes(',')) {
-            return `"${value}"`;
-          }
-          return value || '';
-        }).join(',')
-      )
-    ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -35,6 +42,7 @@ export const exportToCSV = (data, filename = 'export.csv') => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   } catch (err) {
     alert('Error exporting data: ' + err.message);
   }

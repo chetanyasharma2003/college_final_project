@@ -6,6 +6,9 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import 'express-async-errors';
 import dotenv from 'dotenv';
+import { redisResponseCache } from './middleware/redis-cache.middleware.js';
+import redisCache from './services/redis-cache.service.js';
+import { startDataSyncScheduler } from './services/sync-scheduler.service.js';
 import {
   healthCheck,
   requestTimeout,
@@ -76,6 +79,7 @@ app.use(requestTimeout);
 app.use(healthCheck);
 app.use(validateResponse);
 app.use(deduplicateRequests);
+app.use(redisResponseCache);
 app.use(databaseCircuitBreaker);
 
 // General API rate limiting (relaxed for development)
@@ -106,8 +110,9 @@ app.use('/api/v1/auth/register', authLimiter);
 
 // Comprehensive health check
 app.get('/health', (req, res) => {
-  res.json({
-    status: res.locals.dbHealthy ? 'ok' : 'degraded',
+  const healthy = Boolean(res.locals.dbHealthy);
+  res.status(healthy ? 200 : 503).json({
+    status: healthy ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     database: res.locals.dbHealthy ? 'connected' : 'disconnected',
@@ -120,13 +125,16 @@ app.get('/health', (req, res) => {
 });
 
 // System status endpoint for monitoring
-app.get('/api/v1/system/status', (req, res) => {
+app.get('/api/v1/system/status', async (req, res) => {
+  const healthy = Boolean(res.locals.dbHealthy);
+  let cache = 'not_configured';
+  try { cache = await redisCache.ping(); } catch { cache = 'unavailable'; }
   res.json({
-    status: 'healthy',
+    status: healthy ? 'healthy' : 'degraded',
     services: {
-      database: res.locals.dbHealthy ? 'online' : 'offline',
+      database: healthy ? 'online' : 'offline',
       api: 'online',
-      cache: 'online',
+      cache: cache === 'PONG' ? 'online' : cache,
     },
     timestamp: new Date().toISOString(),
     uptime: Math.floor(process.uptime()),
@@ -164,6 +172,7 @@ import mlAnalyticsRoutes from './routes/ml-analytics.routes.js';
 import syncRoutes from './routes/sync.routes.js';
 import dataSyncRoutes from './routes/data-sync.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import drilldownRoutes from './routes/drilldown.routes.js';
 
 // Route mounting
 app.use('/api/v1/auth', authRoutes);
@@ -171,6 +180,7 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/schemes', schemesRoutes);
 app.use('/api/v1/kpis', kpisRoutes);
 app.use('/api/v1/geo', geoRoutes);
+app.use('/api/v1/drilldown', drilldownRoutes);
 app.use('/api/v1/analytics', analyticsRoutes);
 app.use('/api/v1/ml-analytics', mlAnalyticsRoutes);
 app.use('/api/v1/reports', reportsRoutes);
@@ -245,6 +255,7 @@ app.use((err, req, res, next) => {
 // ============= SERVER STARTUP =============
 
 const server = http.createServer(app);
+const stopDataSyncScheduler = startDataSyncScheduler();
 
 // Production-grade connection management (Cineworld pattern)
 // Keep connections alive between requests instead of re-handshaking each time
@@ -290,6 +301,7 @@ server.listen({ port: PORT, host: HOST, exclusive: false, backlog: 511 }, () => 
 // Graceful shutdown handler
 const gracefulShutdown = () => {
   console.log('\nShutting down gracefully...');
+  stopDataSyncScheduler();
   server.close(() => {
     console.log('Server closed');
     process.exit(0);

@@ -44,10 +44,10 @@ const SCHEMES = [
     budget: 200000000000,
   },
   {
-    name: 'DDU-GKY - Deen Dayal Upadhyaya Scheme',
+    name: 'DDU-GKY - Deen Dayal Upadhyaya Grameen Kaushalya Yojana',
     code: 'DDU-GKY',
     description: 'Skill development and youth training',
-    ministry: 'Ministry of Skill Development',
+    ministry: 'Ministry of Rural Development',
     budget: 100000000000,
   },
   {
@@ -63,12 +63,21 @@ async function seed() {
   console.log('🌱 Starting database seeding...\n');
 
   try {
+    if (process.env.NODE_ENV === 'production' || process.env.ALLOW_SYNTHETIC_SEED !== 'true') {
+      throw new Error('Synthetic seed data is disabled unless ALLOW_SYNTHETIC_SEED=true in development.');
+    }
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+    const analystPassword = process.env.SEED_ANALYST_PASSWORD;
+    if (!adminPassword || !analystPassword) {
+      throw new Error('Set SEED_ADMIN_PASSWORD and SEED_ANALYST_PASSWORD before seeding.');
+    }
+
     // 1. Create Users
     console.log('Creating users...');
     const adminUser = await prisma.user.create({
       data: {
         email: 'admin@govschemes.in',
-        password_hash: await bcrypt.hash('Admin@12345', 10),
+        password_hash: await bcrypt.hash(adminPassword, 10),
         full_name: 'Admin User',
         role: 'ADMIN',
         is_active: true,
@@ -78,7 +87,7 @@ async function seed() {
     const analystUser = await prisma.user.create({
       data: {
         email: 'analyst@govschemes.in',
-        password_hash: await bcrypt.hash('Analyst@12345', 10),
+        password_hash: await bcrypt.hash(analystPassword, 10),
         full_name: 'Data Analyst',
         role: 'ANALYST',
         is_active: true,
@@ -490,9 +499,6 @@ async function seed() {
     console.log(`   - KPI Definitions: ${kpiDefinitions.length}`);
     console.log(`   - Users: 2\n`);
 
-    console.log('🔐 Test Credentials:');
-    console.log('   Admin: admin@govschemes.in / Admin@12345');
-    console.log('   Analyst: analyst@govschemes.in / Analyst@12345\n');
   } catch (error) {
     console.error('❌ Seeding failed:', error);
     throw error;

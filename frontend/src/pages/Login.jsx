@@ -35,7 +35,7 @@ export default function Login() {
           <h1 className="text-4xl font-bold text-white mb-2">
             Gov Schemes Analytics
           </h1>
-          <p className="text-blue-200">Real-time Government Performance Tracking</p>
+          <p className="text-blue-200">Government scheme performance analytics</p>
         </div>
 
         {/* Form Card */}
@@ -87,20 +87,6 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Demo Credentials */}
-          <div className="mt-6 pt-6 border-t border-white/10">
-            <p className="text-sm text-gray-400 mb-3">Test Credentials:</p>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-blue-300">Admin:</span>
-                <span className="text-gray-300">admin@govschemes.in / Admin@12345</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-blue-300">Analyst:</span>
-                <span className="text-gray-300">analyst@govschemes.in / Analyst@12345</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}

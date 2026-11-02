@@ -1148,7 +1148,7 @@ Content-Type: application/json
 
 {
   "email": "admin@gov.in",
-  "password": "Admin@12345"
+  "password": "<provisioned-password>"
 }
 
 VALIDATION:
@@ -1461,7 +1461,7 @@ Content-Type: application/json
 
 {
   "email": "admin@gov.in",
-  "password": "Admin@12345"
+  "password": "<provisioned-password>"
 }
 
               ↓
@@ -1477,7 +1477,7 @@ STEP 4: BACKEND VALIDATION
 
 STEP 5: PASSWORD VERIFICATION
 ├─ Retrieve stored hash: $2a$10$N9qo8uLO...
-├─ Input password: Admin@12345
+├─ Input password: <provisioned-password>
 ├─ bcrypt.compare(input, hash):
 │  ├─ Apply same bcrypt algorithm
 │  ├─ Hash input password

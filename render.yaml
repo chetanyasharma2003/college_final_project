@@ -3,7 +3,7 @@ services:
     name: college-final-project-backend
     env: node
     plan: starter
-    buildCommand: "cd backend && npm install && npm run build"
+    buildCommand: "cd backend && npm ci && npm run build"
     startCommand: "cd backend && npm start"
     autoDeploy: true
 
@@ -16,17 +16,10 @@ services:
       - key: HOST
         value: 0.0.0.0
 
-      # Database (will be set in Render dashboard)
+      # Database: external Neon Postgres. Set the pooled URL manually in the
+      # Render dashboard (Environment). Never commit it here.
       - key: DATABASE_URL
-        fromDatabase:
-          name: college-final-project-db
-          property: connectionString
-
-      # Redis (will be set in Render dashboard)
-      - key: REDIS_URL
-        fromDatabase:
-          name: college-final-project-redis
-          property: connectionString
+        sync: false
 
       # JWT Secrets
       - key: JWT_SECRET
@@ -40,18 +33,7 @@ services:
 
     # Health check
     healthCheckPath: /health
-    preDeployCommand: "cd backend && npx prisma migrate deploy"
+    preDeployCommand: "cd backend && npm run migrate"
 
     # Region
-    region: singapore
-
-databases:
-  - name: college-final-project-db
-    provider: postgresql
-    plan: starter
-    version: 16
-
-  - name: college-final-project-redis
-    provider: redis
-    plan: starter
     region: singapore

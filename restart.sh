@@ -2,10 +2,12 @@
 
 echo "♻️ Restarting all services..."
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Call stop script
-/Users/chetanya/Documents/college_final_project/stop.sh
+"$SCRIPT_DIR/stop.sh"
 
 sleep 2
 
 # Call start script
-/Users/chetanya/Documents/college_final_project/start.sh
+"$SCRIPT_DIR/start.sh"

@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useDispatch } from 'react-redux';
+import { logout as clearAuth, setToken, setUser as setReduxUser } from '../store/authSlice';
 import client from './client';
 
 // Auth Hooks
 export const useAuth = () => {
+  const dispatch = useDispatch();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const refreshTimerRef = useRef(null);
@@ -18,48 +21,55 @@ export const useAuth = () => {
     const validateToken = async () => {
       try {
         const response = await client.get('/auth/me');
-        setUser(response.data.data);
+        const authenticatedUser = response.data.data;
+        setUser(authenticatedUser);
+        dispatch(setReduxUser(authenticatedUser));
       } catch (error) {
         // Token invalid - clear everything
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
         setUser(null);
+        dispatch(clearAuth());
       } finally {
         setLoading(false);
       }
     };
 
     validateToken();
-  }, []);
+  }, [dispatch]);
 
   // Auto-refresh access token every 13 minutes (before 15min expiry)
   useEffect(() => {
     if (!user) return;
 
-    const refreshToken = async () => {
+    const refreshSession = async () => {
       try {
-        const response = await client.post('/auth/refresh');
+        const refreshToken = localStorage.getItem('refreshToken');
+        const response = await client.post('/auth/refresh-token', { refreshToken });
         if (response.data?.data?.accessToken) {
           localStorage.setItem('accessToken', response.data.data.accessToken);
+          dispatch(setToken(response.data.data.accessToken));
         }
       } catch (error) {
-        logoutUser();
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setUser(null);
+        dispatch(clearAuth());
       }
     };
 
-    refreshTimerRef.current = setInterval(refreshToken, 13 * 60 * 1000);
+    refreshTimerRef.current = setInterval(refreshSession, 13 * 60 * 1000);
     return () => clearInterval(refreshTimerRef.current);
-  }, [!!user]);
+  }, [user, dispatch]);
 
   // Listen for forced logout triggered when refresh also fails
   useEffect(() => {
     const handler = () => {
       clearInterval(refreshTimerRef.current);
       setUser(null);
+      dispatch(clearAuth());
     };
     window.addEventListener('auth:logout', handler);
     return () => window.removeEventListener('auth:logout', handler);
-  }, []);
+  }, [dispatch]);
 
   const login = useCallback(async (email, password) => {
     try {
@@ -68,11 +78,13 @@ export const useAuth = () => {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       setUser(user);
+      dispatch(setReduxUser(user));
+      dispatch(setToken(accessToken));
       return { success: true, user };
     } catch (error) {
       return { success: false, error: error.response?.data?.message || 'Login failed' };
     }
-  }, []);
+  }, [dispatch]);
 
   const register = useCallback(async (email, password, fullName) => {
     try {
@@ -81,18 +93,21 @@ export const useAuth = () => {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       setUser(user);
+      dispatch(setReduxUser(user));
+      dispatch(setToken(accessToken));
       return { success: true, user };
     } catch (error) {
       return { success: false, error: error.response?.data?.message || 'Registration failed' };
     }
-  }, []);
+  }, [dispatch]);
 
   const logoutUser = useCallback(() => {
     clearInterval(refreshTimerRef.current);
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     setUser(null);
-  }, []);
+    dispatch(clearAuth());
+  }, [dispatch]);
 
   const logout = useCallback(() => {
     client.post('/auth/logout').catch(() => {});
@@ -140,7 +155,7 @@ export const useSchemes = () => {
 };
 
 // KPIs Hook
-export const useKPIs = (schemeIdOrCode = null) => {
+export const useKPIs = (schemeIdOrCode = null, stateId = null) => {
   const [kpis, setKpis] = useState([]);
   const [kpiValues, setKpiValues] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -153,19 +168,16 @@ export const useKPIs = (schemeIdOrCode = null) => {
       if (schemeIdOrCode) {
         if (typeof schemeIdOrCode === 'string') {
           // Scheme code like 'PMAY'
-          url = `/kpis/status/${schemeIdOrCode}`;
+          const stateQuery = stateId ? `?stateId=${encodeURIComponent(stateId)}` : '';
+          url = `/kpis/status/${schemeIdOrCode}${stateQuery}`;
         } else {
           // Scheme ID like 1
           url = `/kpis?schemeId=${schemeIdOrCode}`;
         }
       }
       const response = await client.get(url);
-      let data = [];
-      if (Array.isArray(response.data?.data)) {
-        data = response.data.data;
-      } else if (response.data?.data?.kpi_status) {
-        data = response.data.data.kpi_status;
-      }
+      const payload = response.data?.kpi_status ?? response.data?.data?.kpi_status ?? response.data?.data;
+      const data = Array.isArray(payload) ? payload : [];
       setKpis(data);
     } catch (err) {
       console.error('Error fetching KPIs:', err);
@@ -173,7 +185,7 @@ export const useKPIs = (schemeIdOrCode = null) => {
     } finally {
       setLoading(false);
     }
-  }, [schemeIdOrCode]);
+  }, [schemeIdOrCode, stateId]);
 
   const fetchLatestKPIValues = useCallback(async () => {
     try {
@@ -181,18 +193,15 @@ export const useKPIs = (schemeIdOrCode = null) => {
       let url = '/kpis/latest';
       if (schemeIdOrCode) {
         if (typeof schemeIdOrCode === 'string') {
-          url = `/kpis/status/${schemeIdOrCode}`;
+          const stateQuery = stateId ? `?stateId=${encodeURIComponent(stateId)}` : '';
+          url = `/kpis/status/${schemeIdOrCode}${stateQuery}`;
         } else {
           url = `/kpis/latest?schemeId=${schemeIdOrCode}`;
         }
       }
       const response = await client.get(url);
-      let data = [];
-      if (Array.isArray(response.data?.data)) {
-        data = response.data.data;
-      } else if (response.data?.data?.kpi_status) {
-        data = response.data.data.kpi_status;
-      }
+      const payload = response.data?.kpi_status ?? response.data?.data?.kpi_status ?? response.data?.data;
+      const data = Array.isArray(payload) ? payload : [];
       setKpiValues(data);
     } catch (err) {
       console.error('Error fetching KPI values:', err);
@@ -200,7 +209,7 @@ export const useKPIs = (schemeIdOrCode = null) => {
     } finally {
       setLoading(false);
     }
-  }, [schemeIdOrCode]);
+  }, [schemeIdOrCode, stateId]);
 
   const getKPITrend = useCallback(async (kpiId, days = 90) => {
     try {

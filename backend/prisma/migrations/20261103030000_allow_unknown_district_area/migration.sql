@@ -1,0 +1,2 @@
+ALTER TABLE "District"
+  ALTER COLUMN "area_km2" DROP NOT NULL;

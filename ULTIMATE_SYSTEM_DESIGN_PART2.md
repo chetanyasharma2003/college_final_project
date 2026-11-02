@@ -969,7 +969,7 @@ describe('User Dashboard Journey', () => {
     
     // Fill login form
     await page.fill('#email', 'admin@gov.in')
-    await page.fill('#password', 'Admin@12345')
+    await page.fill('#password', '<provisioned-password>')
     await page.click('#login-button')
     
     // Wait for dashboard

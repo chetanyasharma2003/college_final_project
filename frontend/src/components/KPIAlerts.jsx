@@ -10,7 +10,7 @@ export default function KPIAlerts({ kpiValues = [] }) {
 
     kpiValues.forEach((kpi) => {
       try {
-        if (!kpi || !kpi.target_value) return;
+        if (!kpi || kpi.status === 'no_data' || kpi.current_value == null || !kpi.target_value) return;
 
         const safeValue = Number(kpi.current_value) || 0;
         const safeTarget = Number(kpi.target_value) || 1;

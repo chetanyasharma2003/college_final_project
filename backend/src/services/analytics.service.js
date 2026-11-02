@@ -39,12 +39,14 @@ class AnalyticsService {
           ) / kpiValues.length
         : 0;
 
+      const performance = Math.round(avgCompletion * 100) / 100;
       comparison.push({
         scheme_id: scheme.id,
         scheme_name: scheme.name,
         scheme_code: scheme.code,
         budget: scheme.budget,
-        performance: Math.round(avgCompletion * 100) / 100,
+        performance,
+        avg_completion: performance,
         kpi_count: kpiValues.length,
         achieved_count: kpiValues.filter((k) => k.status === 'on_track').length,
         critical_count: kpiValues.filter((k) => k.status === 'critical').length,
@@ -53,7 +55,7 @@ class AnalyticsService {
     }
 
     // Sort by completion rate
-    return comparison.sort((a, b) => b.avg_completion - a.avg_completion);
+    return comparison.sort((a, b) => b.performance - a.performance);
   }
 
   /**
@@ -106,7 +108,7 @@ class AnalyticsService {
       });
     }
 
-    return comparison.sort((a, b) => b.avg_completion - a.avg_completion);
+    return comparison.sort((a, b) => b.progress - a.progress);
   }
 
   /**
