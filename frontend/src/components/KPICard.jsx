@@ -51,6 +51,7 @@ export default function KPICard({ kpi, schemeCode, data: initialData }) {
     on_track: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30', icon: TrendingUp, label: '↑ On Track' },
     at_risk: { bg: 'bg-yellow-500/10', text: 'text-yellow-400', border: 'border-yellow-500/30', icon: AlertCircle, label: '⚠ At Risk' },
     no_data: { bg: 'bg-white/5', text: 'text-gray-400', border: 'border-white/10', icon: Clock, label: 'No Data' },
+    no_target: { bg: 'bg-white/5', text: 'text-gray-400', border: 'border-white/10', icon: Clock, label: 'Not Rated' },
   };
 
   const config = statusConfig[data.status] || statusConfig.at_risk;

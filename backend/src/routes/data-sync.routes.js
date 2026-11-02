@@ -29,6 +29,26 @@ router.post('/all', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
   }
 });
 
+router.post('/:schemeCode', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
+  try {
+    const schemeCode = req.params.schemeCode.toUpperCase();
+    const result = await DataSyncService.syncSchemeData(schemeCode);
+    const statusCode = result.status === 'success' ? 200 : result.status === 'partial' ? 207 : 502;
+    res.status(statusCode).json({
+      status: result.status,
+      data: result,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error(`Scheme sync failed for ${req.params.schemeCode}:`, error.message);
+    res.status(500).json({
+      status: 'error',
+      message: 'Scheme data sync failed',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
 // GET - Sync status check करो
 router.get('/status', verifyAuth, async (req, res) => {
   try {

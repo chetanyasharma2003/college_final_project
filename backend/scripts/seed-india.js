@@ -3,9 +3,8 @@
  *
  * What it does
  *  - 31 states / UTs (adds the missing ones, keeps existing codes, fills region/population)
- *  - Real districts (approximate area) for 6 states: RJ, MH, UP, MP, GJ, KA
- *  - SAMPLE blocks and villages under those districts (names are generated, coordinates
- *    are jittered around the district centre, so they always fall inside India)
+ *  - Approximate district areas for 6 states: RJ, MH, UP, MP, GJ, KA
+ *  - SYNTHETIC blocks and villages under those districts (names and coordinates are generated)
  *  - KPI values at state level (12 months) for every KPI definition of the 6 schemes.
  *    Schemes with no KPI definitions get 3 defaults.
  *  - With --drilldown also district (3 months), block and village (latest month) KPI values.
@@ -14,16 +13,18 @@
  * All KPI numbers are SIMULATED (deterministic pseudo-random, same result on every run).
  * State populations are approximate Census 2011 figures; district areas are approximate.
  *
- * Usage (from backend/):
+ * Usage (from repository root):
  *   node scripts/seed-india.js --dry-run                      # no database, only checks the data
+ *   node scripts/seed-india.js --geography-only               # states/codes only; no sample or KPI data
+ *   ALLOW_SYNTHETIC_SEED=true node scripts/seed-india.js       # explicitly opt into synthetic demo data
  *   (add --drilldown to include district/block/village KPI values)
- *   DATABASE_URL="<neon-direct-url>" node scripts/seed-india.js
  *
  * Re-running is safe: it deletes only the KPI values of the 6 schemes and re-inserts them.
  * It never touches users, schemes or other tables.
  */
 
 const DRY = process.argv.includes('--dry-run');
+const GEOGRAPHY_ONLY = process.argv.includes('--geography-only');
 // District/block/village KPI rows are only inserted with --drilldown, because several existing
 // backend queries (rankings, top performers) do not yet filter by level and would mix them with
 // state rows. Use --drilldown only after the backend queries are level-aware.
@@ -183,6 +184,11 @@ function seriesRows({ def, refs, key, target, finalProgress, dates, wobble }) {
 
 // ---------- main ----------
 async function main() {
+  if (!DRY && !GEOGRAPHY_ONLY
+    && (process.env.NODE_ENV === 'production' || process.env.ALLOW_SYNTHETIC_SEED !== 'true')) {
+    throw new Error('Synthetic demo data is disabled unless ALLOW_SYNTHETIC_SEED=true in development. Use --geography-only for state references.');
+  }
+
   let prisma = null;
   if (!DRY) {
     const { PrismaClient } = await import('@prisma/client');
@@ -200,7 +206,9 @@ async function main() {
     for (const [name, pref, region, population] of STATES) {
       const found = existing.find((s) => s.name === name);
       if (found) {
-        await prisma.state.update({ where: { id: found.id }, data: { region, population } });
+        if (!GEOGRAPHY_ONLY) {
+          await prisma.state.update({ where: { id: found.id }, data: { region, population } });
+        }
         continue;
       }
       let code = pref;
@@ -211,7 +219,9 @@ async function main() {
         }
       }
       takenCodes.add(code);
-      await prisma.state.create({ data: { name, code, region, population } });
+      await prisma.state.create({
+        data: GEOGRAPHY_ONLY ? { name, code } : { name, code, region, population },
+      });
     }
     stateRows = await prisma.state.findMany();
   }
@@ -219,6 +229,11 @@ async function main() {
   const stateList = STATES.map(([name]) => stateByName.get(name)).filter(Boolean);
   const totalPop = STATES.reduce((a, s) => a + s[3], 0);
   console.log(`states ready: ${stateList.length}`);
+  if (GEOGRAPHY_ONLY) {
+    console.log('geography-only mode: no district, block, village, KPI definition, or KPI value data was written');
+    if (prisma) await prisma.$disconnect();
+    return;
+  }
 
   // 2) districts / blocks / villages ---------------------------------
   const districts = []; // {id,name,state,lat,lng,area}

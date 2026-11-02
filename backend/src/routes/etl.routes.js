@@ -2,6 +2,7 @@ import express from 'express';
 import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
 import ETLService from '../services/etl.service.js';
 import prisma from '../config/prisma.js';
+import { getDataGovApiKey } from '../config/scheme-integrations.js';
 
 const router = express.Router();
 
@@ -12,12 +13,12 @@ router.post('/sync/:schemeCode', verifyAuth, checkRole(['ADMIN']), async (req, r
     const { resourceId: bodyResourceId, filters, mapping } = req.body;
     const schemeKey = schemeCode.replace(/[^A-Z0-9]/gi, '_').toUpperCase();
     const resourceId = bodyResourceId || process.env[`DATA_GOV_RESOURCE_ID_${schemeKey}`];
-    const apiKey = process.env.DATA_GOV_API_KEY;
+    const apiKey = getDataGovApiKey(schemeCode);
 
     if (!apiKey || !resourceId) {
       return res.status(400).json({
         status: 'error',
-        message: 'Configure DATA_GOV_API_KEY and a verified resource ID in the server environment.',
+        message: `Configure DATA_GOV_API_KEY_${schemeKey} and a verified resource ID in the server environment.`,
       });
     }
     const configuredMappingValue = process.env[`DATA_GOV_FIELD_MAP_${schemeKey}`];

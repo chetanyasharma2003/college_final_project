@@ -70,7 +70,7 @@ model District {
   name          String
   state_id      Int
   population    Int?
-  area_km2      Decimal         @db.Decimal(10, 2)
+  area_km2      Decimal?        @db.Decimal(10, 2)
   created_at    DateTime        @default(now())
 
   // Relations

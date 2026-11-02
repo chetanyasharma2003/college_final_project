@@ -1,11 +1,11 @@
 import DataSyncService from './data-sync.service.js';
-import { SCHEME_CONFIGS } from '../config/scheme-integrations.js';
+import { getDataGovApiKey, SCHEME_CONFIGS } from '../config/scheme-integrations.js';
 
-const hasUsableSource = (config) => Boolean(
-  process.env.DATA_GOV_API_KEY
+const hasUsableSource = (schemeCode, config) => Boolean(
+  getDataGovApiKey(schemeCode)
   && config.resourceId
-  && config.fieldMapping?.state
-  && config.fieldMapping?.date
+  && (config.fieldMapping?.state || config.defaultState)
+  && (config.fieldMapping?.date || config.reportDate)
   && config.fieldMapping?.metrics
   && !Array.isArray(config.fieldMapping.metrics)
   && Object.keys(config.fieldMapping.metrics).length > 0
@@ -67,8 +67,9 @@ export function startDataSyncScheduler({ enabled = process.env.ENABLE_DATA_SYNC_
   const timers = [];
 
   for (const [schemeCode, config] of Object.entries(SCHEME_CONFIGS)) {
-    if (!hasUsableSource(config)) continue;
-    if (!config.syncFrequency || !isValidCronExpression(config.syncFrequency)) {
+    if (!hasUsableSource(schemeCode, config)) continue;
+    if (!config.syncFrequency) continue;
+    if (!isValidCronExpression(config.syncFrequency)) {
       console.error(`Skipping invalid data-sync schedule for ${schemeCode}`);
       continue;
     }
@@ -94,4 +95,3 @@ export function startDataSyncScheduler({ enabled = process.env.ENABLE_DATA_SYNC_
   console.info(`Scheduled data sync enabled for ${timers.length} configured schemes.`);
   return () => timers.forEach(clearTimeout);
 }
-

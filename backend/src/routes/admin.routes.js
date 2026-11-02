@@ -1,7 +1,7 @@
 import express from 'express';
 import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
 import prisma from '../config/prisma.js';
-import { SCHEME_CONFIGS } from '../config/scheme-integrations.js';
+import { getDataGovApiKey, SCHEME_CONFIGS } from '../config/scheme-integrations.js';
 
 const router = express.Router();
 
@@ -36,10 +36,10 @@ router.get('/overview', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
 
     const dataSources = Object.entries(SCHEME_CONFIGS).map(([code, config]) => {
       const sourceConfigured = Boolean(
-        process.env.DATA_GOV_API_KEY
+        getDataGovApiKey(code)
         && config.resourceId
-        && config.fieldMapping?.state
-        && config.fieldMapping?.date
+        && (config.fieldMapping?.state || config.defaultState)
+        && (config.fieldMapping?.date || config.reportDate)
         && config.fieldMapping?.metrics
         && Object.keys(config.fieldMapping.metrics).length
         && !Array.isArray(config.fieldMapping.metrics)
@@ -52,8 +52,8 @@ router.get('/overview', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
         schedule: config.syncFrequency,
         source_configured: sourceConfigured,
         resource_configured: Boolean(config.resourceId),
-        field_mapping_configured: Boolean(config.fieldMapping?.state && config.fieldMapping?.date && config.fieldMapping?.metrics && Object.keys(config.fieldMapping.metrics).length),
-        credentials_configured: Boolean(process.env.DATA_GOV_API_KEY),
+        field_mapping_configured: Boolean((config.fieldMapping?.state || config.defaultState) && (config.fieldMapping?.date || config.reportDate) && config.fieldMapping?.metrics && Object.keys(config.fieldMapping.metrics).length),
+        credentials_configured: Boolean(getDataGovApiKey(code)),
       };
     });
 
@@ -71,7 +71,7 @@ router.get('/overview', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
         configuration: {
           database_url_configured: Boolean(process.env.DATABASE_URL),
           jwt_secret_configured: Boolean(process.env.JWT_SECRET),
-          data_gov_api_key_configured: Boolean(process.env.DATA_GOV_API_KEY),
+          data_gov_api_key_configured: Object.keys(SCHEME_CONFIGS).some((code) => getDataGovApiKey(code)),
         },
       },
     });

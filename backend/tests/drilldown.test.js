@@ -54,6 +54,7 @@ function makeDb() {
   const districts = [
     { id: 10, name: 'Jaipur', state_id: 1, area_km2: '11152' },
     { id: 11, name: 'Kota', state_id: 1, area_km2: '5217' },
+    { id: 12, name: 'Source district', state_id: 1, area_km2: null },
   ];
   const blocks = [{ id: 100, name: 'Jaipur Block 1', district_id: 10 }, { id: 101, name: 'Jaipur Block 2', district_id: 10 }];
   const villages = [
@@ -127,6 +128,7 @@ test('state -> districts: newest value, averaged coordinates, no_data when empty
   const kota = res.children.find((c) => c.name === 'Kota');
   assert.equal(kota.status, 'no_data');
   assert.equal(kota.lat, null);
+  assert.equal(res.children.find((c) => c.name === 'Source district').areaKm2, null);
 });
 
 test('district -> blocks and block -> villages', async () => {

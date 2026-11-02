@@ -1,6 +1,7 @@
 import express from 'express';
 import prisma from '../config/prisma.js';
-import KPIManagementService from '../services/kpi-management.service.js';
+import KPIManagementService, { filterSourceKpiDefinitions } from '../services/kpi-management.service.js';
+import { SCHEME_CONFIGS } from '../config/scheme-integrations.js';
 import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
@@ -10,10 +11,22 @@ router.use(verifyAuth);
 router.get('/', async (req, res) => {
   try {
     const schemeId = req.query.schemeId ? Number(req.query.schemeId) : null;
-    const kpis = await prisma.kPIDefinition.findMany({
-      where: schemeId ? { scheme_id: schemeId } : undefined,
-      include: { scheme: true },
-    });
+    const scheme = schemeId
+      ? await prisma.scheme.findUnique({ where: { id: schemeId }, select: { code: true } })
+      : null;
+    let kpis;
+    if (schemeId && scheme?.code && SCHEME_CONFIGS[scheme.code]) {
+      kpis = await KPIManagementService.getSchemeKPIs(scheme.code);
+    } else {
+      const definitions = await prisma.kPIDefinition.findMany({
+        where: schemeId ? { scheme_id: schemeId } : undefined,
+        include: { scheme: true },
+      });
+      kpis = definitions.filter((definition) => {
+        const config = SCHEME_CONFIGS[definition.scheme.code];
+        return !config || filterSourceKpiDefinitions([definition], config).length > 0;
+      });
+    }
     res.json({ status: 'success', data: kpis });
   } catch (error) {
     res.status(400).json({ status: 'error', message: error.message });
@@ -57,6 +70,29 @@ router.get('/latest', async (req, res) => {
       where.kpi = { scheme_id: schemeId };
     } else if (schemeCode) {
       where.kpi = { scheme: { code: schemeCode } };
+    }
+    let resolvedSchemeCode = schemeCode;
+    if (!resolvedSchemeCode && schemeId) {
+      const scheme = await prisma.scheme.findUnique({ where: { id: schemeId }, select: { code: true } });
+      resolvedSchemeCode = scheme?.code || null;
+    }
+    if (resolvedSchemeCode && SCHEME_CONFIGS[resolvedSchemeCode] && !SCHEME_CONFIGS[resolvedSchemeCode].fieldMapping) {
+      return res.json({ status: 'success', data: [] });
+    }
+    if (SCHEME_CONFIGS[resolvedSchemeCode]?.fieldMapping) {
+      where.kpi = {
+        scheme: { code: resolvedSchemeCode },
+        kpi_name: { in: SCHEME_CONFIGS[resolvedSchemeCode].dataPoints.map(({ name }) => name) },
+      };
+    } else if (!resolvedSchemeCode) {
+      where.OR = Object.entries(SCHEME_CONFIGS)
+        .filter(([, config]) => config.fieldMapping)
+        .map(([code, config]) => ({
+          kpi: {
+            scheme: { code },
+            kpi_name: { in: config.dataPoints.map(({ name }) => name) },
+          },
+        }));
     }
     if (parsedStateId) where.state_id = parsedStateId;
     if (start || end) {

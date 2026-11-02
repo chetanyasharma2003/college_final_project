@@ -84,7 +84,8 @@ export function createDrilldownService(db) {
       return {
         kpi, level: 'district', parent: { id: state.id, name: state.name, type: 'state' },
         children: districts.map((d) => shape(d, latest.get(d.id), {
-          areaKm2: Number(d.area_km2), ...(averageCoords(byDistrict.get(d.id) || []) || { lat: null, lng: null }),
+          areaKm2: d.area_km2 == null ? null : Number(d.area_km2),
+          ...(averageCoords(byDistrict.get(d.id) || []) || { lat: null, lng: null }),
         })),
       };
     }

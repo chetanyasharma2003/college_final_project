@@ -1,10 +1,10 @@
 # Centralized Government Scheme Analytics Dashboard
 
-> A comprehensive cloud-based analytics platform for monitoring real-time KPIs across 6 major rural government schemes
+> A source-attributed analytics dashboard for monitoring reported KPIs across six government scheme families
 
 **Institute:** Swami Keshvanand Institute of Technology, Management & Gramothan  
 **Project ID:** 2026-27-IT  
-**Status:** Phase 1 - Setup & Architecture  
+**Status:** Source integrations and dashboard are in progress; source freshness and geographic coverage vary by scheme
 **Timeline:** 16 weeks (12-14 weeks full-time)  
 
 ---
@@ -13,18 +13,20 @@
 
 ### Problem
 Government scheme data is scattered across multiple sources, making it difficult for administrators, analysts, and decision-makers to:
-- Track real-time performance of schemes
+- Track reported scheme performance with source-specific freshness
 - Identify underperforming areas
 - Make data-driven decisions
 - Compare performance across regions
 
 ### Solution
-Build a **centralized, real-time analytics dashboard** that:
+Build a **centralized analytics dashboard** that:
 - Integrates data from 6 government schemes
-- Calculates & tracks 50+ KPIs across states/districts/villages
+- Calculates and tracks source-backed KPIs at the geographic levels provided by each dataset
 - Provides interactive visualizations (charts, heatmaps, maps)
 - Generates comparative analysis & forecasts
 - Exports reports in multiple formats
+
+The connected Open Government Data resources are not all live feeds and do not all contain district or village fields. The dashboard therefore presents historical source-reported data with its reporting period and coverage; it must not be interpreted as a real-time feed or as complete village-level coverage.
 
 ### Target Users
 - Government officials & administrators
@@ -36,12 +38,26 @@ Build a **centralized, real-time analytics dashboard** that:
 
 ## 📊 Government Schemes Covered
 
-1. **PMAY** - Pradhan Mantri Awas Yojana (Housing)
+1. **PMAY** - Pradhan Mantri Awas Yojana (PMAY-G and PMAY-U are separate sources)
 2. **MGNREGS** - Mahatma Gandhi National Rural Employment Guarantee Scheme
 3. **PMGSY** - Pradhan Mantri Gram Sadak Yojana (Rural Roads)
 4. **NRLM** - National Rural Livelihood Mission
-5. **DDU-GKY** - Deen Dayal Upadhyaya Scheme (Skill Development)
+5. **DDU-GKY** - Deen Dayal Upadhyaya Grameen Kaushalya Yojana (Skill Development)
 6. **SAGY** - Sansad Adarsh Gram Yojana (Model Villages)
+
+### Verified source coverage
+
+| Scheme source | Verified metric coverage | Geographic coverage and freshness |
+|---|---|---|
+| PMAY-G | [Eligible beneficiaries who availed the specified loan](https://www.data.gov.in/resource/stateuts-wise-number-eligible-beneficiaries-pradhan-mantri-awaas-yojana-gramin-pmay-g-pmay) | Historical state snapshot; source data cutoff is not stated |
+| PMAY-U | [Houses sanctioned, completed, and occupied](https://www.data.gov.in/resource/stateut-wise-number-houses-sanctioned-completed-and-occupied-under-pmay-u-and-pmay-u-20-22) | State/UT snapshot as of 22 January 2026 |
+| MGNREGS | [Cumulative job cards issued](https://www.data.gov.in/resource/job-cards-issued-under-mgnregs-inception-10th-jan-2022) | Karnataka district snapshot through 10 January 2022; not person-days or current employment |
+| PMGSY | [Physical and financial progress across PMGSY-I, II, and III](https://www.data.gov.in/resource/physical-financial-progress-pradhan-mantri-gram-sadak-yojna-pmgsy-date) | District data; API update date is known, but its exact record-level reporting cutoff is not. District areas and boundaries are not supplied |
+| NRLM | [State/UT funds allocation for FY 2021-22 to FY 2023-24](https://www.data.gov.in/resource/stateut-wise-details-funds-allocation-under-national-rural-livelihoods-mission-nrlm-2021) | Historical; source does not specify the monetary unit |
+| DDU-GKY | [Candidates trained and placed for FY 2020-21 to FY 2023-24](https://www.data.gov.in/resource/state-wise-details-candidates-trained-and-placed-under-ddu-gky-2020-21-2023-24) | Historical state/UT annual counts |
+| SAGY | [Gram Panchayats identified under Phases I-IV](https://www.data.gov.in/resource/stateut-wise-gram-panchayats-identified-under-saansad-adarsh-gram-yojana-sagy-sagy-website) | State/UT snapshot as of 3 March 2020 |
+
+These are six scheme families, with PMAY represented by separate PMAY-G and PMAY-U sources. No verified source currently supports real-time data for all schemes or village-level KPIs. Unmatched geographies are not guessed; those records are excluded from geographic aggregates and reported in import results. PMGSY and MGNREGS district names are provisioned only from their source rows, without fabricated area or boundary data. A partial import is not complete national coverage.
 
 ---
 
@@ -189,10 +205,16 @@ docker-compose ps
 cd backend
 npm run migrate
 
-# Optional synthetic demo data for local development only. Never use as official scheme data.
+# Optional synthetic demo users/data for local development only. Never use as official scheme data.
 ALLOW_SYNTHETIC_SEED=true SEED_ADMIN_PASSWORD='your-admin-password' SEED_ANALYST_PASSWORD='your-analyst-password' npm run seed
 
 cd ..
+```
+
+To load only the configured state/UT reference names without sample geography or synthetic KPIs, run from the repository root:
+
+```bash
+node backend/scripts/seed-india.js --geography-only
 ```
 
 ### 5. Start Development Servers

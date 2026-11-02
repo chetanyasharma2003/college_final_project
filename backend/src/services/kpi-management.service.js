@@ -1,18 +1,43 @@
 import prisma from '../config/prisma.js';
+import { SCHEME_CONFIGS } from '../config/scheme-integrations.js';
+
+export const filterSourceKpiDefinitions = (definitions, config) => {
+  if (!config) return definitions;
+  if (!config.fieldMapping) return [];
+  const sourceKpiNames = new Set((config.dataPoints || []).map(({ name }) => name));
+  return definitions.filter(({ kpi_name }) => sourceKpiNames.has(kpi_name));
+};
 
 class KPIManagementService {
   // Get all KPI definitions for a scheme
   static async getSchemeKPIs(schemeCode) {
-    return prisma.kPIDefinition.findMany({
+    const definitions = await prisma.kPIDefinition.findMany({
       where: { scheme: { code: schemeCode } },
       include: { scheme: true },
     });
+    return filterSourceKpiDefinitions(definitions, SCHEME_CONFIGS[schemeCode]);
   }
 
   // Calculate current KPI values from scheme data
   static async calculateKPIValues(schemeCode) {
     const scheme = await prisma.scheme.findUnique({ where: { code: schemeCode } });
     if (!scheme) throw new Error(`Scheme ${schemeCode} not found`);
+
+    const sourceConfig = SCHEME_CONFIGS[schemeCode];
+    if (sourceConfig && !sourceConfig.fieldMapping) return [];
+
+    if (sourceConfig?.fieldMapping) {
+      const sourceStatus = await this.getKPIStatus(schemeCode);
+      return sourceStatus.map((kpi) => ({
+        kpi_name: kpi.kpi_name,
+        value: kpi.current_value,
+        target: kpi.target_value,
+        unit: kpi.unit,
+        status: kpi.status,
+        last_updated: kpi.last_updated,
+        locations_covered: kpi.locations_covered,
+      }));
+    }
 
     const kpiDefinitions = await this.getSchemeKPIs(schemeCode);
     const results = [];
@@ -232,9 +257,7 @@ class KPIManagementService {
     const scheme = await prisma.scheme.findUnique({ where: { code: schemeCode } });
     if (!scheme) throw new Error(`Scheme ${schemeCode} not found`);
 
-    const kpis = await prisma.kPIDefinition.findMany({
-      where: { scheme_id: scheme.id },
-    });
+    const kpis = await this.getSchemeKPIs(schemeCode);
 
     const status = [];
     for (const kpi of kpis) {
@@ -245,32 +268,60 @@ class KPIManagementService {
         village_id: null,
       };
       let latestValues;
+      let stateValues = [];
+      let hasNationalValue = false;
 
-      if (stateId) {
+      const aggregateByDistrict = Boolean(SCHEME_CONFIGS[schemeCode]?.aggregateByDistrict);
+      if (aggregateByDistrict) {
+        latestValues = await prisma.kPIValue.findMany({
+          where: {
+            kpi_id: kpi.id,
+            state_id: stateId || { not: null },
+            district_id: { not: null },
+            block_id: null,
+            village_id: null,
+          },
+          orderBy: { date: 'desc' },
+          distinct: ['district_id'],
+        });
+      } else if (stateId) {
         const latestValue = await prisma.kPIValue.findFirst({
           where: { ...locationWhere, state_id: stateId },
           orderBy: { date: 'desc' },
         });
         latestValues = latestValue ? [latestValue] : [];
       } else {
-        const nationalValue = await prisma.kPIValue.findFirst({
-          where: { ...locationWhere, state_id: null },
-          orderBy: { date: 'desc' },
-        });
-
-        latestValues = nationalValue ? [nationalValue] : await prisma.kPIValue.findMany({
-          where: { ...locationWhere, state_id: { not: null } },
-          orderBy: { date: 'desc' },
-          distinct: ['state_id'],
-        });
+        [latestValues, stateValues] = await Promise.all([
+          prisma.kPIValue.findFirst({
+            where: { ...locationWhere, state_id: null },
+            orderBy: { date: 'desc' },
+          }),
+          prisma.kPIValue.findMany({
+            where: { ...locationWhere, state_id: { not: null } },
+            orderBy: { date: 'desc' },
+            distinct: ['state_id'],
+          }),
+        ]);
+        hasNationalValue = Boolean(latestValues);
+        latestValues = latestValues ? [latestValues] : stateValues;
       }
 
       const values = latestValues.map(value => Number(value.value));
       const targets = latestValues.map(value => Number(value.target_value ?? kpi.target_value) || 0);
-      const value = values.length ? values.reduce((sum, current) => sum + current, 0) / values.length : null;
-      const percentage = latestValues.length
-        ? latestValues.reduce((sum, item, index) => sum + (targets[index] > 0 ? (values[index] / targets[index]) * 100 : 0), 0) / latestValues.length
-        : 0;
+      const value = values.length
+        ? (hasNationalValue
+          || aggregateByDistrict
+          || (SCHEME_CONFIGS[schemeCode]?.aggregateByStateSum && !stateId)
+          || (schemeCode === 'PMAY-G' && !stateId))
+          ? values.reduce((sum, current) => sum + current, 0)
+          : values.reduce((sum, current) => sum + current, 0) / values.length
+        : null;
+      const ratedValues = latestValues
+        .map((item, index) => ({ value: Number(item.value), target: targets[index] }))
+        .filter((item) => item.target > 0);
+      const percentage = ratedValues.length
+        ? ratedValues.reduce((sum, item) => sum + ((item.value / item.target) * 100), 0) / ratedValues.length
+        : null;
       const target = Number(kpi.target_value) || 0;
       const latestUpdated = latestValues.reduce((latest, item) => (
         !latest || item.date > latest ? item.date : latest
@@ -282,13 +333,25 @@ class KPIManagementService {
         current_value: value,
         target_value: target,
         unit: kpi.unit,
-        progress_percentage: latestValues.length ? Math.round(percentage) : null,
+        progress_percentage: percentage == null ? null : Math.round(percentage),
         status: latestValues.length === 0
           ? 'no_data'
+          : percentage == null
+            ? 'no_target'
           : percentage >= 100 ? 'achieved' : percentage >= 80 ? 'on_track' : 'at_risk',
         last_updated: latestUpdated,
-        states_covered: stateId ? 1 : latestValues.filter(item => item.state_id != null).length,
-        aggregation: !stateId && !latestValues.some(item => item.state_id == null) ? 'state_average' : 'latest',
+        states_covered: aggregateByDistrict
+          ? new Set(latestValues.map(item => item.state_id)).size
+          : stateId ? 1 : stateValues.length,
+        ...(aggregateByDistrict ? { locations_covered: latestValues.length } : {}),
+        aggregation: aggregateByDistrict
+          ? 'mapped_district_sum'
+          : stateId
+            ? 'latest'
+            : hasNationalValue
+            ? 'source_national_total'
+            : SCHEME_CONFIGS[schemeCode]?.aggregateByStateSum ? 'state_sum'
+            : schemeCode === 'PMAY-G' ? 'state_sum' : 'state_average',
       });
     }
 
