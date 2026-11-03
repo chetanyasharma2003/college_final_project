@@ -4,7 +4,7 @@
 
 **Institute:** Swami Keshvanand Institute of Technology, Management & Gramothan  
 **Project ID:** 2026-27-IT  
-**Status:** Source integrations and dashboard are in progress; source freshness and geographic coverage vary by scheme
+**Status:** Core dashboard and source integrations are implemented; production release checks remain pending. Source freshness and geographic coverage vary by scheme.
 **Timeline:** 16 weeks (12-14 weeks full-time)  
 
 ---
@@ -59,6 +59,10 @@ The connected Open Government Data resources are not all live feeds and do not a
 
 These are six scheme families, with PMAY represented by separate PMAY-G and PMAY-U sources. No verified source currently supports real-time data for all schemes or village-level KPIs. Unmatched geographies are not guessed; those records are excluded from geographic aggregates and reported in import results. PMGSY and MGNREGS district names are provisioned only from their source rows, without fabricated area or boundary data. A partial import is not complete national coverage.
 
+### Refresh behavior
+
+The configured feeds are historical snapshots or otherwise have no verified automatic refresh schedule. Scheduled imports are disabled: every configured source has no sync frequency, and the backend scheduler is off unless `ENABLE_DATA_SYNC_SCHEDULER=true` is set. Setting that flag alone does not schedule these feeds. To refresh the configured snapshots manually, provide the private database and data.gov.in settings in `backend/.env.real-data`, then run `cd backend && npm run sync:official`. The Render deployment does not currently run scheduled source imports; dashboard values should not be described as real-time.
+
 ---
 
 ## 👥 Team & Responsibilities
@@ -98,7 +102,7 @@ These are six scheme families, with PMAY represented by separate PMAY-G and PMAY
 ┌───────▼──────────────────────────────────────────────┐
 │    External Data Sources                            │
 │  data.gov.in | Government APIs | CSV Upload        │
-│  → ETL Pipeline → Cron Jobs → DB Updates           │
+│  → ETL Pipeline → Manual Import → DB Updates       │
 └──────────────────────────────────────────────────────┘
 ```
 
@@ -124,7 +128,7 @@ Express.js               # Web framework
 Prisma ORM               # Database ORM
 PostgreSQL 16            # Database
 Redis                    # Caching layer
-Node-cron                # Task scheduling
+Node.js timer scheduler  # Optional scheduled syncs; currently disabled for configured sources
 JWT                      # Authentication
 ```
 
@@ -133,8 +137,8 @@ JWT                      # Authentication
 Docker + Docker Compose  # Containerization
 GitHub                   # Version control
 GitHub Actions           # CI/CD
-Vercel                   # Frontend hosting
-Railway/Render           # Backend hosting
+Render                   # Current frontend and backend hosting
+Vercel                   # Optional alternate frontend host
 AWS RDS / Heroku DB      # Production database
 ```
 
@@ -506,16 +510,14 @@ MIT License - See LICENSE file for details
 
 ---
 
-## 🎯 Next Steps
+## 🎯 Remaining Release Work
 
-1. **Create GitHub Repository** - Set up repo with this structure
-2. **Setup Backend** - Initialize Express server, Prisma, migration system
-3. **Setup Frontend** - Initialize React + Vite project
-4. **Verify Environment** - Test Docker, database, Redis connection
-5. **Start Phase 2** - Begin authentication system implementation
+1. Merge and deploy the latest import/geography changes after CI passes.
+2. Confirm production migrations, database health, authentication, dashboard, source monitoring, geography, and report/export flows.
+3. Keep refreshes manual until a reachable and reliable scheduled worker is configured.
+4. Preserve the source dates and geographic limits listed above in dashboard and report surfaces.
 
 ---
 
-**Last Updated:** August 8, 2026  
-**Status:** Phase 1 - Setup Complete ✅  
-**Next Phase:** Phase 2 - Authentication System
+**Last Updated:** November 3, 2026
+**Status:** Core implementation complete; release and production smoke checks pending.

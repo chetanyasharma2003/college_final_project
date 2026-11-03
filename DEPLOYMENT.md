@@ -1,18 +1,18 @@
 # Production Deployment Guide
 
-Complete guide to deploy Government Schemes Analytics Dashboard to production (Vercel + Render).
+Current production uses a Render frontend and a Render backend. As checked on 3 November 2026, the frontend responds at `https://frontend-ae3v.onrender.com`, and the backend health endpoint responds with its database connected at `https://college-final-project-backend-m86r.onrender.com/health`. The Vercel URLs recorded in older deployment notes currently return 404 and are not active production links.
 
 ## 🎯 Deployment Architecture
 
 ```
 ┌─────────────────────────────────────────┐
-│   Vercel (Frontend)                     │
+│   Render (Frontend)                     │
 │   - React + Vite                        │
-│   - https://college-final-project.vercel.app  │
+│   - https://frontend-ae3v.onrender.com  │
 └────────────┬────────────────────────────┘
              │
              └──> Render Backend API
-                  https://college-final-project-backend.onrender.com/api/v1
+                  https://college-final-project-backend-m86r.onrender.com/api/v1
 
 ┌─────────────────────────────────────────┐
 │   Render (Backend)                      │
@@ -25,14 +25,16 @@ Complete guide to deploy Government Schemes Analytics Dashboard to production (V
 ## Prerequisites
 
 - GitHub Account: https://github.com/chetanyasharma2003/college_final_project
-- Vercel Account: https://vercel.com
 - Render Account: https://render.com
-- Vercel API Token
 - Render API Key
 
 ## Step-by-Step Deployment
 
-### 1. Frontend Deployment (Vercel)
+### 1. Current Frontend Deployment (Render)
+
+The active frontend service is `https://frontend-ae3v.onrender.com`. To create a replacement Render static site, use the `frontend` directory, build command `npm ci && npm run build`, and publish directory `dist`. Set `VITE_API_URL` to `https://college-final-project-backend-m86r.onrender.com/api/v1`. Update the backend `CORS_ORIGIN` setting to the new frontend origin before switching traffic.
+
+### Optional: Deploy the Frontend to Vercel
 
 #### Option A: Automatic Deployment (via CLI)
 
@@ -47,7 +49,7 @@ vercel login
 cd frontend
 vercel --prod
 
-# Your frontend URL: https://college-final-project.vercel.app
+# Use the URL assigned to this Vercel deployment; the old project URL currently returns 404.
 ```
 
 #### Option B: Manual Deployment (via Web)
@@ -57,7 +59,7 @@ vercel --prod
 3. Select root directory: `frontend`
 4. Add Environment Variables:
    ```
-   VITE_API_URL=https://college-final-project-backend.onrender.com/api/v1
+   VITE_API_URL=https://college-final-project-backend-m86r.onrender.com/api/v1
    ```
 5. Click "Deploy"
 
@@ -66,21 +68,14 @@ vercel --prod
 Set in Vercel Dashboard > Settings > Environment Variables:
 
 ```
-VITE_API_URL=https://college-final-project-backend.onrender.com/api/v1
+VITE_API_URL=https://college-final-project-backend-m86r.onrender.com/api/v1
 ```
 
 ### 2. Backend Deployment (Render)
 
-#### Step 1: Create PostgreSQL Database
+#### Step 1: Configure the Neon Database
 
-1. Go to https://dashboard.render.com
-2. Create New > PostgreSQL
-   - Name: `college-final-project-db`
-   - Database: `gov_schemes`
-   - User: `govschemes`
-   - Region: Singapore
-   - Plan: Starter (Free)
-3. Copy the connection string (you'll need it later)
+The deployed backend uses PostgreSQL on Neon. Set `DATABASE_URL` in the Render service's private environment settings to the Neon pooled connection string. Do not put the URL in this file, source control, or screenshots.
 
 #### Step 2: Create Redis Cache
 
@@ -113,15 +108,15 @@ NODE_ENV=production
 PORT=5001
 HOST=0.0.0.0
 
-# Database (from PostgreSQL)
-DATABASE_URL=postgresql://govschemes:PASSWORD@host:5432/gov_schemes
+# Database (private Neon pooled connection string)
+DATABASE_URL=<set privately in Render>
 
 # JWT Secrets
 JWT_SECRET=<unique random secret>
 JWT_REFRESH_SECRET=<different unique random secret>
 
 # CORS
-CORS_ORIGIN=https://college-final-project.vercel.app,http://localhost:5173
+CORS_ORIGIN=https://frontend-ae3v.onrender.com,http://localhost:5173
 ```
 
 #### Step 5: Database Setup
@@ -141,25 +136,23 @@ After backend is deployed, update frontend:
 2. Settings > Environment Variables
 3. Update `VITE_API_URL`:
    ```
-   VITE_API_URL=https://college-final-project-backend.onrender.com/api/v1
+   VITE_API_URL=https://college-final-project-backend-m86r.onrender.com/api/v1
    ```
 4. Redeploy frontend (Settings > Deployments > Redeploy)
 
 ## Production Access
 
 ### Frontend
-- **URL:** https://college-final-project.vercel.app
+- **URL:** https://frontend-ae3v.onrender.com
 - **Login:** Create or provision an account securely; never use a shared demo password.
 
 ### Backend
-- **URL:** https://college-final-project-backend.onrender.com/api/v1
-- **Health:** https://college-final-project-backend.onrender.com/health
+- **URL:** https://college-final-project-backend-m86r.onrender.com/api/v1
+- **Health:** https://college-final-project-backend-m86r.onrender.com/health
 
 ### Database
-- **Type:** PostgreSQL on Render
-- **Host:** provided by Render
-- **Database:** gov_schemes
-- **User:** govschemes
+- **Type:** PostgreSQL on Neon
+- **Connection string:** stored privately in the Render environment
 
 ## 🔍 Verification
 
@@ -167,7 +160,7 @@ After backend is deployed, update frontend:
 
 ```bash
 # Test if frontend is accessible
-curl https://college-final-project.vercel.app
+curl https://frontend-ae3v.onrender.com
 
 # Should see HTML with React app
 ```
@@ -176,13 +169,13 @@ curl https://college-final-project.vercel.app
 
 ```bash
 # Health check
-curl https://college-final-project-backend.onrender.com/health
+curl https://college-final-project-backend-m86r.onrender.com/health
 
 # API status
-curl https://college-final-project-backend.onrender.com/api/v1
+curl https://college-final-project-backend-m86r.onrender.com/api/v1
 
 # Login test (use an account provisioned by your administrator)
-curl -X POST https://college-final-project-backend.onrender.com/api/v1/auth/login \
+curl -X POST https://college-final-project-backend-m86r.onrender.com/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
       "email":"<provisioned-email>",
@@ -192,14 +185,13 @@ curl -X POST https://college-final-project-backend.onrender.com/api/v1/auth/logi
 
 ### Full End-to-End Test
 
-1. Open https://college-final-project.vercel.app
+1. Open https://frontend-ae3v.onrender.com
 2. Login with an account provisioned by the administrator
 3. Dashboard should load with:
-   - Health score 50-55%
-   - 30-day trend graph
-   - KPIs requiring attention
-   - Scheme comparison
-4. Switch between schemes - data should update
+   - source-backed KPIs with their reporting periods
+   - the available geographic coverage for the selected source
+   - scheme comparisons based only on configured source metrics
+4. Check that historical source values are not presented as real-time data.
 
 ## 🚨 Troubleshooting
 
@@ -245,9 +237,9 @@ curl -X POST https://college-final-project-backend.onrender.com/api/v1/auth/logi
 
 ### View Logs
 
-**Vercel:**
+**Vercel (only if a Vercel deployment is re-enabled):**
 ```bash
-vercel logs https://college-final-project.vercel.app
+vercel logs <deployment-url>
 ```
 
 **Render:**
@@ -267,15 +259,9 @@ vercel logs https://college-final-project.vercel.app
 - [ ] Use HTTPS (automatic with Vercel/Render)
 - [ ] Add firewall rules if needed
 
-## 🎯 Cost Breakdown
+## 🎯 Hosting Costs
 
-| Service | Tier | Cost | Notes |
-|---------|------|------|-------|
-| Vercel (Frontend) | Pro | $20/month | Includes 100GB bandwidth |
-| Render (Backend) | Starter | Free | Will sleep after 15min inactivity |
-| PostgreSQL | Starter | Free | 256MB storage |
-| Redis | Starter | Free | 30MB memory |
-| **Total** | | **Free - $20/month** | Can upgrade later |
+Costs depend on the active Render and Neon account plans. They were not verified as part of the endpoint check; do not use older cost estimates in this guide as current billing information.
 
 ## 📞 Support & Resources
 
@@ -303,6 +289,8 @@ vercel logs https://college-final-project.vercel.app
 
 ---
 
-**Deployment completed on:** [Your deployment date]
-**Frontend URL:** https://college-final-project.vercel.app
-**Backend URL:** https://college-final-project-backend.onrender.com/api/v1
+**Last endpoint check:** 3 November 2026 (frontend and backend HTTP checks only; authenticated user flows remain unverified)
+
+**Frontend URL:** https://frontend-ae3v.onrender.com
+
+**Backend URL:** https://college-final-project-backend-m86r.onrender.com/api/v1
