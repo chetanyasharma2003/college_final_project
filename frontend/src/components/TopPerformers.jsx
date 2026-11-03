@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import client from '../api/client';
+import { arrayOrEmpty } from '../utils/arrayPayload';
 
 export default function TopPerformers({ schemeCode = 'PMAY' }) {
   const [rankings, setRankings] = useState([]);
@@ -32,8 +33,8 @@ export default function TopPerformers({ schemeCode = 'PMAY' }) {
       const response = await client.get(`/analytics/state-values/${encodeURIComponent(code)}${query}`);
       if (version !== requestVersion.current) return;
 
-      const data = response.data?.data || [];
-      const availableMetrics = response.data?.kpis || [];
+      const data = arrayOrEmpty(response.data?.data);
+      const availableMetrics = arrayOrEmpty(response.data?.kpis);
       setRankings(data.slice(0, 5));
       setStateCount(data.length);
       setMetrics(availableMetrics);
