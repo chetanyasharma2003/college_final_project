@@ -6,6 +6,8 @@ import {
   averageKpiCompletion,
   comparativeStatus,
   completionPercentage,
+  sourceDataPeriod,
+  sourceDateBounds,
   sourceReportKpiIds,
 } from '../utils/source-report-metrics.js';
 
@@ -28,9 +30,10 @@ class ReportService {
   /**
    * Generate Executive Summary Report (Text/CSV format)
    */
-  static async generateExecutiveSummary(schemeId, stateId = null, days = 30) {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+  static async generateExecutiveSummary(schemeId, stateId = null, days = null) {
+    const hasDaysFilter = Number.isFinite(Number(days)) && Number(days) > 0;
+    const startDate = hasDaysFilter ? new Date() : null;
+    if (startDate) startDate.setDate(startDate.getDate() - Number(days));
 
     const scheme = await prisma.scheme.findUnique({ where: { id: schemeId } });
 
@@ -50,7 +53,7 @@ class ReportService {
       where: {
         kpi_id: { in: sourceKpiIds },
         state_id: stateId || undefined,
-        date: { gte: startDate },
+        date: startDate ? { gte: startDate } : undefined,
       },
       include: { kpi: true, state: true },
     });
@@ -60,7 +63,7 @@ class ReportService {
       scheme_code: scheme.code,
       ministry: scheme.ministry,
       budget: scheme.budget,
-      period: `Last ${days} days`,
+      period: startDate ? `Last ${days} days` : sourceDataPeriod(kpiValues),
       generated_date: new Date().toISOString().split('T')[0],
       total_kpis: kpiValues.length,
       on_track: kpiValues.filter((k) => k.status === 'on_track').length,
@@ -83,12 +86,6 @@ class ReportService {
    * Generate CSV Report
    */
   static async generateCSV(schemeId, stateId = null, startDate = null, endDate = null) {
-    if (!startDate) {
-      startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - 3);
-    }
-    if (!endDate) endDate = new Date();
-
     const scheme = await prisma.scheme.findUnique({ where: { id: schemeId } });
     if (!scheme) {
       const error = new Error('Scheme not found');
@@ -105,7 +102,10 @@ class ReportService {
       where: {
         kpi_id: { in: sourceKpiIds },
         state_id: stateId || undefined,
-        date: { gte: startDate, lte: endDate },
+        date: startDate || endDate ? {
+          gte: startDate || undefined,
+          lte: endDate || undefined,
+        } : undefined,
       },
       include: { kpi: true, state: true },
       orderBy: { date: 'asc' },
@@ -141,12 +141,6 @@ class ReportService {
    * Generate JSON Report (for API response)
    */
   static async generateJSON(schemeId, stateId = null, startDate = null, endDate = null) {
-    if (!startDate) {
-      startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - 3);
-    }
-    if (!endDate) endDate = new Date();
-
     const scheme = await prisma.scheme.findUnique({ where: { id: schemeId } });
     if (!scheme) {
       const error = new Error('Scheme not found');
@@ -163,7 +157,10 @@ class ReportService {
       where: {
         kpi_id: { in: sourceKpiIds },
         state_id: stateId || undefined,
-        date: { gte: startDate, lte: endDate },
+        date: startDate || endDate ? {
+          gte: startDate || undefined,
+          lte: endDate || undefined,
+        } : undefined,
       },
       include: { kpi: true, state: true },
       orderBy: { date: 'asc' },
@@ -177,13 +174,14 @@ class ReportService {
       take: 12,
     });
 
+    const sourceDates = sourceDateBounds(kpiValues);
     return {
       metadata: {
         scheme_name: scheme.name,
         scheme_code: scheme.code,
         generated_date: new Date().toISOString(),
-        period_start: startDate.toISOString().split('T')[0],
-        period_end: endDate.toISOString().split('T')[0],
+        period_start: (startDate || sourceDates.start)?.toISOString().split('T')[0] || null,
+        period_end: (endDate || sourceDates.end)?.toISOString().split('T')[0] || null,
         total_records: kpiValues.length,
       },
       performance: {
