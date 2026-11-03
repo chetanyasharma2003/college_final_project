@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import client from '../api/client';
 
 const dateLabel = (value) => value ? new Date(value).toLocaleString() : 'No import recorded';
+const isNetworkFailure = (message = '') => /\((ECONNREFUSED|ECONNRESET|EHOSTUNREACH|ENETUNREACH|ETIMEDOUT|ENOTFOUND|EAI_AGAIN)\)/.test(message);
 
 export default function AdminMonitoring() {
   const [overview, setOverview] = useState(null);
@@ -29,6 +30,7 @@ export default function AdminMonitoring() {
   }, []);
 
   const syncOfficialData = async () => {
+    if (connectionCheck?.reachable !== true) return;
     setSyncing(true);
     setSyncError('');
     setSyncResult(null);
@@ -103,13 +105,15 @@ export default function AdminMonitoring() {
         <button
           type="button"
           onClick={syncOfficialData}
-          disabled={syncing || overview.ready_data_sources === 0}
+          disabled={syncing || checkingConnection || overview.ready_data_sources === 0 || connectionCheck?.reachable !== true}
           className="rounded-lg border border-blue-400/40 bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 transition hover:bg-blue-500/30 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {syncing ? 'Syncing official sources…' : 'Sync official source data'}
         </button>
         <p className="text-sm text-slate-300">
-          Check Render connectivity and API key before starting an import.
+          {connectionCheck?.reachable === true
+            ? 'Render can reach data.gov.in. Start the import when ready.'
+            : 'Test Render connectivity before starting an import.'}
         </p>
       </div>
       {connectionCheck && (
@@ -122,6 +126,16 @@ export default function AdminMonitoring() {
           data.gov.in connection: {connectionCheck.message}
           {connectionCheck.http_status ? ` (HTTP ${connectionCheck.http_status})` : ''}
         </p>
+      )}
+      {connectionCheck?.reachable === false && (
+        <div role="status" className="mb-4 rounded-lg border border-amber-400/30 bg-amber-500/10 p-3 text-sm text-amber-100">
+          <p>Import is blocked because the Render connection check failed. The failed run imported 0 records; existing source data remains available.</p>
+          {isNetworkFailure(connectionCheck.message) && (
+            <p className="mt-2">
+              Render cannot open a connection to the official API. On a machine with access to data.gov.in, run <code className="rounded bg-black/20 px-1">cd backend &amp;&amp; npm run sync:official</code> using the private <code>.env.real-data</code> file.
+            </p>
+          )}
+        </div>
       )}
       {syncError && <p role="alert" className="mb-4 rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">{syncError}</p>}
       {syncResult && (
