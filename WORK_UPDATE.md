@@ -263,3 +263,10 @@ All three geography migrations were applied to the configured Neon database; it 
 - Prepared a heatmap fix: allow state-to-district drill-down only for feeds configured with district data (MGNREGS and PMGSY), clear stale rows during navigation, and label observed values without official targets as “Not rated · no target” rather than “No data.” Added backend validation so a direct district request for state-only feeds returns a clear HTTP 422 explanation instead of attempting unsupported drill-down.
 - Verification in an isolated clean clone passed: production frontend build, 7 frontend tests, and 52 backend tests; `git diff --check` passed. The first restricted test run could not bind localhost for Redis tests (EPERM); the full suite passed with local socket permission.
 - The Render egress check remains a Render network limitation; weekly imports can use the project machine, and this run succeeded. The heatmap fix has not been deployed. GitHub CLI currently reports the saved account token as invalid, so it cannot yet be published under the user's account; no new GitHub or Render release was made.
+
+### Admin monitoring wording cleanup (4 November 2026)
+
+- Replaced personal “project Mac” references with neutral wording about the configured operations environment.
+- Clarified that the Render connectivity check does not run an import and does not affect existing source data.
+- Moved manual sync instructions into a collapsed details section so they are available when needed without crowding the admin page.
+- Renamed the scheduler and import controls to distinguish the cloud scheduler, Render connectivity check, and manual import action.

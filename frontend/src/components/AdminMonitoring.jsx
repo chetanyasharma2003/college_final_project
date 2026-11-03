@@ -90,7 +90,7 @@ export default function AdminMonitoring() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 id="admin-monitoring-title" className="text-xl font-bold">Admin system monitoring</h2>
         <span className={overview.scheduler_enabled ? 'text-emerald-300' : 'text-amber-200'}>
-          Render scheduler {overview.scheduler_enabled ? 'enabled' : 'disabled'} · {overview.ready_data_sources} source(s) configured
+          Cloud scheduler {overview.scheduler_enabled ? 'enabled' : 'off'} · {overview.ready_data_sources} feeds configured
         </span>
       </div>
       <div className="mb-5 flex flex-wrap items-center gap-3">
@@ -100,7 +100,7 @@ export default function AdminMonitoring() {
           disabled={checkingConnection || syncing}
           className="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {checkingConnection ? 'Testing connection…' : 'Test data.gov.in connection'}
+          {checkingConnection ? 'Checking Render connection…' : 'Check Render connection'}
         </button>
         <button
           type="button"
@@ -109,15 +109,15 @@ export default function AdminMonitoring() {
           className="rounded-lg border border-blue-400/40 bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 transition hover:bg-blue-500/30 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {syncing
-            ? 'Syncing official sources…'
+            ? 'Importing official data…'
             : connectionCheck?.reachable === true
-              ? 'Sync official source data'
-              : 'Render sync unavailable'}
+              ? 'Import official data now'
+              : 'Cloud import unavailable'}
         </button>
         <p className="text-sm text-slate-300">
           {connectionCheck?.reachable === true
             ? 'Render can reach data.gov.in. Start the import when ready.'
-            : 'Weekly imports run from the project Mac; this check only tests Render connectivity.'}
+            : 'Scheduled imports are managed through the configured operations environment. This check only verifies whether Render can reach data.gov.in.'}
         </p>
       </div>
       {connectionCheck && (
@@ -133,11 +133,13 @@ export default function AdminMonitoring() {
       )}
       {connectionCheck?.reachable === false && (
         <div role="status" className="mb-4 rounded-lg border border-amber-400/30 bg-amber-500/10 p-3 text-sm text-amber-100">
-          <p>Import is blocked because the Render connection check failed. The failed run imported 0 records; existing source data remains available.</p>
+          <p>Render could not reach data.gov.in, so imports cannot start from Render. This connection check does not import records; existing source data remains available.</p>
           {isNetworkFailure(connectionCheck.message) && (
-            <p className="mt-2">
-              Render cannot open a connection to the official API. Weekly imports run from the configured project Mac when it is logged in and online. To import now, run <code className="rounded bg-black/20 px-1">cd backend &amp;&amp; npm run sync:official</code> on a machine with data.gov.in access and the private <code>.env.real-data</code> file.
-            </p>
+            <details className="mt-2 rounded-lg border border-white/10 bg-black/10 p-3">
+              <summary className="cursor-pointer font-semibold">Manual import instructions</summary>
+              <p className="mt-2">Run the official sync command from the configured operations environment with its private <code>.env.real-data</code> configuration:</p>
+              <code className="mt-2 inline-block rounded bg-black/20 px-2 py-1">cd backend &amp;&amp; npm run sync:official</code>
+            </details>
           )}
         </div>
       )}
