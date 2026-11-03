@@ -270,3 +270,10 @@ All three geography migrations were applied to the configured Neon database; it 
 - Clarified that the Render connectivity check does not run an import and does not affect existing source data.
 - Moved manual sync instructions into a collapsed details section so they are available when needed without crowding the admin page.
 - Renamed the scheduler and import controls to distinguish the cloud scheduler, Render connectivity check, and manual import action.
+
+### Heatmap 500 fix (4 November 2026)
+
+- Queried Render backend application logs for the reported state-to-district heatmap failures. They show Prisma failing to decode a district whose `area_km2` is null while the running client expects a non-null Decimal.
+- The heatmap does not need district area. Updated the drill-down query to omit `area_km2` and return it as unknown (`null`) in the response, avoiding this nullability mismatch without fabricating area data.
+- Read-only reproduction against the configured project database returned district drill-down results for all 36 states on PMGSY and MGNREGS. The production Render logs identified the separate nullable-area failure.
+- PR and CI status will be recorded after publishing this focused backend change; the live Render fix is pending deployment verification.
