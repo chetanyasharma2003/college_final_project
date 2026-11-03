@@ -21,11 +21,15 @@ router.get('/pdf/:schemeId', verifyAuth, async (req, res) => {
       `Period: ${report.period}`,
       `Generated: ${report.generated_date}`,
       `KPI observations: ${report.total_kpis}`,
-      `Overall completion: ${report.overall_completion}%`,
+      `Overall completion: ${report.overall_completion == null ? 'Not rated (no source target)' : `${report.overall_completion}%`}`,
       `On track: ${report.on_track} | At risk: ${report.at_risk} | Critical: ${report.critical}`,
       '',
       'Key metrics:',
-      ...report.key_metrics.map((metric) => `${metric.name}: ${metric.value} / ${metric.target} (${metric.status})`),
+      ...report.key_metrics.map((metric) => (
+        metric.target == null
+          ? `${metric.name}: ${metric.value} (no source target; ${metric.status})`
+          : `${metric.name}: ${metric.value} / ${metric.target} (${metric.status})`
+      )),
     ];
     const pdf = createTextPDF(lines, { title: `${report.scheme_code} Executive Summary` });
     res.setHeader('Content-Type', 'application/pdf');

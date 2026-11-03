@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 17:32 IST
+**Last updated:** 2026-11-03 17:37 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -21,8 +21,8 @@ Important accuracy rule: **do not claim that every scheme is real-time, complete
 | All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
 | District/block/village data | Only show levels present in source data. Source districts can be created for configured district feeds; no official village feed is currently established |
 | Scheduled imports on Render | Disabled/Render outbound requests to data.gov.in previously failed (`ECONNREFUSED` / `EHOSTUNREACH`). Local `sync:official` is the current import path |
-| Production endpoints | PR #10 is merged; main CI passed. Render backend health is HTTP 200 with the database connected, the schemes API now filters out legacy KPIs, and the active Render frontend returns HTTP 200. Authenticated flows remain unverified. |
-| Overall scope completion | Core application is deployed. Real-time/all-scheme coverage remains unsupported; authenticated flow verification and credential rotation remain open. No defensible completion percentage is claimed. |
+| Production endpoints | PR #10 is merged; main CI passed. Render backend health is HTTP 200 with the database connected, the schemes API filters legacy KPIs, and the active Render frontend returns HTTP 200. A follow-up report/export filter fix is implemented locally and awaits review/deployment. |
+| Overall scope completion | Core application is deployed. Real-time/all-scheme coverage remains unsupported; report/export deployment, authenticated flow verification, and credential rotation remain open. No defensible completion percentage is claimed. |
 
 ## 3. Recent verified work
 
@@ -64,11 +64,19 @@ Changes shipped:
 - `.github/workflows/ci.yml`
   - Replaces the permissive placeholder workflow with CI that installs root, frontend, and backend dependencies and runs `npm test`; Render remains responsible for deployment from `main`.
 
+### Follow-up fix in progress
+
+- `backend/src/services/report.service.js` now filters executive, CSV, JSON, prediction, and comparative report data to KPI definitions mapped to official sources.
+- Report completion stays unavailable when the source has no target, and comparative output distinguishes unrated/no-data schemes from low completion.
+- `backend/src/utils/source-report-metrics.js` and `backend/tests/source-report-metrics.test.js` cover source filtering and no-target handling.
+- This follow-up is not deployed yet; it is being prepared for PR review and CI.
+
 All three geography migrations were applied to the configured Neon database; it has 36 current state/UT rows. The private ignored local import config uses the Neon pooler; a connection probe passed. No credentials or connection strings belong in this file, commits, screenshots, or chat.
 
 ### Latest tests
 
 - Root `npm test`: passed after allowing the Redis tests to open their temporary loopback servers.
+- Latest root `npm test`: passed with 3 frontend tests and 48 backend tests, including report source-filter/no-target coverage.
 - GitHub Actions `Project CI` on `main`: passed after merge.
 - Frontend production build: passed.
 - Frontend tests: 3 passed.
@@ -86,6 +94,7 @@ All three geography migrations were applied to the configured Neon database; it 
 - Repeated the sync; it again reported 7/7 successful and 888 imported. Post-repeat DB counts remained 888 generic records and 7,305 KPI observations, confirming snapshot replacement is idempotent.
 - Direct Neon connections closed during the previous slow row-by-row import. Switching the private local import config to the user-provided pooler, and changing to transactional bulk replacement, resolved the import issue.
 - Post-merge Render health returned HTTP 200 with the database connected; the backend restarted after merge. The schemes API no longer returns the legacy KPI names, confirming the source filter is deployed.
+- A review of protected report endpoints found they still included legacy KPI rows and substituted an arbitrary target of 100. The follow-up code filters those reports and leaves completion unrated when no source target exists; deployment is pending PR #11.
 
 ### Latest continuation (3 November 2026)
 
@@ -94,13 +103,15 @@ All three geography migrations were applied to the configured Neon database; it 
 - `https://frontend-ae3v.onrender.com/`: HTTP 200. The documented `college-final-project.vercel.app` and older `frontend-eta-smoky-88.vercel.app` links returned 404; deployment docs use the active Render URL.
 - Authenticated login, source-monitoring, geography, and report/export flows were not tested because no authorized test account was available.
 - PR #10 is merged and main CI passed. Refreshes remain manual because configured feeds have `syncFrequency: null` and Render access to data.gov.in previously failed.
+- PR #11 should merge only after its required full-suite CI check passes; then recheck report/PDF output in production.
 - README and deployment docs now state that imports are manual. `ENABLE_DATA_SYNC_SCHEDULER=true` alone does not schedule these configured feeds because each has `syncFrequency: null`.
 
 ## 4. How to continue
 
-1. **Authenticated smoke tests.** Use an authorized test account to check login, dashboard, source monitoring, geography, and report/export.
-2. **Refresh schedule.** Imports remain manual because the feeds have no verified cadence and data.gov.in connectivity failed from Render previously. Do not imply automatic refresh is active.
-3. **Credential hygiene.** API/database credentials were exposed during prior troubleshooting. Rotate them in the private hosting/database settings and verify only that new values work; never put them in this log.
+1. **Deliver report fix.** Review PR #11 and merge after CI passes; confirm Render deploys it.
+2. **Authenticated smoke tests.** Use an authorized test account to check login, dashboard, source monitoring, geography, and report/export.
+3. **Refresh schedule.** Imports remain manual because the feeds have no verified cadence and data.gov.in connectivity failed from Render previously. Do not imply automatic refresh is active.
+4. **Credential hygiene.** API/database credentials were exposed during prior troubleshooting. Rotate them in the private hosting/database settings and verify only that new values work; never put them in this log.
 
 ## 5. Acceptance checklist to reach the college scope honestly
 
