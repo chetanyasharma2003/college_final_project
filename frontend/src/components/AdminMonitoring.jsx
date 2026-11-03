@@ -7,6 +7,14 @@ export default function AdminMonitoring() {
   const [overview, setOverview] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState(null);
+  const [syncError, setSyncError] = useState('');
+
+  const refreshOverview = async () => {
+    const { data } = await client.get('/admin/overview');
+    setOverview(data.data);
+  };
 
   useEffect(() => {
     let active = true;
@@ -16,6 +24,21 @@ export default function AdminMonitoring() {
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, []);
+
+  const syncOfficialData = async () => {
+    setSyncing(true);
+    setSyncError('');
+    setSyncResult(null);
+    try {
+      const { data } = await client.post('/data-sync/all');
+      setSyncResult(data.data);
+      await refreshOverview();
+    } catch (requestError) {
+      setSyncError(requestError.response?.data?.message || requestError.message || 'Official data sync failed.');
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   if (loading) return <section aria-live="polite">Loading administration status…</section>;
   if (error) return <section role="alert" className="rounded-xl border border-red-400/30 bg-red-500/10 p-5 text-red-200">{error}</section>;
@@ -29,6 +52,39 @@ export default function AdminMonitoring() {
           Scheduled imports {overview.scheduler_enabled ? 'enabled' : 'disabled'} · {overview.ready_data_sources} source(s) configured
         </span>
       </div>
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={syncOfficialData}
+          disabled={syncing || overview.ready_data_sources === 0}
+          className="rounded-lg border border-blue-400/40 bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 transition hover:bg-blue-500/30 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {syncing ? 'Syncing official sources…' : 'Sync official source data'}
+        </button>
+        <p className="text-sm text-slate-300">
+          Run this after configuring the data.gov.in API key. Imports can take a few minutes.
+        </p>
+      </div>
+      {syncError && <p role="alert" className="mb-4 rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">{syncError}</p>}
+      {syncResult && (
+        <div className="mb-5 rounded-lg border border-white/10 bg-white/5 p-4" aria-live="polite">
+          <p className="mb-3 text-sm font-semibold">
+            Sync finished: {syncResult.success} successful, {syncResult.failed} failed, {syncResult.totalRecords} records imported.
+          </p>
+          <ul className="space-y-2 text-sm text-slate-300">
+            {Object.entries(syncResult.schemes || {}).map(([code, result]) => (
+              <li key={code} className="border-b border-white/10 pb-2 last:border-0">
+                <span className={result.status === 'success' ? 'text-emerald-300' : result.status === 'partial' ? 'text-amber-200' : 'text-red-300'}>
+                  {code}: {result.status}
+                </span>
+                {' · '}{result.recordsLoaded || 0} records
+                {result.error && ` · ${result.error}`}
+                {result.errors?.length > 0 && ` · ${result.errors.join('; ')}`}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <p className="mb-4 text-sm text-slate-300">{overview.counts.schemes} schemes · {overview.counts.states} states · {overview.counts.active_users} active users</p>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-left text-sm">
