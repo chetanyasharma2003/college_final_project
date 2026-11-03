@@ -99,14 +99,21 @@ export default function IndiaHeatmap() {
     a[status] = (a[status] || 0) + 1;
     return a;
   }, {});
-  const canDrill = view.level === 'state' && DISTRICT_FEEDS.has(view.kpi?.scheme?.code);
+  const schemeCode = String(view.kpi?.scheme?.code || '').trim().toUpperCase();
+  const canDrill = view.level === 'state' && DISTRICT_FEEDS.has(schemeCode);
   const allEmpty = view.rows.length > 0 && view.rows.every((row) => row.value == null);
   const unit = view.kpi?.unit || '';
 
   const drillInto = (row) => {
-    if (!canDrill) return;
+    if (!canDrill || loading) return;
     setPath([...path, { level: view.level, id: row.id, name: row.name }]);
   };
+
+  const drillGuidance = canDrill
+    ? 'Click a state name or map marker to view its source-reported districts.'
+    : view.level === 'state'
+      ? 'This source reports state/UT values only. District drill-down is unavailable for this feed.'
+      : 'This source does not provide additional geographic detail below districts.';
 
   return (
     <div className="space-y-4">
@@ -158,6 +165,12 @@ export default function IndiaHeatmap() {
         </span>
       </nav>
 
+      {!loading && view.kpi && (
+        <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-blue-100" role="status">
+          {drillGuidance}
+        </p>
+      )}
+
       {error && <div className="bg-red-500/20 border border-red-400/40 text-red-100 rounded-lg px-4 py-3 text-sm">{error}</div>}
 
       <div className="grid lg:grid-cols-5 gap-4">
@@ -178,14 +191,20 @@ export default function IndiaHeatmap() {
                 key={`${view.level}-${r.id}`}
                 center={[r.lat, r.lng]}
                 radius={RADIUS[view.level]}
-                pathOptions={{ color: '#ffffff', weight: 1.5, fillColor: COLORS[rowStatus(r)] || COLORS.no_data, fillOpacity: 0.85 }}
-                eventHandlers={{ click: () => drillInto(r) }}
+                pathOptions={{
+                  color: '#ffffff',
+                  weight: 1.5,
+                  fillColor: COLORS[rowStatus(r)] || COLORS.no_data,
+                  fillOpacity: 0.85,
+                  className: canDrill && !loading ? 'cursor-pointer' : undefined,
+                }}
+                eventHandlers={canDrill && !loading ? { click: () => drillInto(r) } : undefined}
               >
                 <Tooltip>
                   <strong>{r.name}</strong><br />
                   {r.value == null ? 'No KPI value' : `${nf.format(r.value)}${unit ? ` ${unit}` : ''}`}
                   {r.progress != null && <><br />{r.progress}% of target</>}
-                  {canDrill && <><br /><em>Click to view source-reported districts</em></>}
+                  {canDrill && !loading && <><br /><em>Click to view source-reported districts</em></>}
                 </Tooltip>
             </CircleMarker>
             );
@@ -209,13 +228,18 @@ export default function IndiaHeatmap() {
               <li key={`${view.level}-${r.id}`}>
                 <button
                   type="button"
-                  disabled={!canDrill}
+                  disabled={!canDrill || loading}
                   onClick={() => drillInto(r)}
-                  className={`w-full text-left rounded-lg px-3 py-2 bg-white/5 ${canDrill ? 'hover:bg-white/10 cursor-pointer' : 'cursor-default'}`}
+                  aria-label={canDrill ? `View districts in ${r.name}` : `${r.name}; district drill-down unavailable`}
+                  title={canDrill ? `View districts in ${r.name}` : 'District drill-down unavailable for this source'}
+                  className={`w-full text-left rounded-lg px-3 py-2 bg-white/5 transition-colors ${canDrill && !loading ? 'hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-300' : 'cursor-default'}`}
+                  style={{ cursor: canDrill && !loading ? 'pointer' : 'default' }}
                 >
                   <div className="flex justify-between gap-2 text-sm">
                     <span className="text-white font-medium truncate">{r.name}</span>
-                    <span className="text-blue-100 whitespace-nowrap">{r.progress == null ? '—' : `${r.progress}%`}</span>
+                    <span className="text-blue-100 whitespace-nowrap">
+                      {canDrill ? <span className="font-medium">View districts →</span> : r.progress == null ? '—' : `${r.progress}%`}
+                    </span>
                   </div>
                   <div className="h-1.5 bg-white/10 rounded mt-1" aria-hidden="true">
                     <div
@@ -229,6 +253,9 @@ export default function IndiaHeatmap() {
                   <div className="text-xs text-blue-300 mt-1">
                     {r.value == null ? 'No KPI value' : `${nf.format(r.value)}${unit ? ` ${unit}` : ''}${r.target != null ? ` of ${nf.format(r.target)}` : ''}`}
                   </div>
+                  {canDrill && !loading && (
+                    <div className="mt-1 text-xs font-medium text-sky-200" aria-hidden="true">Open districts →</div>
+                  )}
                 </button>
               </li>
             ))}
