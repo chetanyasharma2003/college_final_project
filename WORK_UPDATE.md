@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 19:07 IST
+**Last updated:** 2026-11-03 19:09 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -21,7 +21,7 @@ Important accuracy rule: **do not claim that every scheme is real-time, complete
 | All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
 | District/block/village data | 706 source-referenced districts remain; synthetic block/village rows were removed. An NRLM village-wise resource is listed by OGD but has not been schema-verified or integrated; no village KPI data are currently served |
 | Scheduled imports | Render and GitHub-hosted runners cannot reach data.gov.in. A local sync on this Mac succeeded 7/7 (888 records, 0 failed). A macOS LaunchAgent is installed and polls every seven days through the reachable local network; the source update cadence remains unverified. |
-| Production endpoints | Source-only cleanup commit `c514249`, frontend deploy commit `79cecd4`, Render automation commit `170548c`, and UI safety commit `4b5e731` passed main CI. Backend health/database and frontend both return HTTP 200; live schemes, geography, CORS, and updated frontend copy were checked. Both Render services auto-deploy after CI checks pass. |
+| Production endpoints | Source-only cleanup commit `c514249`, frontend deploy commit `79cecd4`, Render automation commit `170548c`, UI safety commit `4b5e731`, and final commit `f885959` passed main CI. Backend health returns HTTP 200 with database connected; frontend returns HTTP 200 and serves the new Render-scheduler/local-sync copy. Both Render services auto-deploy after CI checks pass. |
 | Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Weekly local polling is configured, but real-time/all-scheme coverage remains unsupported and credential rotation remains open. No defensible completion percentage is claimed. |
 
 ## 3. Recent verified work
@@ -154,7 +154,7 @@ All three geography migrations were applied to the configured Neon database; it 
 - Added `backend/scripts/install-local-sync-agent.sh`, updated the README, and installed the macOS LaunchAgent `com.collegefinalproject.official-data-sync`. It runs `npm run sync:official` every 604800 seconds, using the ignored local `.env.real-data`; output goes to `~/Library/Logs/college-final-project-official-sync.log`. `launchctl print` confirms it is loaded. It requires this Mac to be logged in and able to access data.gov.in; the interval is polling only, not an official source cadence.
 - Verified the installed LaunchAgent with `launchctl kickstart`: it exited 0 and imported the same seven feeds/888 records successfully.
 - Removed the GitHub-hosted import workflow and the temporary `DATABASE_URL` / `DATA_GOV_API_KEY` Actions secrets after the hosted run confirmed that cloud egress to OGD is blocked. These secrets are not currently stored in GitHub.
-- Updated the admin panel to distinguish the disabled Render scheduler from the local Mac schedule; this UI change is pending CI and the Render frontend deploy.
+- Updated the admin panel to distinguish the disabled Render scheduler from the local Mac schedule. Final commit `f885959` passed GitHub CI, Render frontend serves the new copy, and backend health returns HTTP 200 with the database connected. Working tree is clean after push.
 
 ## 4. How to continue
 
