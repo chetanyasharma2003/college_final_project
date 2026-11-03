@@ -2,6 +2,7 @@ import express from 'express';
 import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
 import prisma from '../config/prisma.js';
 import { getDataGovApiKey, SCHEME_CONFIGS } from '../config/scheme-integrations.js';
+import { filterSourceKpiDefinitions } from '../services/kpi-management.service.js';
 
 const router = express.Router();
 
@@ -14,7 +15,8 @@ router.get('/overview', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
           id: true,
           code: true,
           name: true,
-          _count: { select: { kpi_definitions: true, generic_data: true, data_imports: true } },
+          kpi_definitions: { select: { id: true, kpi_name: true } },
+          _count: { select: { generic_data: true, data_imports: true } },
         },
       }),
       prisma.state.count(),
@@ -62,7 +64,13 @@ router.get('/overview', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
       data: {
         generated_at: new Date().toISOString(),
         counts: { schemes: schemes.length, states, active_users: users },
-        schemes: schemes.map(({ _count, ...scheme }) => ({ ...scheme, ..._count })),
+        schemes: schemes.map(({ _count, kpi_definitions, ...scheme }) => ({
+          ...scheme,
+          kpi_definitions: SCHEME_CONFIGS[scheme.code]?.fieldMapping
+            ? filterSourceKpiDefinitions(kpi_definitions, SCHEME_CONFIGS[scheme.code]).length
+            : 0,
+          ..._count,
+        })),
         data_sources: dataSources,
         ready_data_sources: dataSources.filter((source) => source.source_configured).length,
         scheduler_enabled: process.env.ENABLE_DATA_SYNC_SCHEDULER === 'true' && dataSources.some((source) => source.source_configured),

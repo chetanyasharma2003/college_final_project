@@ -1,4 +1,26 @@
 import prisma from '../config/prisma.js';
+import { SCHEME_CONFIGS } from '../config/scheme-integrations.js';
+import { filterSourceKpiDefinitions } from './kpi-management.service.js';
+
+async function sourceKpiIds(schemeId) {
+  const scheme = await prisma.scheme.findUnique({
+    where: { id: schemeId },
+    select: { code: true },
+  });
+  const config = SCHEME_CONFIGS[scheme?.code];
+  if (!config?.fieldMapping) return [];
+
+  const definitions = await prisma.kPIDefinition.findMany({
+    where: { scheme_id: schemeId },
+    select: { id: true, kpi_name: true },
+  });
+  return filterSourceKpiDefinitions(definitions, config).map(({ id }) => id);
+}
+
+function verifiedSourceDefinitions(schemeCode, definitions) {
+  const config = SCHEME_CONFIGS[schemeCode];
+  return config?.fieldMapping ? filterSourceKpiDefinitions(definitions, config) : [];
+}
 
 class AnalyticsService {
   /**
@@ -18,14 +40,20 @@ class AnalyticsService {
     const comparison = [];
 
     for (const scheme of schemes) {
-      const kpiValues = await prisma.kPIValue.findMany({
+      const sourceIds = verifiedSourceDefinitions(scheme.code, scheme.kpi_definitions)
+        .map(({ id }) => id);
+      const kpiValues = sourceIds.length ? await prisma.kPIValue.findMany({
         where: {
-          kpi: { scheme_id: scheme.id },
+          kpi_id: { in: sourceIds },
           state_id: stateId || undefined,
+          district_id: null,
+          block_id: null,
+          village_id: null,
+          target_value: { not: null },
           date: { gte: startDate },
         },
         include: { kpi: true, state: true },
-      });
+      }) : [];
 
       const avgCompletion = kpiValues.length
         ? kpiValues.reduce(
@@ -64,6 +92,8 @@ class AnalyticsService {
   static async compareStates(schemeId, days = 30) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
+    const sourceIds = await sourceKpiIds(schemeId);
+    if (sourceIds.length === 0) return [];
 
     const states = await prisma.state.findMany({
       include: { _count: { select: { districts: true } } },
@@ -74,8 +104,12 @@ class AnalyticsService {
     for (const state of states) {
       const kpiValues = await prisma.kPIValue.findMany({
         where: {
-          kpi: { scheme_id: schemeId },
+          kpi_id: { in: sourceIds },
           state_id: state.id,
+          district_id: null,
+          block_id: null,
+          village_id: null,
+          target_value: { not: null },
           date: { gte: startDate },
         },
       });
@@ -117,12 +151,18 @@ class AnalyticsService {
   static async compareStateDetails(schemeId, state1Id, state2Id, days = 30) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
+    const sourceIds = await sourceKpiIds(schemeId);
+    if (sourceIds.length === 0) return { scheme_id: schemeId, comparison: [] };
 
     const getStateData = async (stateId) => {
       const kpiValues = await prisma.kPIValue.findMany({
         where: {
-          kpi: { scheme_id: schemeId },
+          kpi_id: { in: sourceIds },
           state_id: stateId,
+          district_id: null,
+          block_id: null,
+          village_id: null,
+          target_value: { not: null },
           date: { gte: startDate },
         },
         include: { kpi: true },
@@ -187,17 +227,30 @@ class AnalyticsService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const schemes = await prisma.scheme.findMany();
+    const schemes = await prisma.scheme.findMany({
+      include: { kpi_definitions: { select: { id: true, kpi_name: true } } },
+    });
     const states = await prisma.state.findMany();
+    const sourceIdsByScheme = new Map(schemes.map((scheme) => [
+      scheme.id,
+      verifiedSourceDefinitions(scheme.code, scheme.kpi_definitions)
+        .map(({ id }) => id),
+    ]));
 
     const rankings = [];
 
     for (const state of states) {
       for (const scheme of schemes) {
+        const sourceIds = sourceIdsByScheme.get(scheme.id);
+        if (sourceIds.length === 0) continue;
         const kpiValues = await prisma.kPIValue.findMany({
           where: {
-            kpi: { scheme_id: scheme.id },
+            kpi_id: { in: sourceIds },
             state_id: state.id,
+            district_id: null,
+            block_id: null,
+            village_id: null,
+            target_value: { not: null },
             date: { gte: startDate },
           },
         });
@@ -235,11 +288,17 @@ class AnalyticsService {
   static async getPerformanceGaps(schemeId, stateId = null, days = 30) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
+    const sourceIds = await sourceKpiIds(schemeId);
+    if (sourceIds.length === 0) return [];
 
     const kpiValues = await prisma.kPIValue.findMany({
       where: {
-        kpi: { scheme_id: schemeId },
+        kpi_id: { in: sourceIds },
         state_id: stateId || undefined,
+        district_id: null,
+        block_id: null,
+        village_id: null,
+        target_value: { not: null },
         date: { gte: startDate },
       },
       include: { kpi: true, state: true },
@@ -268,11 +327,27 @@ class AnalyticsService {
   static async getTrendAnalysis(kpiId, stateId = null, days = 90) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
+    const definition = await prisma.kPIDefinition.findUnique({
+      where: { id: kpiId },
+      include: { scheme: true },
+    });
+    const config = definition && SCHEME_CONFIGS[definition.scheme.code];
+    if (!config?.fieldMapping || filterSourceKpiDefinitions([definition], config).length === 0) {
+      return {
+        kpi_name: null,
+        trend: [],
+        avg_value: null,
+        trend_direction: 'insufficient_data',
+      };
+    }
 
     const values = await prisma.kPIValue.findMany({
       where: {
         kpi_id: kpiId,
         state_id: stateId || undefined,
+        district_id: null,
+        block_id: null,
+        village_id: null,
         date: { gte: startDate },
       },
       orderBy: { date: 'asc' },
@@ -284,7 +359,7 @@ class AnalyticsService {
       trend: values.map((v) => ({
         date: v.date,
         value: Number(v.value),
-        target: Number(v.target_value),
+        target: v.target_value == null ? null : Number(v.target_value),
         status: v.status,
       })),
       avg_value: values.length
@@ -293,7 +368,7 @@ class AnalyticsService {
               values.length) *
               100
           ) / 100
-        : 0,
+        : null,
       trend_direction: this.calculateTrend(values),
     };
   }

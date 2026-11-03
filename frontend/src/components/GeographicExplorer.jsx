@@ -20,6 +20,13 @@ export default function GeographicExplorer() {
   const [heatmapError, setHeatmapError] = useState('');
   const [locationKpis, setLocationKpis] = useState([]);
   const [locationError, setLocationError] = useState('');
+  const [reloadVersion, setReloadVersion] = useState(0);
+
+  useEffect(() => {
+    const refresh = () => setReloadVersion((version) => version + 1);
+    window.addEventListener('kpi-data:updated', refresh);
+    return () => window.removeEventListener('kpi-data:updated', refresh);
+  }, []);
 
   useEffect(() => {
     setDistrictId(''); setBlockId(''); setVillageId('');
@@ -40,7 +47,7 @@ export default function GeographicExplorer() {
       .then(({ data }) => { if (active) { setHeatmap(data.data); setHeatmapError(''); } })
       .catch((error) => { if (active) setHeatmapError(error.response?.data?.message || 'Heatmap data is unavailable.'); });
     return () => { active = false; };
-  }, [stateId, selectedScheme]);
+  }, [stateId, selectedScheme, reloadVersion]);
 
   const location = useMemo(() => {
     if (villageId) return { level: 'village', id: villageId };
@@ -56,7 +63,7 @@ export default function GeographicExplorer() {
       .then(({ data }) => { if (active) { setLocationKpis(data.data); setLocationError(''); } })
       .catch((error) => { if (active) setLocationError(error.response?.data?.message || 'Location KPIs are unavailable.'); });
     return () => { active = false; };
-  }, [location, selectedScheme]);
+  }, [location, selectedScheme, reloadVersion]);
 
   const selectedLocation = useMemo(() => {
     if (villageId) return villages.find((item) => String(item.id) === villageId);
@@ -69,7 +76,7 @@ export default function GeographicExplorer() {
   return (
     <section className="mb-8 rounded-2xl border border-white/15 bg-slate-900/70 p-5 text-white" aria-labelledby="geo-explorer-title">
       <h2 id="geo-explorer-title" className="mb-2 text-xl font-bold">Geographic drill-down and district KPI heatmap</h2>
-      <p className="mb-4 text-sm text-slate-300">Explore recorded data from state to village. District cells show each KPI’s latest recorded status; this is a status matrix, not a boundary map.</p>
+      <p className="mb-4 text-sm text-slate-300">Explore official source observations at the geographic levels provided by each dataset. District cells show latest recorded values; no village metrics or administrative boundaries are inferred.</p>
       <div className="mb-5 flex flex-wrap gap-3">
         <label className="grid gap-1 text-xs text-slate-300">State<select className={selectClass} value={stateId} onChange={(event) => setStateId(event.target.value)}><option value="">Select state</option>{states.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
         <label className="grid gap-1 text-xs text-slate-300">District<select className={selectClass} value={districtId} disabled={!stateId} onChange={(event) => setDistrictId(event.target.value)}><option value="">Select district</option>{districts.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
@@ -81,7 +88,7 @@ export default function GeographicExplorer() {
       {location && <div className="mb-5 overflow-x-auto">
         <h3 className="mb-2 font-semibold">Latest {location.level} KPI readings</h3>
         {locationKpis.length ? <table className="w-full min-w-[480px] text-left text-sm"><thead><tr className="border-b border-white/15 text-slate-300"><th className="p-2">KPI</th><th className="p-2">Value</th><th className="p-2">Target</th><th className="p-2">Status</th><th className="p-2">Date</th></tr></thead><tbody>
-          {locationKpis.map((item) => <tr key={item.kpi_id} className="border-b border-white/10"><th className="p-2">{item.kpi_name}</th><td className="p-2">{item.value.toLocaleString()} {item.unit || ''}</td><td className="p-2">{item.target.toLocaleString()} {item.unit || ''}</td><td className="p-2">{item.status || 'unknown'}</td><td className="p-2">{new Date(item.date).toLocaleDateString()}</td></tr>)}
+          {locationKpis.map((item) => <tr key={item.kpi_id} className="border-b border-white/10"><th className="p-2">{item.kpi_name}</th><td className="p-2">{item.value.toLocaleString()} {item.unit || ''}</td><td className="p-2">{item.target == null ? 'Not provided' : `${item.target.toLocaleString()} ${item.unit || ''}`}</td><td className="p-2">{item.status || 'unknown'}</td><td className="p-2">{new Date(item.date).toLocaleDateString()}</td></tr>)}
         </tbody></table> : <p className="text-sm text-slate-400">No KPI readings are recorded at this level.</p>}
       </div>}
       {heatmapError && <p role="alert" className="text-sm text-red-200">{heatmapError}</p>}
@@ -99,7 +106,7 @@ export default function GeographicExplorer() {
           })}
         </tr>)}</tbody>
       </table></div>}
-      <p className="mt-3 text-xs text-slate-400">Values come from the application database. Confirm the recorded import source and date before treating them as official figures.</p>
+      <p className="mt-3 text-xs text-slate-400">Only source-mapped KPI definitions are displayed. Coverage varies by dataset; values are not real-time unless the official source reports them as current.</p>
     </section>
   );
 }

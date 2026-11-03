@@ -54,6 +54,12 @@ export default function TrendChart({ dateRange, stateId = null }) {
     };
   }, [selectedScheme, schemes, dateRange?.startDate, dateRange?.endDate, stateId, reloadVersion]);
 
+  useEffect(() => {
+    const refresh = () => setReloadVersion((version) => version + 1);
+    window.addEventListener('kpi-data:updated', refresh);
+    return () => window.removeEventListener('kpi-data:updated', refresh);
+  }, []);
+
   const metricOptions = useMemo(() => {
     const metrics = new Map();
     kpiValues.forEach((item) => {

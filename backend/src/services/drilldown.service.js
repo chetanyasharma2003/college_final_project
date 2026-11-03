@@ -1,4 +1,6 @@
 import { progressPct, statusFromProgress, latestPerEntity, averageCoords } from '../utils/drilldown-math.js';
+import { filterSourceKpiDefinitions } from './kpi-management.service.js';
+import { SCHEME_CONFIGS } from '../config/scheme-integrations.js';
 
 export class HttpError extends Error {
   constructor(status, message) { super(message); this.status = status; }
@@ -17,6 +19,10 @@ export function createDrilldownService(db) {
   async function loadKpi(kpiId) {
     const kpi = await db.kPIDefinition.findUnique({ where: { id: kpiId }, include: { scheme: true } });
     if (!kpi) throw new HttpError(404, 'KPI not found');
+    if (!SCHEME_CONFIGS[kpi.scheme.code]?.fieldMapping
+      || filterSourceKpiDefinitions([kpi], SCHEME_CONFIGS[kpi.scheme.code]).length === 0) {
+      throw new HttpError(404, 'KPI is not backed by a configured official source');
+    }
     return {
       id: kpi.id, name: kpi.kpi_name, unit: kpi.unit,
       scheme: { code: kpi.scheme.code, name: kpi.scheme.name },
@@ -42,6 +48,44 @@ export function createDrilldownService(db) {
       where: stateScope ? { id: stateScope } : undefined,
       orderBy: { name: 'asc' },
     });
+    const config = SCHEME_CONFIGS[kpi.scheme.code];
+    if (config?.aggregateByDistrict) {
+      const districts = await db.kPIValue.findMany({
+        where: {
+          kpi_id: kpiId,
+          district_id: { not: null },
+          block_id: null,
+          village_id: null,
+          district: { state_id: { in: states.map((state) => state.id) } },
+        },
+        orderBy: { date: 'desc' },
+        include: { district: { select: { state_id: true } } },
+      });
+      const latestByDistrict = latestPerEntity(districts, (row) => row.district_id);
+      const totalsByState = new Map();
+      for (const row of latestByDistrict.values()) {
+        const total = totalsByState.get(row.district.state_id) || {
+          value: 0,
+          target_value: null,
+          date: row.date,
+        };
+        total.value += Number(row.value);
+        if (row.date > total.date) total.date = row.date;
+        totalsByState.set(row.district.state_id, total);
+      }
+      const data = states.map((state) => shape(
+        state,
+        totalsByState.get(state.id),
+        { code: state.code, region: state.region },
+      ));
+      const dates = data.map((item) => item.date).filter(Boolean).map((date) => new Date(date).getTime());
+      return {
+        kpi,
+        date: dates.length ? new Date(Math.max(...dates)) : null,
+        states: data,
+      };
+    }
+
     const rows = await db.kPIValue.findMany({
       where: { kpi_id: kpiId, state_id: { in: states.map((s) => s.id) }, ...NOLEVEL_NULLS },
       orderBy: { date: 'desc' },

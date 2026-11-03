@@ -3,6 +3,7 @@ import GeographicService from '../services/geographic.service.js';
 import prisma from '../config/prisma.js';
 import { verifyAuth } from '../middleware/auth.middleware.js';
 import { createLocationScope } from '../services/location-scope.js';
+import KPIManagementService from '../services/kpi-management.service.js';
 
 const stateIdOfLocation = createLocationScope(prisma);
 
@@ -153,19 +154,18 @@ router.get('/performance-heatmap', verifyAuth, async (req, res) => {
       return res.status(403).json({ status: 'error', message: 'State access denied' });
     }
 
-    const [definitions, rows] = await Promise.all([
-      prisma.kPIDefinition.findMany({
-        where: { scheme_id: schemeId },
-        orderBy: { kpi_name: 'asc' },
-        select: { id: true, kpi_name: true, unit: true },
-      }),
-      prisma.kPIValue.findMany({
-        where: { state_id: stateId, district_id: { not: null }, block_id: null, village_id: null, kpi: { scheme_id: schemeId } },
+    const scheme = await prisma.scheme.findUnique({ where: { id: schemeId }, select: { code: true } });
+    if (!scheme) return res.status(404).json({ status: 'error', message: 'Scheme not found' });
+    const sourceDefinitions = await KPIManagementService.getSchemeKPIs(scheme.code);
+    const definitions = sourceDefinitions
+      .map(({ id, kpi_name, unit }) => ({ id, kpi_name, unit }))
+      .sort((first, second) => first.kpi_name.localeCompare(second.kpi_name));
+    const rows = definitions.length ? await prisma.kPIValue.findMany({
+        where: { kpi_id: { in: definitions.map(({ id }) => id) }, state_id: stateId, district_id: { not: null }, block_id: null, village_id: null },
         orderBy: { date: 'desc' },
         take: 10000,
         include: { district: { select: { id: true, name: true } }, kpi: { select: { id: true, kpi_name: true, target_value: true } } },
-      }),
-    ]);
+      }) : [];
 
     const districts = new Map();
     for (const row of rows) {
@@ -173,8 +173,8 @@ router.get('/performance-heatmap', verifyAuth, async (req, res) => {
       if (!item.values[row.kpi_id]) {
         item.values[row.kpi_id] = {
           value: Number(row.value),
-          target: Number(row.target_value),
-          status: row.status,
+          target: row.target_value == null ? null : Number(row.target_value),
+          status: row.target_value == null ? 'not_rated' : row.status,
           date: row.date,
         };
       }
@@ -200,7 +200,11 @@ router.get('/location-kpis', verifyAuth, async (req, res) => {
       return res.status(403).json({ status: 'error', message: 'State access denied' });
     }
 
-    const where = { kpi: { scheme_id: schemeId } };
+    const scheme = await prisma.scheme.findUnique({ where: { id: schemeId }, select: { code: true } });
+    if (!scheme) return res.status(404).json({ status: 'error', message: 'Scheme not found' });
+    const sourceDefinitions = await KPIManagementService.getSchemeKPIs(scheme.code);
+    if (sourceDefinitions.length === 0) return res.json({ status: 'success', data: [] });
+    const where = { kpi_id: { in: sourceDefinitions.map(({ id }) => id) } };
     if (level === 'state') Object.assign(where, { state_id: id, district_id: null, block_id: null, village_id: null });
     if (level === 'district') Object.assign(where, { district_id: id, block_id: null, village_id: null });
     if (level === 'block') Object.assign(where, { block_id: id, village_id: null });
@@ -218,8 +222,8 @@ router.get('/location-kpis', verifyAuth, async (req, res) => {
         kpi_name: row.kpi.kpi_name,
         unit: row.kpi.unit,
         value: Number(row.value),
-        target: Number(row.target_value),
-        status: row.status,
+        target: row.target_value == null ? null : Number(row.target_value),
+        status: row.target_value == null ? 'not_rated' : row.status,
         date: row.date,
       });
     }

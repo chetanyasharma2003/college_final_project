@@ -221,7 +221,7 @@ export default function IndiaHeatmap() {
       </div>
 
       <p className="text-xs text-blue-300">
-        Sample / simulated data. Markers show indicative locations only; administrative borders are not drawn.
+        Only KPIs mapped to configured official sources are shown. Markers indicate approximate state locations; administrative boundaries are not drawn.
         {view.date ? ` State values as of ${new Date(view.date).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}.` : ''}
       </p>
     </div>

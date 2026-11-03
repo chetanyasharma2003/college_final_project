@@ -8,6 +8,8 @@ export default function TopPerformers({ schemeCode = 'PMAY' }) {
 
   useEffect(() => {
     fetchTopPerformers();
+    window.addEventListener('kpi-data:updated', fetchTopPerformers);
+    return () => window.removeEventListener('kpi-data:updated', fetchTopPerformers);
   }, [schemeCode]);
 
   const fetchTopPerformers = async () => {
@@ -75,7 +77,9 @@ export default function TopPerformers({ schemeCode = 'PMAY' }) {
         </div>
       ) : (
         <div className="flex justify-center items-center h-64">
-          <p className="text-gray-400">No data available</p>
+          <p className="max-w-sm text-center text-gray-400">
+            No target-based state ranking is available for this source. Official targets are not provided for the imported measures.
+          </p>
         </div>
       )}
     </div>

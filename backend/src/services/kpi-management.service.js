@@ -11,11 +11,14 @@ export const filterSourceKpiDefinitions = (definitions, config) => {
 class KPIManagementService {
   // Get all KPI definitions for a scheme
   static async getSchemeKPIs(schemeCode) {
+    const config = SCHEME_CONFIGS[schemeCode];
+    if (!config?.fieldMapping) return [];
+
     const definitions = await prisma.kPIDefinition.findMany({
       where: { scheme: { code: schemeCode } },
       include: { scheme: true },
     });
-    return filterSourceKpiDefinitions(definitions, SCHEME_CONFIGS[schemeCode]);
+    return filterSourceKpiDefinitions(definitions, config);
   }
 
   // Calculate current KPI values from scheme data
