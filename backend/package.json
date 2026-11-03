@@ -10,6 +10,7 @@
     "build": "prisma generate",
     "migrate": "prisma migrate deploy",
     "seed": "node src/migrations/seed.js",
+    "sync:official": "node scripts/sync-official-data.js",
     "test": "node --test",
     "test:watch": "node --test --watch",
     "lint": "eslint src/",
