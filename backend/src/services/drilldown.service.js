@@ -111,7 +111,10 @@ export function createDrilldownService(db) {
       }
       const districts = await db.district.findMany({
         where: { state_id: state.id }, orderBy: { name: 'asc' },
-        select: { id: true, name: true, area_km2: true },
+        // Area is optional and may be null for source-derived districts. It is
+        // not needed by this heatmap response; selecting it can make an older
+        // generated Prisma client fail while decoding the row.
+        select: { id: true, name: true },
       });
       const villages = await db.village.findMany({
         where: { block: { district: { state_id: state.id } } },
@@ -132,7 +135,7 @@ export function createDrilldownService(db) {
       return {
         kpi, level: 'district', parent: { id: state.id, name: state.name, type: 'state' },
         children: districts.map((d) => shape(d, latest.get(d.id), {
-          areaKm2: d.area_km2 == null ? null : Number(d.area_km2),
+          areaKm2: null,
           ...(averageCoords(byDistrict.get(d.id) || []) || { lat: null, lng: null }),
         })),
       };
