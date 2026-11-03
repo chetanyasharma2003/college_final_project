@@ -1,12 +1,12 @@
-# 🐳 Government Schemes Analytics Dashboard - Docker Edition
+# 🐳 Government Schemes Analytics Dashboard — Docker Compose
 
-> **Production-Ready Application Ready to Deploy**
+> This guide describes the local Docker Compose setup. Production is deployed separately on Render; see [DEPLOYMENT.md](./DEPLOYMENT.md).
 
 ---
 
 ## ✨ What's Inside
 
-This is a **complete, production-ready application** running in Docker:
+The Compose stack runs the application with local PostgreSQL and Redis containers. It is for local development and evaluation; it does not create a production deployment or import the official source snapshots automatically.
 
 ### 🏢 Architecture
 ```
@@ -35,38 +35,48 @@ This is a **complete, production-ready application** running in Docker:
 
 ---
 
-## 🚀 Getting Started (1 Minute)
+## 🚀 Getting Started
 
-### 1. Start Everything
+### 1. Configure local secrets
+
+Copy the root environment template and set a strong local database password plus two different random JWT secrets:
+
 ```bash
-docker-compose up -d
+cp .env.example .env
 ```
 
-### 2. Open Browser
+### 2. Start the containers
+
+```bash
+docker compose up -d --build
+```
+
+### 3. Apply database migrations
+
+```bash
+docker compose exec backend npm run migrate
+```
+
+### 4. Open the application
+
 ```
 http://localhost:5173
 ```
 
-### 3. Login
-```
-Email:    admin@govschemes.in
-Password: <provisioned-password>
-```
-
-**Done!** ✨
+There is no default admin account or shared demo password. Use the available account registration flow, or provision an account through your local development setup.
 
 ---
 
 ## 🛑 Stop Everything
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ### Clean Fresh Start (Deletes All Data)
 ```bash
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```
 
 ---
@@ -76,7 +86,7 @@ docker-compose up -d
 Check if everything is running:
 
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 Expected output:
@@ -92,17 +102,11 @@ redis       Up ... (healthy)
 
 ## 📚 Documentation
 
-### Quick References
-- **Setup Guide** → `DOCKER_QUICKSTART.md`
-- **Share with Team** → `SHARE_WITH_TEAM.md`
-- **API Documentation** → `API_ML_ANALYTICS.md`
-- **Deployment** → `DEPLOYMENT_GUIDE.md`
-- **Commands** → `QUICK_COMMANDS.md`
-
-### Technical Docs
-- **Architecture** → See `CLAUDE.md`
-- **Database Schema** → `backend/prisma/schema.prisma`
-- **Project Plan** → `PROJECT_PLAN.md`
+### References
+- **Project status and source coverage** → [README.md](./README.md)
+- **Production endpoints and setup** → [DEPLOYMENT.md](./DEPLOYMENT.md)
+- **Current handoff and verification record** → [WORK_UPDATE.md](./WORK_UPDATE.md)
+- **Database schema** → `backend/prisma/schema.prisma`
 
 ---
 
@@ -110,14 +114,14 @@ redis       Up ... (healthy)
 
 ### All Logs
 ```bash
-docker-compose logs -f
+docker compose logs -f
 ```
 
 ### Specific Service
 ```bash
-docker-compose logs -f backend
-docker-compose logs -f frontend
-docker-compose logs -f postgres
+docker compose logs -f backend
+docker compose logs -f frontend
+docker compose logs -f postgres
 ```
 
 ---
@@ -142,52 +146,36 @@ docker-compose logs -f postgres
 
 ## 🔧 Configuration
 
-### Environment Variables
-Located in `docker-compose.yml`:
+Compose reads the root `.env` file. The required local values are:
 
 ```yaml
-Database:
-  DB_USER: govschemes
-  DB_PASSWORD: <set-strong-db-password>
-  DB_NAME: gov_schemes
-
-Application:
-  NODE_ENV: development
-  JWT_SECRET: your-secret-key-change-in-production
-
-Ports:
-  DB_PORT: 5432
-  REDIS_PORT: 6379
+DB_PASSWORD=<strong-local-password>
+JWT_SECRET=<random-secret-at-least-32-characters>
+JWT_REFRESH_SECRET=<different-random-secret-at-least-32-characters>
 ```
 
-**To customize**: Create `.env` file in project root (optional)
+The `.env` file is ignored by Git. Do not use production credentials in a local Compose environment.
 
 ---
 
-## 🎯 Features & Capabilities
+## 🎯 Features & Data
 
-### ✅ Currently Working
+### Application surfaces
 - [x] Dashboard with source-reported KPI observations and reporting dates
 - [x] 6 Government schemes (PMAY, MGNREGS, PMGSY, NRLM, DDU-GKY, SAGY)
 - [x] Authentication & role-based access
 - [x] Geographic analytics at source-supported levels (state and district for current feeds)
 - [x] Interactive visualizations (Recharts)
-- [x] ML Analytics (anomaly detection, pattern analysis)
+- [x] Analytics and comparative views
 - [x] Report generation & export
-- [x] Predictive forecasting
-- [x] Chatbot for natural language queries
+- [x] Prediction and chatbot API surfaces
 - [x] Redis caching for performance
 - [x] Database persistence
 - [x] Production-grade error handling
 
-### 🔄 Data
-- Official source snapshot ingestion; configured feeds do not provide a verified refresh cadence
-- Time-series data tracking
-- Scheme-specific metrics
-- State and district aggregation where source data supplies those locations; no generated block/village observations
-- Performance analytics
+### Data behavior
 
-Production does not use synthetic KPI, block, or village observations. Historical source data is displayed with its reporting dates; the configured feeds do not provide real-time coverage across every scheme. The OGD catalog lists an NRLM village-wise SHG/member resource, but its API schema has not yet been verified and integrated, so no village KPI data is currently served.
+The Compose database is separate from production and starts without the production Neon data. Apply migrations before using it. Official source snapshots are not imported by `docker compose up`; the configured weekly importer runs on the designated Mac and writes to Neon. Current source dates and geographic coverage vary by scheme, and no village KPI observations are configured.
 
 ### 🎨 Frontend
 - Responsive dashboard
@@ -222,27 +210,14 @@ curl http://localhost:5001/health
 curl http://localhost:5173
 
 # Check if containers are healthy
-docker-compose ps
+docker compose ps
 ```
 
 ---
 
-## 📈 Performance
+## 📈 Performance and Operations
 
-### Response Times
-- Dashboard load: <2 seconds
-- API queries: <500ms (p95)
-- Report generation: <5 seconds
-
-### Capacity
-- Concurrent users: 100+
-- Database connections: 20
-- Request rate: 10,000 req/min (development)
-
-### Caching
-- KPI cache TTL: 1 hour
-- Session cache: Redis
-- Query result cache: In-memory
+The Docker Compose file includes PostgreSQL, Redis, and container health checks. No load-test results or capacity guarantees are recorded for this setup. Use `docker compose logs -f` and `docker compose ps` to inspect the local services.
 
 ---
 
@@ -269,45 +244,45 @@ docker-compose ps
 
 ### Issue: Port Already in Use
 ```bash
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 ```
 
 ### Issue: Database Connection Failed
 ```bash
 # Check if database is healthy
-docker-compose ps
+docker compose ps
 
 # Restart database
-docker-compose restart postgres
+docker compose restart postgres
 ```
 
 ### Issue: Backend keeps restarting
 ```bash
 # Check logs
-docker-compose logs backend
+docker compose logs backend
 
 # Rebuild
-docker-compose down -v
-docker-compose build --no-cache backend
-docker-compose up -d
+docker compose down -v
+docker compose build --no-cache backend
+docker compose up -d
 ```
 
 ### Issue: Frontend not loading
 ```bash
 # Check frontend logs
-docker-compose logs frontend
+docker compose logs frontend
 
 # Restart frontend
-docker-compose restart frontend
+docker compose restart frontend
 ```
 
 ### Issue: Data not persisting
 ```bash
 # Data persists in volumes by default
 # To delete all data:
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```
 
 ---
@@ -326,7 +301,7 @@ docker volume ls | grep gov-schemes
 
 **Cleanup all data:**
 ```bash
-docker-compose down -v
+docker compose down -v
 ```
 
 ---
@@ -341,51 +316,43 @@ docker-compose down -v
 
 ### Rebuild After Dependency Changes
 ```bash
-docker-compose build backend
-docker-compose restart backend
+docker compose build backend
+docker compose restart backend
 ```
 
 ### Database Migrations
 ```bash
 # Run migrations
-docker-compose exec backend npx prisma migrate deploy
+docker compose exec backend npx prisma migrate deploy
 
 # Create new migration
-docker-compose exec backend npx prisma migrate dev --name your_migration_name
+docker compose exec backend npx prisma migrate dev --name your_migration_name
 ```
 
 ---
 
-## 🚀 Deployment
+## 🚀 Production Deployment
 
-### Ready for Production
-This setup is production-ready! Deploy to:
-
-- **Frontend**: Vercel, Netlify
-- **Backend**: Railway, Render, Heroku
-- **Database**: AWS RDS, PostgreSQL managed service
-- **Cache**: Redis Cloud, ElastiCache
-
-See **DEPLOYMENT_GUIDE.md** for step-by-step instructions.
+Production currently uses the Render frontend and backend with Neon PostgreSQL, not this local Compose stack. See [DEPLOYMENT.md](./DEPLOYMENT.md) for the active endpoints, configuration, and known operational limits.
 
 ---
 
 ## 📞 Support & Help
 
 ### Quick Answers
-1. Check `DOCKER_QUICKSTART.md`
-2. Check `QUICK_COMMANDS.md`
-3. View logs: `docker-compose logs`
+- Start local services: `docker compose up -d`
+- Stop local services: `docker compose down`
+- View service status: `docker compose ps`
+- View logs: `docker compose logs`
 
 ### For Developers
 - Backend: See `backend/src/` and `backend/prisma/schema.prisma`
 - Frontend: See `frontend/src/components/` and `frontend/src/pages/`
 
 ### Documentation Files
-- API Spec: `API_ML_ANALYTICS.md`
-- Setup: `DOCKER_QUICKSTART.md`
-- Deployment: `DEPLOYMENT_GUIDE.md`
-- Team Sharing: `SHARE_WITH_TEAM.md`
+- Project overview and official-source coverage: [`README.md`](./README.md)
+- Current Render deployment: [`DEPLOYMENT.md`](./DEPLOYMENT.md)
+- Current progress and verified handoff: [`WORK_UPDATE.md`](./WORK_UPDATE.md)
 
 ---
 
@@ -413,20 +380,11 @@ See **DEPLOYMENT_GUIDE.md** for step-by-step instructions.
 
 ---
 
-## ✅ Production Checklist
+## 🔐 Production Notes
 
-Before deploying:
-
-- [ ] Change `JWT_SECRET` to a random string
-- [ ] Change database password
-- [ ] Set `NODE_ENV=production`
-- [ ] Configure proper CORS origins
-- [ ] Set up SSL certificates
-- [ ] Configure backup strategy
-- [ ] Enable monitoring & logging
-- [ ] Test all endpoints
-- [ ] Load test the application
-- [ ] Plan disaster recovery
+- Production secrets are configured privately in their hosting providers and must not be copied into `.env` or committed.
+- Source imports are best-effort weekly polling from the configured Mac. The polling interval is not a source update guarantee.
+- Review [WORK_UPDATE.md](./WORK_UPDATE.md) for the latest import, deployment, and verification record.
 
 ---
 
@@ -434,7 +392,7 @@ Before deploying:
 
 ### Current Logs
 ```bash
-docker-compose logs
+docker compose logs
 ```
 
 ### For Production
@@ -447,49 +405,19 @@ Set up:
 
 ---
 
-## 🎉 You're All Set!
+## 📝 Current Status
 
-Your complete Government Schemes Analytics Dashboard is:
-
-✅ **Running** in Docker containers  
-✅ **Secured** with authentication & RBAC  
-✅ **Performant** with caching & optimization  
-✅ **Scalable** with production patterns  
-✅ **Documented** with complete guides  
-✅ **Ready for production** deployment  
-
----
-
-## 📝 Version Info
-
-```
-Version: 1.0 Production Ready
-Date: August 2026
-Status: ✅ Working & Tested
-Docker: ✅ Complete Setup
-Team Ready: ✅ Yes
-```
+This file documents how to run the local Compose configuration; it does not assert that containers are running or that this configuration has passed a separate production-readiness review. Last reviewed: 3 November 2026.
 
 ---
 
 ## 🚀 Next Steps
 
-1. **Explore** - Open http://localhost:5173
-2. **Test** - Try all features in dashboard
-3. **Share** - Give GitHub link to team members
-4. **Deploy** - Follow DEPLOYMENT_GUIDE.md
-5. **Monitor** - Set up production monitoring
+1. Configure `.env` with local-only secrets.
+2. Start the containers and apply migrations.
+3. Use the local dashboard at http://localhost:5173.
+4. Consult [DEPLOYMENT.md](./DEPLOYMENT.md) for production status and limits.
 
 ---
 
-**Your application is ready!** 🎉
-
-**Questions?** Check the documentation files in the project root.
-
-**Ready to share with team?** See `SHARE_WITH_TEAM.md`
-
----
-
-**Happy coding! 🚀**
-
-सब कुछ तैयार है! अब बस अपने दोस्तों को दे दो और हो गया! 🎯
+For project or deployment status, use the linked README and handoff above.
