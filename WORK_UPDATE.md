@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 17:46 IST
+**Last updated:** 2026-11-03 17:49 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -84,9 +84,10 @@ All three geography migrations were applied to the configured Neon database; it 
 ### Latest tests
 
 - Root `npm test`: passed after allowing the Redis tests to open their temporary loopback servers.
-- Latest root `npm test`: passed with 3 frontend tests and 48 backend tests, including report source-filter/no-target coverage.
+- Local root `npm test` after PR #11: passed with 3 frontend tests and 48 backend tests, including report source-filter/no-target coverage.
 - PR #11 required CI and merged-main CI both passed; the merged workflow runs the same root suite.
 - PR #12 required CI and merged-main CI both passed.
+- PR #12 and the final handoff commit passed the full root build/test suite in GitHub Actions.
 - GitHub Actions `Project CI` on `main`: passed after merge.
 - Frontend production build: passed.
 - Frontend tests: 3 passed.
@@ -130,7 +131,7 @@ All three geography migrations were applied to the configured Neon database; it 
 - [x] Official dataset/resource mappings are configured and source attribution/limitations are documented.
 - [x] Dashboard avoids fabricated targets and unsupported geographic/real-time claims.
 - [x] Analytics, comparisons, charts, authentication, report/export, and geographic UI have implementation coverage.
-- [x] Regression/build/test suite passes locally.
+- [x] Full root build/test suite passes in GitHub Actions; the local suite also passed after PR #11.
 - [x] Latest Neon import run: 7/7 feeds successful, 888 records, no failed rows.
 - [x] Geographic aliases/territories are mapped; all non-total source geographies in configured feeds resolve.
 - [x] Persisted row/KPI counts and import history are verified; repeated sync did not duplicate rows.
