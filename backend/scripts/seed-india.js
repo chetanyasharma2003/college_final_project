@@ -2,7 +2,7 @@
  * seed-india.js  (batched, re-runnable)
  *
  * What it does
- *  - 31 states / UTs (adds the missing ones, keeps existing codes, fills region/population)
+ *  - 36 current states / UTs (adds missing ones, keeps existing codes, fills region/population)
  *  - Approximate district areas for 6 states: RJ, MH, UP, MP, GJ, KA
  *  - SYNTHETIC blocks and villages under those districts (names and coordinates are generated)
  *  - KPI values at state level (12 months) for every KPI definition of the 6 schemes.
@@ -65,6 +65,11 @@ const STATES = [
   ['Delhi', 'DL', 'North', 16787941],
   ['Jammu and Kashmir', 'JK', 'North', 12541302],
   ['Puducherry', 'PY', 'South', 1247953],
+  ['Andaman and Nicobar Islands', 'AN', 'Islands'],
+  ['Chandigarh', 'CH', 'North'],
+  ['Dadra and Nagar Haveli and Daman and Diu', 'DN', 'West'],
+  ['Ladakh', 'LA', 'North'],
+  ['Lakshadweep', 'LD', 'Islands'],
 ];
 
 // state name -> [district, lat, lng, area_km2(approx)]
@@ -227,7 +232,7 @@ async function main() {
   }
   const stateByName = new Map(stateRows.map((s) => [s.name, s]));
   const stateList = STATES.map(([name]) => stateByName.get(name)).filter(Boolean);
-  const totalPop = STATES.reduce((a, s) => a + s[3], 0);
+  const totalPop = STATES.reduce((total, state) => total + (state[3] || 0), 0);
   console.log(`states ready: ${stateList.length}`);
   if (GEOGRAPHY_ONLY) {
     console.log('geography-only mode: no district, block, village, KPI definition, or KPI value data was written');
@@ -327,7 +332,7 @@ async function main() {
 
   for (const def of defs) {
     for (const st of stateList) {
-      const share = STATES.find((s) => s[0] === st.name)[3] / totalPop;
+      const share = (STATES.find((s) => s[0] === st.name)[3] || 0) / totalPop;
       const target = noScale(def) ? def.target_value : Math.max(def.target_value * share, 1);
       const r = rng(`state:${st.name}:${def.kpi_name}`);
       const fp = 0.38 + r() * 0.7; // 0.38 .. 1.08

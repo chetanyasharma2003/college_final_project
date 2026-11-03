@@ -25,6 +25,9 @@ const normalizeLocationName = (name) => String(name || '')
 const STATE_ALIASES = new Map([
   ['andaman and nicobar', 'andaman and nicobar islands'],
   ['andman and nicobar islands', 'andaman and nicobar islands'],
+  ['keralam', 'kerala'],
+  ['dadra and nagar haveli', 'dadra and nagar haveli and daman and diu'],
+  ['daman and diu', 'dadra and nagar haveli and daman and diu'],
   ['nct of delhi', 'delhi'],
   ['orissa', 'odisha'],
   ['uttaranchal', 'uttarakhand'],
@@ -106,10 +109,69 @@ export const aggregateSourceCategories = (records, config) => {
     });
 };
 
-const resolveStateId = (stateMap, stateName) => {
+const canonicalStateName = (stateName) => {
   const normalized = normalizeLocationName(stateName);
-  const canonical = STATE_ALIASES.get(normalized) || normalized;
+  return STATE_ALIASES.get(normalized) || normalized;
+};
+
+export const resolveStateId = (stateMap, stateName) => {
+  const canonical = canonicalStateName(stateName);
   return stateMap.get(canonical);
+};
+
+export const aggregateAliasedStateRows = (records, config) => {
+  if (!config.aggregateByStateSum || !config.fieldMapping?.state) return records;
+
+  const grouped = new Map();
+  for (const record of records) {
+    const rawState = record[config.fieldMapping.state];
+    const canonicalState = canonicalStateName(rawState);
+    const rawDate = config.reportDate
+      || record[config.fieldMapping.date]
+      || record.date
+      || record.report_date
+      || record.data_date
+      || record.month;
+    const key = `${canonicalState}:${rawDate ? String(rawDate) : ''}`;
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(record);
+  }
+
+  return Array.from(grouped.values()).flatMap((group) => {
+    const sourceStates = new Set(group.map((record) => normalizeLocationName(record[config.fieldMapping.state])));
+    if (sourceStates.size < 2) return [group[group.length - 1]];
+
+    const aggregated = { ...group[group.length - 1] };
+    for (const field of Object.values(config.fieldMapping.metrics || {})) {
+      const values = group.map((record) => {
+        const rawValue = record[field];
+        if (rawValue == null || rawValue === '') return null;
+        const value = Number(String(rawValue).replace(/,/g, ''));
+        return Number.isFinite(value) ? value : null;
+      });
+      aggregated[field] = values.every((value) => value != null)
+        ? values.reduce((sum, value) => sum + value, 0)
+        : null;
+      if (aggregated[field] == null) delete aggregated[field];
+    }
+    aggregated[config.fieldMapping.state] = group[group.length - 1][config.fieldMapping.state];
+    aggregated.source_state_breakdown = group.map((record) => ({
+      state: record[config.fieldMapping.state],
+      metrics: Object.fromEntries(
+        Object.entries(config.fieldMapping.metrics || {}).map(([metricId, field]) => [metricId, record[field] ?? null]),
+      ),
+    }));
+    return [aggregated];
+  });
+};
+
+export const isExcludedSourceRecord = (record, config) => {
+  const category = (config.fieldMapping?.category && record[config.fieldMapping.category])
+    || record.category
+    || (config.excludeCategories?.length && config.fieldMapping?.state
+      ? record[config.fieldMapping.state]
+      : null);
+  return isExcludedCategory(category, config.excludeCategories);
 };
 
 class DataSyncService {
@@ -326,7 +388,7 @@ class DataSyncService {
       if (page.length < pageSize || (total != null && offset >= total)) break;
     } while (true);
 
-    return aggregateSourceCategories(records, config);
+    return aggregateAliasedStateRows(aggregateSourceCategories(records, config), config);
   }
 
   static async loadDataToDatabase(schemeCode, data, config) {
@@ -345,7 +407,7 @@ class DataSyncService {
     // Get all states for mapping
     const allStates = await prisma.state.findMany();
     const stateMap = new Map();
-    allStates.forEach((state) => stateMap.set(normalizeLocationName(state.name), state.id));
+    allStates.forEach((state) => stateMap.set(canonicalStateName(state.name), state.id));
     const defaultStateId = config.defaultState ? resolveStateId(stateMap, config.defaultState) : null;
     const districtWhere = config.defaultState ? { state_id: defaultStateId || -1 } : {};
     const allDistricts = config.fieldMapping.district
@@ -358,12 +420,24 @@ class DataSyncService {
       `${district.state_id}:${normalizeLocationName(district.name)}`,
       district,
     ]));
+    const kpiDefinitions = await prisma.kPIDefinition.findMany({
+      where: { scheme_id: scheme.id },
+    });
+    const sourceKpiDefinitions = kpiDefinitions.filter((definition) => (
+      config.dataPoints?.some((dataPoint) => (
+        dataPoint.name.toLowerCase() === definition.kpi_name.toLowerCase()
+      ))
+    ));
+    const genericRows = [];
+    const kpiRows = [];
+    const genericDates = new Map();
+    const kpiDates = new Map();
 
-    for (const record of data) {
+    const processRecord = async (record) => {
       try {
-        if (isExcludedCategory(record.category, config.excludeCategories)) {
+        if (isExcludedSourceRecord(record, config)) {
           skipped++;
-          continue;
+          return;
         }
 
         const stateName = (config.fieldMapping.state && record[config.fieldMapping.state])
@@ -376,7 +450,7 @@ class DataSyncService {
         if (!stateId && !nationalAggregate) {
           failed++;
           errors.push(`State not found: ${stateName || 'unknown'}`);
-          continue;
+          return;
         }
 
         const rawDate = config.reportDate
@@ -396,7 +470,7 @@ class DataSyncService {
         }
         if (isExcludedDistrict(districtName, config.excludeDistricts)) {
           skipped++;
-          continue;
+          return;
         }
         const canonicalDistrictName = resolveDistrictName(districtName, config.districtAliases);
         let district = districtName
@@ -429,22 +503,96 @@ class DataSyncService {
           : null;
         if (villageName && !village) throw new Error(`Village not found: ${villageName}`);
 
-        await prisma.$transaction(async (transaction) => {
-          await this.createSchemeRecord(transaction, scheme.id, stateId, district?.id || null, block?.id || null, village?.id || null, date, record, config);
-          await this.createKPIValues(transaction, scheme.id, stateId, district?.id || null, block?.id || null, village?.id || null, date, record, config);
-        });
+        const location = {
+          state_id: stateId,
+          district_id: district?.id || null,
+          block_id: block?.id || null,
+          village_id: village?.id || null,
+        };
+        genericRows.push(this.buildSchemeRecordData(scheme.id, location, date, record, config));
+        genericDates.set(date.toISOString(), date);
+        for (const dataPoint of config.dataPoints || []) {
+          const metricDate = dataPoint.reportDate || date;
+          kpiDates.set(metricDate.toISOString(), metricDate);
+        }
+        kpiRows.push(...this.buildKPIValueData(
+          sourceKpiDefinitions,
+          location,
+          date,
+          record,
+          config,
+        ));
         loaded++;
       } catch (error) {
         console.warn(`⚠️  Failed to load record for ${schemeCode}:`, error.message);
         failed++;
         errors.push(error.message);
       }
-    }
+    };
+
+    const concurrency = config.aggregateByDistrict ? 4 : 1;
+    let nextRecord = 0;
+    const workerCount = Math.min(concurrency, data.length);
+    await Promise.all(Array.from({ length: workerCount }, async () => {
+      while (nextRecord < data.length) {
+        const record = data[nextRecord];
+        nextRecord += 1;
+        await processRecord(record);
+      }
+    }));
+
+    await this.replaceImportedSnapshot(
+      scheme.id,
+      genericRows,
+      kpiRows,
+      sourceKpiDefinitions.map((definition) => definition.id),
+      [...genericDates.values()],
+      [...kpiDates.values()],
+    );
 
     return { loaded, failed, skipped, errors };
   }
 
-  static async createSchemeRecord(database, schemeId, stateId, districtId, blockId, villageId, date, record, config) {
+  static async replaceImportedSnapshot(schemeId, genericRows, kpiRows, kpiIds, genericDates, kpiDates) {
+    const deduplicate = (rows, keyFields) => {
+      const unique = new Map();
+      for (const row of rows) {
+        const key = keyFields.map((field) => (
+          row[field] instanceof Date ? row[field].toISOString() : row[field] ?? ''
+        )).join(':');
+        unique.set(key, row);
+      }
+      return [...unique.values()];
+    };
+    const uniqueGenericRows = deduplicate(genericRows, [
+      'scheme_id', 'state_id', 'district_id', 'block_id', 'village_id', 'date',
+    ]);
+    const uniqueKpiRows = deduplicate(kpiRows, [
+      'kpi_id', 'state_id', 'district_id', 'block_id', 'village_id', 'date',
+    ]);
+    const insertBatches = async (database, model, rows) => {
+      for (let index = 0; index < rows.length; index += 500) {
+        await database[model].createMany({ data: rows.slice(index, index + 500) });
+      }
+    };
+
+    await prisma.$transaction(async (transaction) => {
+      if (genericDates.length > 0) {
+        await transaction.schemeDataGeneric.deleteMany({
+          where: { scheme_id: schemeId, date: { in: genericDates } },
+        });
+      }
+      if (kpiIds.length > 0 && kpiDates.length > 0) {
+        await transaction.kPIValue.deleteMany({
+          where: { kpi_id: { in: kpiIds }, date: { in: kpiDates } },
+        });
+      }
+      await insertBatches(transaction, 'schemeDataGeneric', uniqueGenericRows);
+      await insertBatches(transaction, 'kPIValue', uniqueKpiRows);
+    }, { maxWait: 15000, timeout: 120000 });
+  }
+
+  static buildSchemeRecordData(schemeId, location, date, record, config) {
     const excludedFields = new Set([
       'state_name', 'state', 'district_name', 'district', 'date', 'last_updated',
       'report_date', 'data_date', 'data_month', 'month', 'sl__no_', '_s__no_',
@@ -469,7 +617,18 @@ class DataSyncService {
       })
     );
     const metrics = { ...sourceFields, ...mappedMetrics };
-    const where = { scheme_id: schemeId, state_id: stateId, district_id: districtId, block_id: blockId, village_id: villageId, date };
+    return { scheme_id: schemeId, ...location, date, data: metrics };
+  }
+
+  static async createSchemeRecord(database, schemeId, stateId, districtId, blockId, villageId, date, record, config) {
+    const row = this.buildSchemeRecordData(
+      schemeId,
+      { state_id: stateId, district_id: districtId, block_id: blockId, village_id: villageId },
+      date,
+      record,
+      config,
+    );
+    const { data: metrics, ...where } = row;
     const existing = await database.schemeDataGeneric.findFirst({ where });
 
     if (existing) {
@@ -484,41 +643,31 @@ class DataSyncService {
     });
   }
 
-  static async createKPIValues(database, schemeId, stateId, districtId, blockId, villageId, date, record, config) {
-    const definitions = await database.kPIDefinition.findMany({ where: { scheme_id: schemeId } });
-
-    for (const dataPoint of config.dataPoints || []) {
-      const definition = definitions.find(kpi => (
+  static buildKPIValueData(definitions, location, date, record, config) {
+    return (config.dataPoints || []).flatMap((dataPoint) => {
+      const definition = definitions.find((kpi) => (
         kpi.kpi_name.toLowerCase() === dataPoint.name.toLowerCase()
       ));
       const rawValue = record[config.fieldMapping?.metrics?.[dataPoint.id] || dataPoint.id];
-      if (!definition || rawValue == null || rawValue === '') continue;
+      if (!definition || rawValue == null || rawValue === '') return [];
 
       const value = Number(String(rawValue).replace(/,/g, ''));
-      if (!Number.isFinite(value)) continue;
+      if (!Number.isFinite(value)) return [];
 
       const target = Number(definition.target_value) || 0;
       const progress = target > 0 ? (value / target) * 100 : null;
       const status = progress == null ? 'no_target' : progress >= 80 ? 'on_track' : progress >= 50 ? 'at_risk' : 'critical';
-      const metricDate = dataPoint.reportDate || date;
-      const where = {
+      return [{
         kpi_id: definition.id,
-        state_id: stateId,
-        district_id: districtId,
-        block_id: blockId,
-        village_id: villageId,
-        date: metricDate,
-      };
-      const existing = await database.kPIValue.findFirst({ where });
-      const data = { value, target_value: definition.target_value, status };
-
-      if (existing) {
-        await database.kPIValue.update({ where: { id: existing.id }, data });
-      } else {
-        await database.kPIValue.create({ data: { ...where, ...data } });
-      }
-    }
+        ...location,
+        date: dataPoint.reportDate || date,
+        value,
+        target_value: definition.target_value,
+        status,
+      }];
+    });
   }
+
 }
 
 export default DataSyncService;

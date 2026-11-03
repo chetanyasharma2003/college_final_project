@@ -1,4 +1,26 @@
 import prisma from '../config/prisma.js';
+import { SCHEME_CONFIGS } from '../config/scheme-integrations.js';
+import { filterSourceKpiDefinitions } from './kpi-management.service.js';
+
+export const filterSchemeKpiDefinitions = (scheme) => {
+  const config = SCHEME_CONFIGS[scheme.code];
+  return {
+    ...scheme,
+    kpi_definitions: config?.fieldMapping
+      ? filterSourceKpiDefinitions(scheme.kpi_definitions || [], config)
+      : [],
+  };
+};
+
+const getVerifiedKpiIds = async (scheme) => {
+  const config = SCHEME_CONFIGS[scheme.code];
+  if (!config?.fieldMapping) return [];
+  const definitions = await prisma.kPIDefinition.findMany({
+    where: { scheme_id: scheme.id },
+    select: { id: true, kpi_name: true },
+  });
+  return filterSourceKpiDefinitions(definitions, config).map(({ id }) => id);
+};
 
 export class SchemesService {
   // Get all schemes with stats
@@ -18,7 +40,7 @@ export class SchemesService {
 
       return {
         status: 'success',
-        data: schemes,
+        data: schemes.map(filterSchemeKpiDefinitions),
         count: schemes.length,
       };
     } catch (error) {
@@ -56,7 +78,7 @@ export class SchemesService {
 
       return {
         status: 'success',
-        data: scheme,
+        data: filterSchemeKpiDefinitions(scheme),
       };
     } catch (error) {
       return {
@@ -85,7 +107,7 @@ export class SchemesService {
 
       return {
         status: 'success',
-        data: scheme,
+        data: filterSchemeKpiDefinitions(scheme),
       };
     } catch (error) {
       return {
@@ -109,11 +131,19 @@ export class SchemesService {
         };
       }
 
+      const verifiedKpiIds = await getVerifiedKpiIds(scheme);
+      if (verifiedKpiIds.length === 0) {
+        return {
+          status: 'success',
+          data: { scheme, kpiData: [], statusSummary: [] },
+        };
+      }
+
       // Get latest KPI values for all states
       const kpiData = await prisma.kPIValue.groupBy({
         by: ['kpi_id', 'state_id'],
         where: {
-          kpi: { scheme_id: parseInt(schemeId) },
+          kpi_id: { in: verifiedKpiIds },
         },
         _avg: { value: true },
         orderBy: { _avg: { value: 'desc' } },
@@ -123,7 +153,7 @@ export class SchemesService {
       const statusCount = await prisma.kPIValue.groupBy({
         by: ['status'],
         where: {
-          kpi: { scheme_id: parseInt(schemeId) },
+          kpi_id: { in: verifiedKpiIds },
         },
         _count: { id: true },
       });
@@ -162,7 +192,7 @@ export class SchemesService {
 
       return {
         status: 'success',
-        data: schemes,
+        data: schemes.map(filterSchemeKpiDefinitions),
         pagination: {
           page,
           limit,

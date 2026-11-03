@@ -29,7 +29,7 @@ services:
 
       # CORS (includes all deployment URLs)
       - key: CORS_ORIGIN
-        value: "https://frontend-ae3v.onrender.com,https://college-final-project.vercel.app,http://localhost:5173"
+        value: "https://frontend-ae3v.onrender.com,http://localhost:5173"
 
     # Health check
     healthCheckPath: /health

@@ -2,14 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { getDataGovApiKey, SCHEME_CONFIGS } from '../src/config/scheme-integrations.js';
 import DataSyncService, {
+  aggregateAliasedStateRows,
   aggregateSourceCategories,
   formatOpenDataRequestError,
   isExcludedCategory,
   isExcludedDistrict,
+  isExcludedSourceRecord,
   isNationalAggregate,
   resolveDistrictName,
+  resolveStateId,
 } from '../src/services/data-sync.service.js';
 import { filterSourceKpiDefinitions } from '../src/services/kpi-management.service.js';
+import { filterSchemeKpiDefinitions } from '../src/services/schemes.service.js';
 
 const withEnvironment = async (values, callback) => {
   const previous = Object.fromEntries(
@@ -81,6 +85,41 @@ test('recognizes official national aggregate labels without treating state names
   assert.equal(isNationalAggregate('All India'), true);
   assert.equal(isNationalAggregate('India'), true);
   assert.equal(isNationalAggregate('Andaman and Nicobar'), false);
+});
+
+test('resolves official territory name variants to the database state', () => {
+  const stateMap = new Map([['andaman and nicobar islands', 12]]);
+
+  assert.equal(resolveStateId(stateMap, 'Andaman and Nicobar'), 12);
+  assert.equal(resolveStateId(stateMap, 'Andaman and Nicobar Islands'), 12);
+  assert.equal(resolveStateId(stateMap, 'Andman and Nicobar Islands'), 12);
+  assert.equal(resolveStateId(new Map([['kerala', 13]]), 'Keralam'), 13);
+});
+
+test('excludes subtotals from the configured state field', () => {
+  const config = SCHEME_CONFIGS['PMAY-U'];
+  assert.equal(isExcludedSourceRecord({ state_ut: 'Sub-total (States)' }, config), true);
+  assert.equal(isExcludedSourceRecord({ state_ut: 'Maharashtra' }, config), false);
+});
+
+test('combines aliased historic territories without treating missing metrics as zero', () => {
+  const config = {
+    aggregateByStateSum: true,
+    reportDate: new Date('2020-03-03T00:00:00.000Z'),
+    fieldMapping: {
+      state: 'state_ut',
+      metrics: { phase_one: 'phase_i', phase_two: 'phase_ii' },
+    },
+  };
+  const records = aggregateAliasedStateRows([
+    { state_ut: 'Dadra and Nagar Haveli', phase_i: '1', phase_ii: 'NA' },
+    { state_ut: 'Daman and Diu', phase_i: '1', phase_ii: 'NA' },
+  ], config);
+
+  assert.equal(records.length, 1);
+  assert.equal(records[0].phase_i, 2);
+  assert.equal(Object.hasOwn(records[0], 'phase_ii'), false);
+  assert.equal(records[0].source_state_breakdown.length, 2);
 });
 
 test('PMAY-U uses the verified dated state snapshot and excludes subtotal rows', () => {
@@ -225,6 +264,23 @@ test('configured scheme dashboards suppress stale KPIs not present in the offici
     SCHEME_CONFIGS.NRLM.dataPoints.map(({ name }) => name),
   );
   assert.deepEqual(filterSourceKpiDefinitions(definitions, null), definitions);
+});
+
+test('scheme summaries expose only KPI definitions backed by configured sources', () => {
+  const pmay = filterSchemeKpiDefinitions({
+    code: 'PMAY',
+    kpi_definitions: [{ kpi_name: 'Total Units Built' }],
+  });
+  assert.deepEqual(pmay.kpi_definitions, []);
+
+  const pmayUrban = filterSchemeKpiDefinitions({
+    code: 'PMAY-U',
+    kpi_definitions: [
+      { kpi_name: 'Houses Sanctioned' },
+      { kpi_name: 'Completion Rate' },
+    ],
+  });
+  assert.deepEqual(pmayUrban.kpi_definitions.map(({ kpi_name }) => kpi_name), ['Houses Sanctioned']);
 });
 
 test('unsupported legacy PMAY aggregate does not expose fabricated KPI definitions', () => {
