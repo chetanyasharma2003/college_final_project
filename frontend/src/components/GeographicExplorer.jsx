@@ -8,9 +8,11 @@ const cellTone = (status) => ({
   at_risk: 'bg-amber-500/25 text-amber-100',
   critical: 'bg-red-500/25 text-red-100',
 })[status] || 'bg-slate-700 text-slate-200';
+const stateOnlySources = new Set(['PMAY-G', 'PMAY-U', 'NRLM', 'DDU-GKY', 'SAGY']);
 
 export default function GeographicExplorer() {
-  const selectedScheme = useSelector((state) => state.data.selectedScheme);
+  const { selectedScheme, schemes } = useSelector((state) => state.data);
+  const selectedSchemeCode = schemes.find((scheme) => scheme.id === selectedScheme)?.code;
   const { states, districts, blocks, villages, fetchDistricts, fetchBlocks, fetchVillages } = useGeographic();
   const [stateId, setStateId] = useState('');
   const [districtId, setDistrictId] = useState('');
@@ -77,6 +79,11 @@ export default function GeographicExplorer() {
     <section className="mb-8 rounded-2xl border border-white/15 bg-slate-900/70 p-5 text-white" aria-labelledby="geo-explorer-title">
       <h2 id="geo-explorer-title" className="mb-2 text-xl font-bold">Geographic drill-down and district KPI heatmap</h2>
       <p className="mb-4 text-sm text-slate-300">Explore official source observations at the geographic levels provided by each dataset. District cells show latest recorded values; no village metrics or administrative boundaries are inferred.</p>
+      {stateOnlySources.has(selectedSchemeCode) && (
+        <p className="mb-4 rounded-lg border border-amber-400/20 bg-amber-500/5 p-3 text-sm text-amber-100">
+          {selectedSchemeCode} reports state/UT values only. Selecting a state shows its source values; district, block, and village metrics are not part of this feed.
+        </p>
+      )}
       <div className="mb-5 flex flex-wrap gap-3">
         <label className="grid gap-1 text-xs text-slate-300">State<select className={selectClass} value={stateId} onChange={(event) => setStateId(event.target.value)}><option value="">Select state</option>{states.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
         <label className="grid gap-1 text-xs text-slate-300">District<select className={selectClass} value={districtId} disabled={!stateId} onChange={(event) => setDistrictId(event.target.value)}><option value="">Select district</option>{districts.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>

@@ -196,8 +196,11 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
           <p className="text-3xl font-bold text-gray-300">{stats.no_target}</p>
         </div>
         <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
-          <p className="text-purple-400 text-sm mb-1">Avg Progress</p>
-          <p className="text-3xl font-bold text-purple-400">{stats.avg_progress == null ? 'N/A' : `${stats.avg_progress}%`}</p>
+          <p className="text-purple-400 text-sm mb-1">Target-based average</p>
+          <p className={`font-bold text-purple-400 ${stats.avg_progress == null ? 'text-lg' : 'text-3xl'}`}>
+            {stats.avg_progress == null ? 'Not available' : `${stats.avg_progress}%`}
+          </p>
+          {stats.avg_progress == null && <p className="mt-1 text-xs text-gray-400">No official targets in this source</p>}
         </div>
       </div>
 

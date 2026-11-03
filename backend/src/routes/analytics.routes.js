@@ -2,6 +2,9 @@ import express from 'express';
 import prisma from '../config/prisma.js';
 import { verifyAuth } from '../middleware/auth.middleware.js';
 import AnalyticsService from '../services/analytics.service.js';
+import KPIManagementService from '../services/kpi-management.service.js';
+import { SCHEME_CONFIGS } from '../config/scheme-integrations.js';
+import { rankSourceValuesByState } from '../utils/source-state-rankings.js';
 
 const router = express.Router();
 router.use(verifyAuth);
@@ -199,6 +202,61 @@ router.get('/trend/:kpiId', async (req, res) => {
       status: 'error',
       message: error.message,
     });
+  }
+});
+
+// Rank source-reported values without interpreting larger values as better performance.
+router.get('/state-values/:scheme', async (req, res) => {
+  try {
+    const schemeCode = req.params.scheme.toUpperCase();
+    const config = SCHEME_CONFIGS[schemeCode];
+    if (!config?.fieldMapping) {
+      return res.status(404).json({ status: 'error', message: 'No verified source mapping exists for this scheme.' });
+    }
+
+    const definitions = await KPIManagementService.getSchemeKPIs(schemeCode);
+    if (definitions.length === 0) {
+      return res.json({ status: 'success', data: [], kpis: [], selected_kpi_id: null });
+    }
+
+    const requestedKpiId = req.query.kpi_id == null || req.query.kpi_id === ''
+      ? definitions[0].id
+      : Number(req.query.kpi_id);
+    const selectedKpi = definitions.find(({ id }) => id === requestedKpiId);
+    if (!Number.isInteger(requestedKpiId) || !selectedKpi) {
+      return res.status(400).json({ status: 'error', message: 'Select a source-mapped KPI for this scheme.' });
+    }
+
+    const requestedStateId = req.query.state_id ? Number(req.query.state_id) : null;
+    const scope = scopedStateId(req, req.query.state_id);
+    if (scope.denied) return res.status(403).json({ status: 'error', message: 'State access denied' });
+    if (req.query.state_id && (!Number.isInteger(requestedStateId) || requestedStateId < 1)) {
+      return res.status(400).json({ status: 'error', message: 'Invalid state ID' });
+    }
+
+    const rows = await prisma.kPIValue.findMany({
+      where: {
+        kpi_id: selectedKpi.id,
+        state_id: scope.stateId || { not: null },
+        district_id: config.aggregateByDistrict ? { not: null } : null,
+        block_id: null,
+        village_id: null,
+      },
+      include: { state: { select: { id: true, name: true } } },
+      orderBy: [{ date: 'desc' }, { id: 'desc' }],
+    });
+
+    const data = rankSourceValuesByState(rows, { aggregateByDistrict: Boolean(config.aggregateByDistrict) });
+    res.json({
+      status: 'success',
+      scheme: schemeCode,
+      data,
+      kpis: definitions.map(({ id, kpi_name, unit }) => ({ id, name: kpi_name, unit })),
+      selected_kpi_id: selectedKpi.id,
+      aggregation: config.aggregateByDistrict ? 'latest value summed across source districts' : 'latest source-reported state value',
+    });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
   }
 });
 

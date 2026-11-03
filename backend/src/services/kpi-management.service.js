@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import { SCHEME_CONFIGS } from '../config/scheme-integrations.js';
+import { positiveKpiTargetOrNull } from '../utils/kpi-target.js';
 
 export const filterSourceKpiDefinitions = (definitions, config) => {
   if (!config) return definitions;
@@ -325,7 +326,7 @@ class KPIManagementService {
       const percentage = ratedValues.length
         ? ratedValues.reduce((sum, item) => sum + ((item.value / item.target) * 100), 0) / ratedValues.length
         : null;
-      const target = Number(kpi.target_value) || 0;
+      const target = positiveKpiTargetOrNull(kpi.target_value);
       const latestUpdated = latestValues.reduce((latest, item) => (
         !latest || item.date > latest ? item.date : latest
       ), null);

@@ -69,6 +69,9 @@ export default function Dashboard() {
   }, [kpiValuesData, dispatch]);
 
   const filteredKPIValues = kpiValuesData;
+  const schemeFamilyCount = new Set(schemes.map((scheme) => (
+    scheme.code.startsWith('PMAY-') ? 'PMAY' : scheme.code
+  ))).size;
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -144,9 +147,9 @@ export default function Dashboard() {
         {/* Stats Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
           <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 sm:p-6">
-            <p className="text-blue-200 text-xs sm:text-sm mb-2">Total Schemes</p>
+            <p className="text-blue-200 text-xs sm:text-sm mb-2">Official data feeds</p>
             <p className="text-3xl sm:text-4xl font-bold text-white">{schemes.length}</p>
-            <p className="text-blue-300 text-xs mt-2">Active Government Programs</p>
+            <p className="text-blue-300 text-xs mt-2">Across {schemeFamilyCount} scheme families; PMAY has two feeds</p>
           </div>
 
           <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 sm:p-6">

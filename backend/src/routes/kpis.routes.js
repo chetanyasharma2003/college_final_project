@@ -39,7 +39,11 @@ router.get('/latest', async (req, res) => {
   try {
     const schemeId = req.query.schemeId ? Number(req.query.schemeId) : null;
     const schemeCode = req.query.scheme ? req.query.scheme.toUpperCase() : null;
-    const limit = req.query.limit ? Number(req.query.limit) : 100;
+    const requestedLimit = req.query.limit == null ? 100 : Number(req.query.limit);
+    if (!Number.isInteger(requestedLimit) || requestedLimit < 1) {
+      return res.status(400).json({ status: 'error', message: 'Invalid result limit' });
+    }
+    const limit = Math.min(requestedLimit, 10000);
     const { startDate, endDate, stateId } = req.query;
 
     const parseDate = (value, endOfDay = false) => {
@@ -106,24 +110,22 @@ router.get('/latest', async (req, res) => {
     const values = await prisma.kPIValue.findMany({
       where,
       include: {
-        kpi: true,
-        state: true
+        kpi: { include: { scheme: true } },
+        state: true,
       },
       orderBy: { date: 'desc' },
       take: limit,
     });
 
     // Add scheme info to response
-    const valuesWithScheme = await Promise.all(values.map(async (v) => {
-      const kpi = await prisma.kPIDefinition.findUnique({
-        where: { id: v.kpi_id },
-        include: { scheme: true }
-      });
+    const valuesWithScheme = values.map(({ kpi, ...value }) => {
+      const { scheme, ...definition } = kpi || {};
       return {
-        ...v,
-        scheme: kpi?.scheme || null
+        ...value,
+        kpi: Object.keys(definition).length ? definition : null,
+        scheme: scheme || null,
       };
-    }));
+    });
 
     res.json({ status: 'success', data: valuesWithScheme });
   } catch (error) {

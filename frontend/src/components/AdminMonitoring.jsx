@@ -108,12 +108,16 @@ export default function AdminMonitoring() {
           disabled={syncing || checkingConnection || overview.ready_data_sources === 0 || connectionCheck?.reachable !== true}
           className="rounded-lg border border-blue-400/40 bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 transition hover:bg-blue-500/30 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {syncing ? 'Syncing official sources…' : 'Sync official source data'}
+          {syncing
+            ? 'Syncing official sources…'
+            : connectionCheck?.reachable === true
+              ? 'Sync official source data'
+              : 'Render sync unavailable'}
         </button>
         <p className="text-sm text-slate-300">
           {connectionCheck?.reachable === true
             ? 'Render can reach data.gov.in. Start the import when ready.'
-            : 'Test Render connectivity before starting an import.'}
+            : 'Weekly imports run from the project Mac; this check only tests Render connectivity.'}
         </p>
       </div>
       {connectionCheck && (

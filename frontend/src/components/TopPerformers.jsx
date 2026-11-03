@@ -1,91 +1,141 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import client from '../api/client';
 
 export default function TopPerformers({ schemeCode = 'PMAY' }) {
-  const [topPerformers, setTopPerformers] = useState([]);
+  const [rankings, setRankings] = useState([]);
+  const [stateCount, setStateCount] = useState(0);
+  const [metrics, setMetrics] = useState([]);
+  const [selectedKpiId, setSelectedKpiId] = useState('');
+  const [aggregation, setAggregation] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const requestVersion = useRef(0);
+
+  const loadSourceValues = useCallback(async (code, kpiId = '') => {
+    if (!code) {
+      setRankings([]);
+      setStateCount(0);
+      setMetrics([]);
+      setLoading(false);
+      return;
+    }
+
+    const version = requestVersion.current + 1;
+    requestVersion.current = version;
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (kpiId) params.set('kpi_id', kpiId);
+      const encodedParams = params.toString();
+      const query = encodedParams ? `?${encodedParams}` : '';
+      const response = await client.get(`/analytics/state-values/${encodeURIComponent(code)}${query}`);
+      if (version !== requestVersion.current) return;
+
+      const data = response.data?.data || [];
+      const availableMetrics = response.data?.kpis || [];
+      setRankings(data.slice(0, 5));
+      setStateCount(data.length);
+      setMetrics(availableMetrics);
+      setSelectedKpiId(String(response.data?.selected_kpi_id || ''));
+      setAggregation(response.data?.aggregation || '');
+    } catch (requestError) {
+      if (version === requestVersion.current) {
+        setRankings([]);
+        setError(requestError.response?.data?.message || 'Source values are unavailable.');
+      }
+    } finally {
+      if (version === requestVersion.current) setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!schemeCode) {
-      setTopPerformers([]);
-      setError(null);
-      setLoading(false);
-      return undefined;
-    }
+    setRankings([]);
+    setStateCount(0);
+    setMetrics([]);
+    setSelectedKpiId('');
+    setAggregation('');
+    loadSourceValues(schemeCode);
+    return () => { requestVersion.current += 1; };
+  }, [schemeCode, loadSourceValues]);
 
-    fetchTopPerformers();
-    window.addEventListener('kpi-data:updated', fetchTopPerformers);
-    return () => window.removeEventListener('kpi-data:updated', fetchTopPerformers);
-  }, [schemeCode]);
-
-  const fetchTopPerformers = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await client.get(`/analytics/state-ranking/${encodeURIComponent(schemeCode)}`);
-      const rankings = Array.isArray(response.data?.data) ? response.data.data : [];
-      setTopPerformers(rankings.slice(0, 5).map((state, index) => ({ ...state, rank: index + 1 })));
-    } catch (err) {
-      console.error('Error fetching top performers:', err);
-      setError('Failed to load top performers');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getMedalEmoji = (rank) => {
-    if (rank === 1) return '🥇';
-    if (rank === 2) return '🥈';
-    if (rank === 3) return '🥉';
-    return '⭐';
-  };
-
-  const formatValue = (val) => {
-    const num = parseFloat(val) || 0;
-    if (num > 1000000) return (num / 1000000).toFixed(1) + 'M';
-    if (num > 1000) return (num / 1000).toFixed(1) + 'K';
-    return num.toFixed(0);
-  };
+  const selectedMetric = metrics.find((metric) => String(metric.id) === selectedKpiId);
+  const sourceDate = rankings.reduce((latest, item) => (
+    !latest || new Date(item.source_date) > new Date(latest) ? item.source_date : latest
+  ), null);
+  const formatValue = (value) => Number(value).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+  const formatDate = (value) => value
+    ? new Date(value).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    : null;
 
   return (
     <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
-      <h3 className="text-xl font-bold text-white mb-4">Top States: {schemeCode}</h3>
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="text-xl font-bold text-white">Highest reported values: {schemeCode}</h3>
+          <p className="mt-1 max-w-xl text-sm text-gray-400">
+            Showing up to five of {stateCount} states/UTs with data. A larger count or allocation does not mean better performance.
+          </p>
+        </div>
+        <label className="grid gap-1 text-xs text-gray-300">
+          Indicator
+          <select
+            aria-label="Indicator for state value ranking"
+            value={selectedKpiId}
+            disabled={metrics.length === 0 || loading}
+            onChange={(event) => {
+              const nextKpiId = event.target.value;
+              setSelectedKpiId(nextKpiId);
+              loadSourceValues(schemeCode, nextKpiId);
+            }}
+            className="max-w-full rounded border border-white/20 bg-slate-800 px-3 py-2 text-white"
+          >
+            {metrics.map((metric) => (
+              <option key={metric.id} value={metric.id}>{metric.name}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      {selectedMetric && (
+        <p className="mb-3 text-xs text-gray-400">
+          {selectedMetric.name}{selectedMetric.unit ? ` · ${selectedMetric.unit}` : ''}
+          {sourceDate ? ` · source date ${formatDate(sourceDate)}` : ''}
+        </p>
+      )}
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
+        <div className="flex h-64 items-center justify-center" aria-live="polite">
           <div className="animate-spin"><div className="text-4xl">⏳</div></div>
         </div>
       ) : error ? (
-        <div className="text-center text-red-400">{error}</div>
-      ) : topPerformers.length > 0 ? (
+        <p role="alert" className="text-center text-red-300">{error}</p>
+      ) : rankings.length > 0 ? (
         <div className="space-y-3">
-          {topPerformers.map((performer) => (
+          {rankings.map((item, index) => (
             <div
-              key={`${performer.kpi_id}-${performer.state_id}-${performer.rank}`}
-              className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition"
+              key={`${item.state_id}-${selectedKpiId}`}
+              className="flex items-center justify-between gap-4 rounded-lg border border-white/10 bg-white/5 p-4"
             >
-              <div className="flex items-center gap-4 flex-1">
-                <span className="text-2xl">{getMedalEmoji(performer.rank)}</span>
-                <div className="flex-1">
-                  <p className="text-white font-semibold">{performer.state?.name || 'State'}</p>
-                  <p className="text-gray-400 text-sm">Average KPI progress</p>
+              <div className="flex min-w-0 items-center gap-4">
+                <span className="text-lg font-bold text-blue-200">#{index + 1}</span>
+                <div className="min-w-0">
+                  <p className="truncate font-semibold text-white">{item.state?.name || 'State'}</p>
+                  {aggregation.includes('district') && (
+                    <p className="text-xs text-gray-400">{item.locations_covered} source districts summed</p>
+                  )}
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  {Number(performer.progress || 0).toFixed(1)}%
-                </p>
-                <p className="text-gray-400 text-xs">{performer.status || 'Status unavailable'}</p>
-              </div>
+              <p className="shrink-0 text-right font-semibold text-blue-100">
+                {formatValue(item.value)}{selectedMetric?.unit ? ` ${selectedMetric.unit}` : ''}
+              </p>
             </div>
           ))}
         </div>
       ) : (
-        <div className="flex justify-center items-center h-64">
+        <div className="flex h-64 items-center justify-center">
           <p className="max-w-sm text-center text-gray-400">
-            No target-based state ranking is available for this source. Official targets are not provided for the imported measures.
+            This source has no state-level observations to rank for the selected indicator.
           </p>
         </div>
       )}

@@ -29,7 +29,7 @@ export default function TrendChart({ dateRange, stateId = null }) {
       try {
         setLoading(true);
         setError(null);
-        const params = new URLSearchParams({ scheme: scheme.code, limit: '500' });
+        const params = new URLSearchParams({ scheme: scheme.code, limit: '10000' });
         if (dateRange?.startDate) params.set('startDate', dateRange.startDate);
         if (dateRange?.endDate) params.set('endDate', dateRange.endDate);
         if (stateId) params.set('stateId', stateId);
@@ -83,20 +83,28 @@ export default function TrendChart({ dateRange, stateId = null }) {
         const timestamp = new Date(item.date);
         if (Number.isNaN(timestamp.getTime())) return;
         const dateKey = timestamp.toISOString().slice(0, 10);
-        const current = valuesByDate.get(dateKey) || { total: 0, count: 0 };
-        current.total += Number(item.value) || 0;
-        current.count += 1;
+        const current = valuesByDate.get(dateKey) || [];
+        current.push(item);
         valuesByDate.set(dateKey, current);
       });
 
-    return Array.from(valuesByDate, ([dateKey, values]) => ({
-      dateKey,
-      date: new Date(`${dateKey}T00:00:00`).toLocaleDateString('en-IN', {
-        month: 'short',
-        day: 'numeric',
-      }),
-      value: Number((values.total / values.count).toFixed(2)),
-    })).sort((first, second) => first.dateKey.localeCompare(second.dateKey));
+    return Array.from(valuesByDate, ([dateKey, rows]) => {
+      const nationalRows = rows.filter((item) => (
+        item.state_id == null && item.district_id == null && item.block_id == null && item.village_id == null
+      ));
+      const districtRows = rows.filter((item) => item.district_id != null && item.block_id == null && item.village_id == null);
+      const stateRows = rows.filter((item) => item.state_id != null && item.district_id == null && item.block_id == null && item.village_id == null);
+      const sourceRows = nationalRows.length ? nationalRows : districtRows.length ? districtRows : stateRows;
+      const total = sourceRows.reduce((sum, item) => sum + (Number(item.value) || 0), 0);
+      return {
+        dateKey,
+        date: new Date(`${dateKey}T00:00:00`).toLocaleDateString('en-IN', {
+          month: 'short',
+          day: 'numeric',
+        }),
+        value: Number(total.toFixed(2)),
+      };
+    }).sort((first, second) => first.dateKey.localeCompare(second.dateKey));
   }, [kpiValues, activeKpiId]);
 
   const formatDate = (date) => date
@@ -107,12 +115,17 @@ export default function TrendChart({ dateRange, stateId = null }) {
     <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
         <div>
-          <h3 className="text-xl font-bold text-white">Performance Trend</h3>
+          <h3 className="text-xl font-bold text-white">
+            {trendData.length === 1 ? 'Source snapshot' : 'Performance trend'}
+          </h3>
           <p className="text-sm text-gray-400 mt-1">
-            {dateRange?.startDate && dateRange?.endDate
+            {trendData.length === 1
+              ? `One source-reported date is available (${formatDate(trendData[0].dateKey)}); a time trend cannot be calculated.`
+              : dateRange?.startDate && dateRange?.endDate
               ? `${formatDate(dateRange.startDate)} to ${formatDate(dateRange.endDate)}`
               : 'Available reporting dates'}
           </p>
+          <p className="mt-1 text-xs text-gray-500">Uses the source national total when available; otherwise totals the lowest available state/district level.</p>
         </div>
         <label className="flex items-center gap-2 text-sm text-gray-300">
           <span>KPI</span>

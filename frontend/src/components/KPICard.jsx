@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TrendingUp, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import PerformanceBadge from './PerformanceBadge';
 import TrendSparkline from './TrendSparkline';
@@ -55,7 +55,9 @@ export default function KPICard({ kpi, schemeCode, data: initialData }) {
   };
 
   const config = statusConfig[data.status] || statusConfig.at_risk;
-  const percentage = Math.min(data.progress_percentage || 0, 100);
+  const numericTarget = data.target_value == null ? null : Number(data.target_value);
+  const hasTarget = Number.isFinite(numericTarget) && numericTarget > 0;
+  const percentage = hasTarget ? Math.min(Number(data.progress_percentage) || 0, 100) : 0;
 
   const formatValue = (val, unit) => {
     if (val === null || val === undefined) return 'N/A';
@@ -113,27 +115,33 @@ export default function KPICard({ kpi, schemeCode, data: initialData }) {
             {formatValue(data.current_value, data.unit)}
           </p>
         </div>
-        <p className="text-gray-400 text-xs mb-3">Target: {formatValue(data.target_value, data.unit)}</p>
-
-        {/* Progress Bar */}
-        <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden border border-white/10">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ease-out ${
-              percentage >= 100
-                ? 'bg-gradient-to-r from-green-500 to-emerald-500'
-                : percentage >= 80
-                ? 'bg-gradient-to-r from-blue-500 to-blue-400'
-                : percentage >= 60
-                ? 'bg-gradient-to-r from-yellow-500 to-orange-400'
-                : 'bg-gradient-to-r from-red-500 to-pink-400'
-            }`}
-            style={{ width: `${percentage}%` }}
-            role="progressbar"
-            aria-valuenow={percentage}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          ></div>
-        </div>
+        {hasTarget ? (
+          <>
+            <p className="text-gray-400 text-xs mb-3">Official target: {formatValue(numericTarget, data.unit)}</p>
+            <div className="w-full bg-white/5 rounded-full h-3 overflow-hidden border border-white/10">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ease-out ${
+                  percentage >= 100
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-500'
+                    : percentage >= 80
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-400'
+                    : percentage >= 60
+                    ? 'bg-gradient-to-r from-yellow-500 to-orange-400'
+                    : 'bg-gradient-to-r from-red-500 to-pink-400'
+                }`}
+                style={{ width: `${percentage}%` }}
+                role="progressbar"
+                aria-valuenow={percentage}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              ></div>
+            </div>
+          </>
+        ) : (
+          <p className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-gray-400">
+            No official target is supplied for this indicator; progress cannot be rated.
+          </p>
+        )}
       </div>
 
       {/* Status & Percentage */}
@@ -142,7 +150,7 @@ export default function KPICard({ kpi, schemeCode, data: initialData }) {
           {config.label}
         </span>
         <span className={`font-bold ${config.text}`}>
-          {data.progress_percentage == null ? 'N/A' : `${percentage}%`}
+          {!hasTarget || data.progress_percentage == null ? 'Not rated' : `${percentage}%`}
         </span>
       </div>
 

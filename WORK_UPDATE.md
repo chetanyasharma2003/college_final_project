@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 19:09 IST
+**Last updated:** 2026-11-03 19:22 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -155,6 +155,16 @@ All three geography migrations were applied to the configured Neon database; it 
 - Verified the installed LaunchAgent with `launchctl kickstart`: it exited 0 and imported the same seven feeds/888 records successfully.
 - Removed the GitHub-hosted import workflow and the temporary `DATABASE_URL` / `DATA_GOV_API_KEY` Actions secrets after the hosted run confirmed that cloud egress to OGD is blocked. These secrets are not currently stored in GitHub.
 - Updated the admin panel to distinguish the disabled Render scheduler from the local Mac schedule. Final commit `f885959` passed GitHub CI, Render frontend serves the new copy, and backend health returns HTTP 200 with the database connected. Working tree is clean after push.
+
+### Dashboard screenshot follow-up (3 November 2026)
+
+- Verified the latest seven Neon import-history rows are all `completed`, with PMAY-G 27, PMAY-U 36, MGNREGS 31, PMGSY 691, NRLM 35, DDU-GKY 31, and SAGY 37 records; all report 0 failures.
+- Live Neon inspection confirmed PMAY-U's three source KPIs have actual values and null targets. The status API previously converted a missing target to numeric 0 even while returning `no_target`; it now returns null. KPI cards hide the false zero-target progress bar and explain that no source target exists; the aggregate reads “Not available.”
+- Replaced the target-dependent empty state-ranking panel with a selectable source-value ranking. It reports the source date and coverage, aggregates district feeds using each district's latest value, and explicitly says larger source values are not better performance scores. Live-data logic returned 35 PMAY-U state/UT observations and 30 PMGSY state aggregates from 691 districts.
+- Fixed national chart aggregation: use the official national total when supplied, otherwise sum the lowest available state/district rows, never average national and state subtotals together. PMAY-U national rows match the sum of their state rows. Removed the KPI history endpoint's per-row lookup and raised the safe cap to 10,000 so PMGSY's 7,601 observations are not truncated at 500.
+- A one-date chart now identifies itself as a “Source snapshot” and says that one reporting date cannot make a trend. The top summary calls the seven items official data feeds across six scheme families (PMAY-G/U are separate feeds).
+- Geographic drill-down now explains when the selected feed reports only state/UT values, so an empty district heatmap for those sources is clearly a source-coverage limit rather than an import error.
+- Added unit tests for missing targets and source rankings; targeted test run passed 3/3. These UI/API changes are pending push, GitHub CI, and Render deployment.
 
 ## 4. How to continue
 
