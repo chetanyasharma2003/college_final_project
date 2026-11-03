@@ -20,6 +20,13 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!schemeCode) {
+      setKpiData([]);
+      setError(null);
+      setLoading(false);
+      return undefined;
+    }
+
     fetchAllKPIs();
     const interval = setInterval(fetchAllKPIs, 5 * 60 * 1000);
     window.addEventListener('kpi-data:updated', fetchAllKPIs);
@@ -30,6 +37,13 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
   }, [schemeCode, stateId]);
 
   const fetchAllKPIs = async () => {
+    if (!schemeCode) {
+      setKpiData([]);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const url = stateId
