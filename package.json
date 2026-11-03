@@ -1,11 +1,8 @@
 {
   "name": "government-schemes-analytics",
   "version": "1.0.0",
-  "description": "Automated Government Schemes Real-time Analytics Dashboard",
+  "description": "Source-attributed analytics dashboard for reported KPIs across six government scheme families",
   "scripts": {
-    "auto:system": "node scripts/auto-system.js",
-    "auto:deploy": "node scripts/auto-deploy.js",
-    "auto:fix": "node scripts/auto-fix.js",
     "health:check": "node scripts/health-check.js",
     "frontend:build": "cd frontend && npm run build",
     "frontend:test": "cd frontend && npm test",

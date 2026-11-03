@@ -270,26 +270,21 @@ Costs depend on the active Render and Neon account plans. They were not verified
 - Prisma Docs: https://www.prisma.io/docs
 - GitHub: https://github.com/chetanyasharma2003/college_final_project
 
-## ✅ Deployment Checklist
+## ✅ Checklist for a New Deployment
 
-- [ ] GitHub repository updated with all changes
-- [ ] Vercel project created and configured
-- [ ] Frontend deployed to Vercel
-- [ ] Render PostgreSQL created
-- [ ] Render Redis created
-- [ ] Render backend service created
-- [ ] Database migrations run
-- [ ] Seed script executed
-- [ ] Environment variables configured
-- [ ] CORS settings verified
-- [ ] Frontend-backend connection tested
-- [ ] Login tested
-- [ ] Dashboard data loading verified
-- [ ] Monitors and alerts configured
+- [ ] Main branch CI passes for the release commit
+- [ ] Render frontend is connected to the repository, `main`, and the `frontend` root directory
+- [ ] Render backend is connected to the repository and `main`
+- [ ] Backend environment points to the private Neon pooled connection and has unique JWT secrets
+- [ ] Database migrations complete successfully
+- [ ] Backend CORS allows the active frontend origin
+- [ ] Frontend and backend health checks pass
+- [ ] Login, source coverage, geography, admin monitoring, and report/export flows are smoke-tested
+- [ ] Any source freshness and coverage limits are disclosed in the UI and project documentation
 
 ---
 
-**Last endpoint check:** 3 November 2026 (frontend and backend HTTP checks only; authenticated user flows remain unverified)
+**Latest recorded production verification:** 3 November 2026. Frontend and backend health returned HTTP 200, Neon was connected, the scheme and geography APIs returned source-backed results, and authenticated dashboard, admin source-monitoring, and report/export flows were smoke-tested. See [WORK_UPDATE.md](./WORK_UPDATE.md) for the recorded details. The configured source feeds remain historical snapshots with no verified refresh cadence.
 
 **Frontend URL:** https://frontend-ae3v.onrender.com
 

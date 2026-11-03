@@ -1,7 +1,7 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 19:25 IST
-**Project:** Government Schemes Analytics Dashboard
+**Last updated:** 2026-11-03 22:45 IST
+**Project:** Unified Performance Dashboard for all MoRD Schemes (repository application name: Centralized Government Scheme Analytics Dashboard)
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
 ## 1. College scope
@@ -169,7 +169,17 @@ All three geography migrations were applied to the configured Neon database; it 
 ## 4. How to continue
 
 1. **Refresh schedule.** The local LaunchAgent is installed. Check it with `launchctl print gui/$(id -u)/com.collegefinalproject.official-data-sync`; inspect `~/Library/Logs/college-final-project-official-sync.log` for counts or failures. Reinstall/update it with `cd backend && ./scripts/install-local-sync-agent.sh`.
-2. **Credential hygiene.** Rotate/revoke the Render API key shared in chat after the deadline. API/database credentials were also exposed during prior troubleshooting; rotate those in private hosting/database settings. Do not write replacement values to this log.
+2. **Credential hygiene.** The Render API key was re-shared in chat on 3 November 2026. Revoke it and create a replacement after the user's deadline. API/database credentials were also exposed during prior troubleshooting; rotate those in private hosting/database settings. Do not write replacement values to this log.
+
+### Latest continuation (3 November 2026, 19:37 IST)
+
+- Read-only `launchctl print gui/501/com.collegefinalproject.official-data-sync` confirmed the weekly LaunchAgent is loaded, configured for a 604800-second interval, and not currently running; its last exit code is 0.
+- The latest matching lines in `~/Library/Logs/college-final-project-official-sync.log` report PMAY-G 27, PMAY-U 36, MGNREGS 31, PMGSY 691, NRLM 35, DDU-GKY 31, and SAGY 37 records: **7 successful, 0 failed, 888 total**.
+- Corrected stale release/deployment status in `README.md` and `DEPLOYMENT.md`, and rewrote `DOCKER_README.md` to describe the local Compose setup accurately. The old Docker guide described pending smoke checks, a default demo login, and a production-ready/running Docker stack despite production using Render and a separate local polling job.
+- Rechecked the [official NRLM catalog](https://www.data.gov.in/catalog/national-rural-livelihoods-mission): it lists a village-wise SHG/member-count resource, but the accessible catalog/API page still does not expose a verified resource field schema or usable data-resource mapping. Keep village KPI ingestion disabled until those are verified; no third-party village data was substituted.
+- No database import or production deployment was needed for this continuation; existing live verification and passing CI records remain those documented above.
+- The Render key remains an outstanding rotation item after the user's deadline. No credential value is recorded here.
+- `git diff --check` passes for the documentation changes. No test suite was run because this continuation changed documentation only.
 
 ## 5. Acceptance checklist to reach the college scope honestly
 
@@ -193,3 +203,48 @@ All three geography migrations were applied to the configured Neon database; it 
 - Keep secrets out of this file; include only names of private environment files when needed.
 - Prefer source-backed, reproducible outputs over estimates. Clearly label unknown or unverified status.
 - The older `PROJECT_WORK_LOG.md` in Downloads is a historical note and may be stale; this repository file is the current handoff.
+
+## 7. SRS and Form-3 documents (3 November 2026)
+
+- The user confirmed that the newer scanned Form-1/Form-2 packet controls the project identity and assigned module. Use project ID `2026-27-CC-13`, title “Unified Performance Dashboard for all MoRD Schemes,” and Chetanya Prakash Sharma's Form-2 module “Testing & Report Generation.” The project repository still uses the application name “Centralized Government Scheme Analytics Dashboard.”
+- Inspected the friend's `beacon_srs.pdf`: 24 pages with 11 numbered figure captions and 12 embedded image objects including the SKIT logo. It was used only as a visual/layout reference; Beacon's project title, ID, author and role assignments were not copied. This project's mentor/coordinator names came from its own Form-1.
+- Rebuilt `Unified_Performance_Dashboard_SRS.docx` as version 2.0 using the supplied SRS format, the controlling Form-2 packet and verified implementation. Its cover now follows the Beacon layout and uses the SKIT logo plus mentor/coordinator names from this project's Form-1. It contains 11 numbered, project-specific figures: iterative development cycle, system architecture, DFD Levels 0–2, E-R, class, two use-case views, sequence and component diagrams.
+- Copied the verified version 2.0 DOCX to `/Users/chetanya/Downloads/Unified_Performance_Dashboard_SRS.docx` at the user's request; destination file confirmed present (750,603 bytes).
+- Found `/Users/chetanya/Downloads/Unified_Performance_Dashboard_SRS.pdf` already present when asked to convert. Validated it as a 31-page PDF with project ID `2026-27-CC-13`, version 2.0 and all 11 numbered figures. No overwrite/export was needed.
+- The SRS records all three Form-2 work packages and their soft/hard deadlines: Report Generation (02/11/2026, 14/11/2026), Monitoring Dashboard (21/12/2026, 26/12/2026), and API Testing & Documentation (03/02/2027, 12/02/2027). It distinguishes implemented reporting/feed-monitoring surfaces from individual completion evidence; no Postman collection/test record was found in the repository snapshot.
+- The SDG guide allows one or at most two goals. The user selected SDGs 9 and 16 for this SRS; the scanned Form-1 separately lists 9, 11 and 16. The SRS limits its mapping to 9/Target 9.1 (indirect relationship to PMGSY records, not a measure of UN indicator 9.1.1) and 16/Target 16.6 (source-attributed public information, not proof of improved accountability).
+- Form-3 weekly progress remains pending because the student has not yet provided roll-number confirmation/week-by-week actual notes. Do not invent achievements. When notes arrive, fill only the student's assigned module/functionality and actual weekly work; leave mentor verification/remarks/signatures to the mentor.
+- SRS structural audit of version 2.0: A4 pages, 1-inch margins, page borders, 14 tables, 11 numbered diagrams (12 inline images including the logo), and page numbering begins at Introduction while cover/index remain unnumbered. Quick Look thumbnail reviewed for the cover and new diagrams were inspected individually. Full-page render QA is unavailable because the DOCX renderer requires `soffice`, which is not installed; do not describe full-document visual QA as passed.
+- Preserve source-backed qualifications: the attached packet describes “real-time” data, while the configured production feeds are historical snapshots with different dates and coverage. Do not claim complete/current all-scheme coverage without source evidence.
+
+### Plain-language SRS guide (3 November 2026)
+
+- Created `SRS_Hinglish_Explanation.docx` from the saved SRS version 2.0 and copied it to `/Users/chetanya/Downloads/SRS_Hinglish_Explanation.docx` at the user's request.
+- The Roman-script Hinglish guide explains the full SRS for a non-technical reader: Chapters 1–7, all 15 functional and 10 non-functional requirements, all 11 numbered figures, the source feeds and coverage, the Form-2 module/deadlines, and the two selected SDG mappings. It keeps the SRS's source-date and evidence limitations explicit.
+- Structural checks confirmed 109 paragraphs, 12 tables, the expected FR/NFR and figure coverage, a separate cover page break, and one-inch margins. The cover thumbnail was reviewed. Full-page render QA could not run because `soffice` is not installed; the complete DOCX therefore has not had page-by-page visual verification.
+
+### Overleaf LaTeX source (3 November 2026)
+
+- Recreated the final SRS version 2.0 as an Overleaf-ready LaTeX project in the style of the supplied Beacon example. The ZIP contains `main.tex`, the SKIT logo, all 11 numbered diagram images, and a short setup README; the standalone `main.tex` is also available.
+- Saved `Unified_Performance_Dashboard_SRS_Overleaf.zip` and `main.tex` in `/Users/chetanya/Downloads/` at the user's request. The source uses A4, Times New Roman with a TeX Gyre Termes fallback, 1.5 spacing, a page border, unnumbered front matter and page numbering from Introduction; the compile engine is XeLaTeX.
+- Structural audit confirmed all seven main sections, all 15 FR and 10 NFR identifiers, 11 figures, 12 long tables including revision history, and all 12 referenced image assets. This is reconstructed from the final DOCX; no original `.tex` source existed. XeLaTeX is not installed locally, so compilation still needs to be checked in Overleaf.
+
+### Git and Render status check (3 November 2026)
+
+- Local `main` and the cached `origin/main` ref both point to `a6fa397`. That commit only updates `WORK_UPDATE.md`; the latest application-code commit is `9bfb910`, whose CI pass is recorded above. A fresh GitHub Actions query could not connect because DNS/network access to `api.github.com` was unavailable.
+- The current uncommitted changes are documentation and SRS artifacts only (`README.md`, `DEPLOYMENT.md`, `DOCKER_README.md`, `WORK_UPDATE.md`, and generated SRS files); no backend or frontend source file is modified.
+- A fresh production backend `/health` request returned `status: ok`, `environment: production`, and `database: connected` at 2026-11-03 17:48 UTC. A fresh Render frontend request could not be completed: automatic approval review rejected that read-only request with `Bad Request`, and it was not executed. The latest prior recorded frontend check returned HTTP 200; current frontend status therefore remains unverified.
+
+### Workspace cleanup (3 November 2026)
+
+- Removed exact duplicate SRS DOCX copies and the workspace Overleaf ZIP/source folder after SHA-256 checks confirmed the deliverables remain in Downloads. Removed the ignored generated `frontend/dist` build and the stale `frontend/vercel_deploy.log`.
+- Kept `node_modules` so local development dependencies remain installed, and kept `logs/backend.log` / `logs/frontend.log` for diagnostics. No tracked application source was deleted. Git status now shows only the existing documentation edits; final documents and Overleaf package remain in Downloads.
+
+### Markdown documentation cleanup (3 November 2026)
+
+- Reviewed all 31 first-party Markdown files in the repository. Kept the four maintained references: `README.md`, `DEPLOYMENT.md`, `DOCKER_README.md`, and this handoff. Removed 27 stale or duplicate plans, status reports, setup/deployment/seed guides, design drafts, and unrelated project-idea lists; no non-Markdown source files referenced the removed documents.
+- Updated README identity to the approved project ID `2026-27-CC-13` and assigned module “Testing & Report Generation.” Replaced its obsolete documentation-tree links and the Docker guide's links to deleted files with links to the four maintained references.
+- Left package-owned Markdown under `node_modules` untouched; those files belong to installed dependencies. The four maintained Markdown files remain at the project root.
+- Read-only GitHub check on 3 November 2026 found no open pull requests.
+- Repository-root audit found and removed obsolete Vercel-token deploy, PM2, port-killing start/stop/restart, unused hash-generation, and auto-rollback/auto-fix scripts. The old auto-deploy script could force-push `main` after a failed build. Removed those script commands from root `package.json`; retained the CI workflow, current Render/Docker configs, and the public health-check script. `.last-working-commit` was only state for the removed automation and was deleted. Removed the local macOS `.DS_Store` file as well.
+- Pushed the cleanup branch and opened [PR #13](https://github.com/chetanyasharma2003/college_final_project/pull/13). GitHub Actions `verify` passed (run `41692964486`); GitHub reports the PR open, mergeable, and conflict-free. Merge remains pending the user's approval.

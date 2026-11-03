@@ -3,9 +3,9 @@
 > A source-attributed analytics dashboard for monitoring reported KPIs across six government scheme families
 
 **Institute:** Swami Keshvanand Institute of Technology, Management & Gramothan  
-**Project ID:** 2026-27-IT  
+**Project ID:** 2026-27-CC-13<br>
 **Status:** Core dashboard and source integrations are deployed to Render. Production KPI observations are retained only when they match configured official source records. Source freshness and geographic coverage vary by scheme.
-**Timeline:** 16 weeks (12-14 weeks full-time)  
+**Academic Session:** 2026–27
 
 ---
 
@@ -23,7 +23,7 @@ Build a **centralized analytics dashboard** that:
 - Integrates data from 6 government schemes
 - Calculates and tracks source-backed KPIs at the geographic levels provided by each dataset
 - Provides interactive visualizations (charts, heatmaps, maps)
-- Generates comparative analysis & forecasts
+- Supports comparisons and exploratory forecasts only when adequate historical source data exists
 - Exports reports in multiple formats
 
 The connected Open Government Data resources are not all live feeds and do not all contain district or village fields. The dashboard therefore presents source-reported data with its reporting period and coverage; it must not be interpreted as a real-time feed or as complete village-level coverage. Synthetic demo seed data is disabled for production and has been removed from the live database.
@@ -69,14 +69,9 @@ To audit an existing database for generated demo records, run `cd backend && npm
 
 ---
 
-## 👥 Team & Responsibilities
+## Assigned Module
 
-| Member | Role | Responsibilities |
-|--------|------|------------------|
-| **Divyansh Tak** | Backend Lead | Backend API, AI/ML Predictions, Chatbot |
-| **Chetanya Sharma** | Backend Developer | Data Integration, ETL, API, Database |
-| **Chitransh Jain** | Frontend Lead | Dashboard UI, Analytics, Visualizations |
-| **Harshit Tripathi** | DevOps/QA | Deployment, Documentation, Testing |
+Chetanya Prakash Sharma's approved Form-2 module is **Testing & Report Generation**. See [WORK_UPDATE.md](./WORK_UPDATE.md) for the current project handoff and [DEPLOYMENT.md](./DEPLOYMENT.md) for live deployment details.
 
 ---
 
@@ -142,8 +137,8 @@ Docker + Docker Compose  # Containerization
 GitHub                   # Version control
 GitHub Actions           # CI/CD
 Render                   # Current frontend and backend hosting
-Vercel                   # Optional alternate frontend host
-AWS RDS / Heroku DB      # Production database
+Neon PostgreSQL           # Production database
+Redis                    # Optional cache integration
 ```
 
 ---
@@ -159,9 +154,9 @@ AWS RDS / Heroku DB      # Production database
 ### 1. Clone & Setup
 
 ```bash
-# Clone repository (will be done after GitHub setup)
-git clone https://github.com/yourusername/gov-schemes-analytics.git
-cd gov-schemes-analytics
+# Clone the project
+git clone https://github.com/chetanyasharma2003/college_final_project.git
+cd college_final_project
 
 # Install backend dependencies
 cd backend
@@ -245,7 +240,7 @@ npm run dev
 ## 📁 Project Structure
 
 ```
-gov-schemes-analytics/
+college_final_project/
 ├── frontend/                    # React frontend (Vite)
 │   ├── src/
 │   │   ├── components/          # Reusable UI components
@@ -278,31 +273,22 @@ gov-schemes-analytics/
 │   │   └── migrations/          # SQL migrations
 │   └── .env
 │
-├── docs/                        # Documentation
-│   ├── SETUP.md                 # Local development guide
-│   ├── API.md                   # API documentation
-│   ├── DATABASE.md              # Database schema
-│   ├── ARCHITECTURE.md          # System design
-│   └── DEPLOYMENT.md            # Production setup
-│
 ├── docker-compose.yml           # Docker configuration
 ├── .env.example                 # Environment template
 ├── .gitignore
-├── README.md                    # This file
-└── IMPLEMENTATION_ROADMAP.md    # Detailed development plan
+├── README.md                    # Project overview and source coverage
+├── DEPLOYMENT.md                # Current production deployment
+├── DOCKER_README.md             # Local Docker Compose setup
+└── WORK_UPDATE.md               # Current project handoff
 ```
 
 ---
 
 ## 📚 Documentation
 
-- **[IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md)** - Detailed 16-week plan with all modules, API endpoints, database schema
-- **[PROJECT_PLAN.md](./PROJECT_PLAN.md)** - Original project specifications
-- **[SETUP.md](./docs/SETUP.md)** - Local development setup guide
-- **[DATABASE.md](./docs/DATABASE.md)** - PostgreSQL schema documentation
-- **[API.md](./docs/API.md)** - API endpoints reference
-- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System design decisions
-- **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Production deployment guide
+- **[DOCKER_README.md](./DOCKER_README.md)** - Local Docker Compose setup
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Current Render production deployment
+- **[WORK_UPDATE.md](./WORK_UPDATE.md)** - Current progress, verification and limitations
 
 ---
 
@@ -394,7 +380,7 @@ npm run test:coverage     # Coverage report
 - Geographic tables for states, districts, blocks, and villages; current source data populates state/district levels only
 - Reported KPI values with timestamps
 - Scheme-specific data (PMAY, MGNREGS, etc.)
-- Predictions & forecasts
+- Exploratory predictions and forecasts, subject to adequate historical data
 - Reports & exports
 - Audit logs
 
@@ -505,23 +491,13 @@ MIT License - See LICENSE file for details
 
 ---
 
-## 👨‍💻 Project Leads
+## 🚀 Release Status and Remaining Limits
 
-- **Project Coordinator:** Chetanya Sharma (hs8502097870@gmail.com)
-- **Technical Lead:** Divyansh Tak
-- **Design Lead:** Chitransh Jain
-- **DevOps Lead:** Harshit Narayan Tripathi
+The current Render frontend and backend are deployed. The latest recorded production checks confirmed backend health with Neon connected, source-mapped scheme and geography APIs, the frontend, and authenticated dashboard, monitoring, and report flows. See [DEPLOYMENT.md](./DEPLOYMENT.md) for the active URLs and [WORK_UPDATE.md](./WORK_UPDATE.md) for the detailed verification record.
 
----
-
-## 🎯 Remaining Release Work
-
-1. Merge and deploy the latest import/geography changes after CI passes.
-2. Confirm production migrations, database health, authentication, dashboard, source monitoring, geography, and report/export flows.
-3. Keep refreshes manual until a reachable and reliable scheduled worker is configured.
-4. Preserve the source dates and geographic limits listed above in dashboard and report surfaces.
+Official-source imports run weekly from the configured local Mac LaunchAgent because Render and GitHub-hosted runners could not reach data.gov.in. The LaunchAgent requires this Mac to be logged in and online. This is a polling interval, not an official source update schedule. Source freshness remains limited to the dates reported by each configured feed; the NRLM village-wise resource is not integrated because its schema and location mapping are unverified.
 
 ---
 
 **Last Updated:** November 3, 2026
-**Status:** Core implementation complete; release and production smoke checks pending.
+**Status:** Core release deployed; weekly best-effort local polling configured; source freshness and coverage remain operational limits.
