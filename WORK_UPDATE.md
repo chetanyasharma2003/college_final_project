@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 18:07 IST
+**Last updated:** 2026-11-03 18:20 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -21,7 +21,7 @@ Important accuracy rule: **do not claim that every scheme is real-time, complete
 | All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
 | District/block/village data | 706 source-referenced districts remain; synthetic block/village rows were removed. An NRLM village-wise resource is listed by OGD but has not been schema-verified or integrated; no village KPI data are currently served |
 | Scheduled imports on Render | Disabled/Render outbound requests to data.gov.in previously failed (`ECONNREFUSED` / `EHOSTUNREACH`). Local `sync:official` is the current import path |
-| Production endpoints | PRs #10–#12 are merged; main CI passed for each. Latest source-only cleanup commit `c514249` passed CI and Render backend health is HTTP 200 with database connected. The active frontend returns HTTP 200 but still serves its prior bundle; its manual Render deployment is pending because no Render control-plane tool or deploy credential is available here. |
+| Production endpoints | Source-only cleanup commit `c514249` and documentation commit `79cecd4` both passed main CI. Render backend health is HTTP 200 with database connected. The frontend was manually deployed through the Render API at commit `79cecd4`; live HTTP 200 and updated source-backed UI copy were verified. Both Render services are connected to `main` with auto-deploy enabled. |
 | Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Real-time/all-scheme coverage remains unsupported; refreshes are manual and credential rotation remains open. No defensible completion percentage is claimed. |
 
 ## 3. Recent verified work
@@ -128,12 +128,20 @@ All three geography migrations were applied to the configured Neon database; it 
 - Feed-matched KPI observation counts retained: PMAY-G 27, PMAY-U 108, MGNREGS 31, PMGSY 7,601, NRLM 105, DDU-GKY 244, SAGY 125.
 - The cleanup command is reproducible and dry-run by default: `cd backend && npm run purge:synthetic -- --env-file=.env.real-data`. Applying it requires explicit `--apply --confirm-production-cleanup` flags.
 - This database cleanup does not make snapshots real-time or integrate the NRLM village-wise resource. Source freshness remains historical/uncadenced, and the dashboard must disclose source dates and geographic coverage.
-- Documentation and UI copy now describe source-reported dates and source-supported geography instead of real-time or generated sample coverage. Commit `c514249` is pushed to `main`; GitHub Actions passed and Render backend restarted with HTTP 200/database connected. The Render frontend still serves its old bundle and needs a manual deployment from the Render control plane, which is unavailable in this workspace.
+- Documentation and UI copy now describe source-reported dates and source-supported geography instead of real-time or generated sample coverage. Commit `c514249` is pushed to `main`; GitHub Actions passed and Render backend restarted with HTTP 200/database connected. The Render frontend was subsequently deployed through the API at commit `79cecd4` and serves the updated copy.
+
+### Render deployment automation (3 November 2026)
+
+- With the user's Render API key, listed workspace services without exposing or saving any secret values. Confirmed the existing `frontend` static site uses this repository, `main`, root directory `frontend`, and has auto-deploy enabled; the backend is also connected to `main` with auto-deploy enabled.
+- Triggered frontend deploy `dep-dbktfvm7bikc73frgh30` for commit `79cecd4b6169662ebd46804023458645eff63416`. Render reported `live`.
+- Live verification: frontend HTTP 200; the served JS chunks contain the updated “source-backed KPI observations” message and no longer contain the old “Detailed sample data covers” copy. Backend remains HTTP 200 with database connected. Main CI passed for commits `c514249` and `79cecd4`.
+- The Render API key was supplied in chat and used only in memory; it was not written to repo files, logs, or this handoff. Rotate/revoke it after the deadline. Existing source imports remain manual: configured feeds have no verified refresh cadence, and Render previously could not reach data.gov.in.
+- OGD lists the NRLM village-wise SHG/member resource, but the linked catalog API identifier is not a data resource endpoint (`Meta not found` when probed as one). Its actual fields and location mapping are still unverified; no village KPI data were fabricated or added.
 
 ## 4. How to continue
 
 1. **Refresh schedule.** Imports remain manual because the feeds have no verified cadence and data.gov.in connectivity failed from Render previously. Do not imply automatic refresh is active.
-2. **Credential hygiene.** API/database credentials were exposed during prior troubleshooting. Rotate them in private hosting/database settings. This workspace has no Render/Neon control-plane integration, so rotation could not be performed here. Verify new values without writing them to this log.
+2. **Credential hygiene.** Rotate/revoke the Render API key shared in chat after the deadline. API/database credentials were also exposed during prior troubleshooting; rotate those in private hosting/database settings. Do not write replacement values to this log.
 
 ## 5. Acceptance checklist to reach the college scope honestly
 
