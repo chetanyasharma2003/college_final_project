@@ -105,6 +105,10 @@ export function createDrilldownService(db) {
       const state = await db.state.findUnique({ where: { id: parentId } });
       if (!state) throw new HttpError(404, 'State not found');
       assertStateAllowed(stateScope, state.id);
+      const sourceConfig = SCHEME_CONFIGS[kpi.scheme.code];
+      if (!sourceConfig?.aggregateByDistrict && !sourceConfig?.fieldMapping?.district) {
+        throw new HttpError(422, 'This source reports state/UT values only; district data is unavailable');
+      }
       const districts = await db.district.findMany({
         where: { state_id: state.id }, orderBy: { name: 'asc' },
         select: { id: true, name: true, area_km2: true },

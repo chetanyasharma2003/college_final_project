@@ -4,10 +4,11 @@ import 'leaflet/dist/leaflet.css';
 import client from '../api/client';
 import { STATE_CENTROIDS } from '../data/stateCentroids';
 
-const COLORS = { on_track: '#16a34a', at_risk: '#f59e0b', critical: '#dc2626', no_data: '#9ca3af' };
-const LABELS = { on_track: 'On track', at_risk: 'At risk', critical: 'Critical', no_data: 'No data' };
+const COLORS = { on_track: '#176643', at_risk: '#875d16', critical: '#a43838', no_data: '#68766f', no_target: '#68766f' };
+const LABELS = { on_track: 'On track', at_risk: 'Below target threshold', critical: 'Below target threshold', no_data: 'No observation', no_target: 'Not rated · no target' };
 const LEVEL_TITLE = { state: 'States', district: 'Districts', block: 'Blocks', village: 'Villages' };
 const RADIUS = { state: 14, district: 12, block: 10, village: 8 };
+const DISTRICT_FEEDS = new Set(['MGNREGS', 'PMGSY']);
 const INDIA_CENTER = [22.9, 79.5];
 const nf = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 1 });
 
@@ -31,7 +32,7 @@ export default function IndiaHeatmap() {
   const [view, setView] = useState({ level: 'state', rows: [], kpi: null, date: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [sortBy, setSortBy] = useState('worst');
+  const [sortBy, setSortBy] = useState('highest');
 
   // KPI list
   useEffect(() => {
@@ -55,6 +56,7 @@ export default function IndiaHeatmap() {
     setLoading(true);
     setError('');
     const parent = path[path.length - 1];
+    setView({ level: parent ? 'district' : 'state', rows: [], kpi: null, date: null });
     const request = parent
       ? client.get('/drilldown/children', { params: { kpiId, level: parent.level, parentId: parent.id } })
       : client.get('/drilldown/heatmap', { params: { kpiId } });
@@ -63,9 +65,9 @@ export default function IndiaHeatmap() {
         if (!alive) return;
         const d = res.data?.data;
         if (parent) {
-          setView({ level: d.level, rows: d.children, kpi: d.kpi, date: null });
+          setView({ level: d.level, rows: Array.isArray(d.children) ? d.children : [], kpi: d.kpi, date: null });
         } else {
-          const rows = d.states.map((s) => {
+          const rows = (Array.isArray(d.states) ? d.states : []).map((s) => {
             const c = STATE_CENTROIDS[s.name];
             return { ...s, lat: c ? c[0] : null, lng: c ? c[1] : null };
           });
@@ -86,14 +88,19 @@ export default function IndiaHeatmap() {
   const sorted = useMemo(() => {
     const rows = [...view.rows];
     if (sortBy === 'name') return rows.sort((a, b) => a.name.localeCompare(b.name));
-    const val = (r) => (r.progress == null ? (sortBy === 'worst' ? Infinity : -Infinity) : r.progress);
-    return rows.sort((a, b) => (sortBy === 'worst' ? val(a) - val(b) : val(b) - val(a)));
+    const val = (row) => row.value == null ? (sortBy === 'lowest' ? Infinity : -Infinity) : row.value;
+    return rows.sort((a, b) => (sortBy === 'lowest' ? val(a) - val(b) : val(b) - val(a)));
   }, [view.rows, sortBy]);
 
   const points = view.rows.filter((r) => r.lat != null && r.lng != null).map((r) => [r.lat, r.lng]);
-  const counts = view.rows.reduce((a, r) => ((a[r.status] = (a[r.status] || 0) + 1), a), {});
-  const canDrill = view.level !== 'village';
-  const allEmpty = view.rows.length > 0 && view.rows.every((r) => r.status === 'no_data');
+  const rowStatus = (row) => row.value == null ? 'no_data' : row.target == null ? 'no_target' : row.status;
+  const counts = view.rows.reduce((a, row) => {
+    const status = rowStatus(row);
+    a[status] = (a[status] || 0) + 1;
+    return a;
+  }, {});
+  const canDrill = view.level === 'state' && DISTRICT_FEEDS.has(view.kpi?.scheme?.code);
+  const allEmpty = view.rows.length > 0 && view.rows.every((row) => row.value == null);
   const unit = view.kpi?.unit || '';
 
   const drillInto = (row) => {
@@ -106,6 +113,7 @@ export default function IndiaHeatmap() {
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-3">
         <select
+          aria-label="Choose an indicator for the geographic map"
           value={kpiId || ''}
           onChange={(e) => { setKpiId(Number(e.target.value)); setPath([]); }}
           className="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-2 text-sm max-w-full"
@@ -117,12 +125,13 @@ export default function IndiaHeatmap() {
           ))}
         </select>
         <select
+          aria-label="Sort geographic locations"
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
           className="bg-white/10 text-white border border-white/20 rounded-lg px-3 py-2 text-sm"
         >
-          <option value="worst" className="text-black">Worst progress first</option>
-          <option value="best" className="text-black">Best progress first</option>
+          <option value="highest" className="text-black">Highest reported value</option>
+          <option value="lowest" className="text-black">Lowest reported value</option>
           <option value="name" className="text-black">Name (A-Z)</option>
         </select>
         <div className="flex flex-wrap gap-3 text-xs text-blue-100">
@@ -145,7 +154,7 @@ export default function IndiaHeatmap() {
           </span>
         ))}
         <span className="ml-2 text-xs text-blue-300">
-          {view.kpi ? `${view.kpi.scheme.code} · ${view.kpi.name}${unit ? ` (${unit})` : ''}` : ''}
+          {view.kpi ? `${view.kpi.scheme.code} · ${view.kpi.name || view.kpi.kpi_name}${unit ? ` (${unit})` : ''}` : ''}
         </span>
       </nav>
 
@@ -163,22 +172,24 @@ export default function IndiaHeatmap() {
               url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <FitToPoints points={points} level={view.level} />
-            {view.rows.filter((r) => r.lat != null && r.lng != null).map((r) => (
+          {view.rows.filter((r) => r.lat != null && r.lng != null).map((r) => {
+            return (
               <CircleMarker
                 key={`${view.level}-${r.id}`}
                 center={[r.lat, r.lng]}
                 radius={RADIUS[view.level]}
-                pathOptions={{ color: '#ffffff', weight: 1.5, fillColor: COLORS[r.status], fillOpacity: 0.85 }}
+                pathOptions={{ color: '#ffffff', weight: 1.5, fillColor: COLORS[rowStatus(r)] || COLORS.no_data, fillOpacity: 0.85 }}
                 eventHandlers={{ click: () => drillInto(r) }}
               >
                 <Tooltip>
                   <strong>{r.name}</strong><br />
                   {r.value == null ? 'No KPI value' : `${nf.format(r.value)}${unit ? ` ${unit}` : ''}`}
                   {r.progress != null && <><br />{r.progress}% of target</>}
-                  {canDrill && <><br /><em>Click to drill down</em></>}
+                  {canDrill && <><br /><em>Click to view source-reported districts</em></>}
                 </Tooltip>
-              </CircleMarker>
-            ))}
+            </CircleMarker>
+            );
+          })}
           </MapContainer>
         </div>
 
@@ -206,8 +217,14 @@ export default function IndiaHeatmap() {
                     <span className="text-white font-medium truncate">{r.name}</span>
                     <span className="text-blue-100 whitespace-nowrap">{r.progress == null ? '—' : `${r.progress}%`}</span>
                   </div>
-                  <div className="h-1.5 bg-white/10 rounded mt-1">
-                    <div className="h-1.5 rounded" style={{ width: `${Math.min(r.progress ?? 0, 100)}%`, background: COLORS[r.status] }} />
+                  <div className="h-1.5 bg-white/10 rounded mt-1" aria-hidden="true">
+                    <div
+                      className="h-1.5 rounded"
+                      style={{
+                        width: `${Math.max(0, Math.min(Number(r.progress) || 0, 100))}%`,
+                        background: COLORS[rowStatus(r)] || COLORS.no_data,
+                      }}
+                    />
                   </div>
                   <div className="text-xs text-blue-300 mt-1">
                     {r.value == null ? 'No KPI value' : `${nf.format(r.value)}${unit ? ` ${unit}` : ''}${r.target != null ? ` of ${nf.format(r.target)}` : ''}`}
@@ -221,7 +238,7 @@ export default function IndiaHeatmap() {
 
       <p className="text-xs text-blue-300">
         Only KPIs mapped to configured official sources are shown. Markers indicate approximate state locations; administrative boundaries are not drawn.
-        {view.date ? ` State values as of ${new Date(view.date).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}.` : ''}
+        {view.date && !Number.isNaN(new Date(view.date).getTime()) ? ` State values as of ${new Date(view.date).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}.` : ''}
       </p>
     </div>
   );

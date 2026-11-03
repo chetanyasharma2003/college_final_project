@@ -62,7 +62,8 @@ function makeDb(schemeCode = 'PMAY-U') {
     { id: 1001, name: 'V2', block_id: 100, population: 700, latitude: '27.0', longitude: '75.9' },
     { id: 1002, name: 'V3', block_id: 101, population: 500, latitude: '26.9', longitude: '75.8' },
   ];
-  const kpi = { id: 7, kpi_name: 'Houses Completed', unit: 'units', scheme: { code: schemeCode, name: schemeCode } };
+  const kpiName = schemeCode === 'MGNREGS' ? 'Job Cards Issued (cumulative)' : 'Houses Completed';
+  const kpi = { id: 7, kpi_name: kpiName, unit: 'units', scheme: { code: schemeCode, name: schemeCode } };
   const values = [
     // state level (two dates) + a district-level row that must NOT leak into the state heatmap
     { kpi_id: 7, state_id: 1, district_id: null, block_id: null, village_id: null, value: 40, target_value: 100, date: D('2026-09-01') },
@@ -120,6 +121,16 @@ test('drilldown rejects synthetic KPI definitions outside a verified source mapp
   );
 });
 
+test('state-only feeds reject district drilldown with a clear availability response', async () => {
+  const svc = createDrilldownService(makeDb('PMAY-U'));
+  await assert.rejects(
+    svc.getChildren({ kpiId: 7, level: 'state', parentId: 1, stateScope: null }),
+    (error) => error instanceof HttpError
+      && error.status === 422
+      && error.message === 'This source reports state/UT values only; district data is unavailable',
+  );
+});
+
 test('heatmap respects the user state scope', async () => {
   const svc = createDrilldownService(makeDb());
   const res = await svc.getHeatmap({ kpiId: 7, stateScope: 2 });
@@ -127,7 +138,7 @@ test('heatmap respects the user state scope', async () => {
 });
 
 test('state -> districts: newest value, averaged coordinates, no_data when empty', async () => {
-  const svc = createDrilldownService(makeDb());
+  const svc = createDrilldownService(makeDb('MGNREGS'));
   const res = await svc.getChildren({ kpiId: 7, level: 'state', parentId: 1, stateScope: null });
   assert.equal(res.level, 'district');
   const jaipur = res.children.find((c) => c.name === 'Jaipur');
@@ -140,7 +151,7 @@ test('state -> districts: newest value, averaged coordinates, no_data when empty
 });
 
 test('district -> blocks and block -> villages', async () => {
-  const svc = createDrilldownService(makeDb());
+  const svc = createDrilldownService(makeDb('MGNREGS'));
   const blocks = await svc.getChildren({ kpiId: 7, level: 'district', parentId: 10, stateScope: null });
   assert.equal(blocks.level, 'block');
   assert.equal(blocks.children.find((b) => b.id === 100).value, 90);
