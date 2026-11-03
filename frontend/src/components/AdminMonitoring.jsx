@@ -11,6 +11,8 @@ export default function AdminMonitoring() {
   const [syncResult, setSyncResult] = useState(null);
   const [syncProgress, setSyncProgress] = useState(null);
   const [syncError, setSyncError] = useState('');
+  const [connectionCheck, setConnectionCheck] = useState(null);
+  const [checkingConnection, setCheckingConnection] = useState(false);
 
   const refreshOverview = async () => {
     const { data } = await client.get('/admin/overview');
@@ -61,6 +63,22 @@ export default function AdminMonitoring() {
     }
   };
 
+  const testDataSourceConnection = async () => {
+    setCheckingConnection(true);
+    setConnectionCheck(null);
+    try {
+      const { data } = await client.post('/admin/test-data-source');
+      setConnectionCheck(data.data);
+    } catch (requestError) {
+      setConnectionCheck({
+        reachable: false,
+        message: requestError.response?.data?.message || requestError.message || 'Unable to test the data.gov.in connection.',
+      });
+    } finally {
+      setCheckingConnection(false);
+    }
+  };
+
   if (loading) return <section aria-live="polite">Loading administration status…</section>;
   if (error) return <section role="alert" className="rounded-xl border border-red-400/30 bg-red-500/10 p-5 text-red-200">{error}</section>;
   if (!overview) return null;
@@ -76,6 +94,14 @@ export default function AdminMonitoring() {
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <button
           type="button"
+          onClick={testDataSourceConnection}
+          disabled={checkingConnection || syncing}
+          className="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {checkingConnection ? 'Testing connection…' : 'Test data.gov.in connection'}
+        </button>
+        <button
+          type="button"
           onClick={syncOfficialData}
           disabled={syncing || overview.ready_data_sources === 0}
           className="rounded-lg border border-blue-400/40 bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 transition hover:bg-blue-500/30 disabled:cursor-not-allowed disabled:opacity-50"
@@ -83,9 +109,20 @@ export default function AdminMonitoring() {
           {syncing ? 'Syncing official sources…' : 'Sync official source data'}
         </button>
         <p className="text-sm text-slate-300">
-          Run this after configuring the data.gov.in API key. Imports can take a few minutes.
+          Check Render connectivity and API key before starting an import.
         </p>
       </div>
+      {connectionCheck && (
+        <p
+          role={connectionCheck.reachable ? 'status' : 'alert'}
+          className={`mb-4 rounded-lg border p-3 text-sm ${connectionCheck.reachable
+            ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200'
+            : 'border-amber-400/30 bg-amber-500/10 text-amber-100'}`}
+        >
+          data.gov.in connection: {connectionCheck.message}
+          {connectionCheck.http_status ? ` (HTTP ${connectionCheck.http_status})` : ''}
+        </p>
+      )}
       {syncError && <p role="alert" className="mb-4 rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">{syncError}</p>}
       {syncResult && (
         <div className="mb-5 rounded-lg border border-white/10 bg-white/5 p-4" aria-live="polite">

@@ -1,10 +1,52 @@
 import express from 'express';
+import axios from 'axios';
 import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
 import prisma from '../config/prisma.js';
 import { getDataGovApiKey, SCHEME_CONFIGS } from '../config/scheme-integrations.js';
 import { filterSourceKpiDefinitions } from '../services/kpi-management.service.js';
+import { formatOpenDataRequestError } from '../services/data-sync.service.js';
 
 const router = express.Router();
+
+router.post('/test-data-source', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
+  const schemeCode = 'PMAY-U';
+  const config = SCHEME_CONFIGS[schemeCode];
+  const apiKey = getDataGovApiKey(schemeCode);
+  if (!apiKey || !config.resourceId) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'A data.gov.in API key and configured resource are required.',
+    });
+  }
+
+  try {
+    const response = await axios.get(
+      `${config.apiEndpoint}/${encodeURIComponent(config.resourceId)}`,
+      {
+        timeout: 12000,
+        params: { 'api-key': apiKey, format: 'json', limit: 1 },
+      },
+    );
+    return res.json({
+      status: 'success',
+      data: {
+        reachable: true,
+        http_status: response.status,
+        message: 'Render connected to data.gov.in and the configured API key was accepted.',
+      },
+    });
+  } catch (error) {
+    const httpStatus = error.response?.status || null;
+    return res.json({
+      status: 'success',
+      data: {
+        reachable: false,
+        http_status: httpStatus,
+        message: formatOpenDataRequestError(error),
+      },
+    });
+  }
+});
 
 router.get('/overview', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
   try {
