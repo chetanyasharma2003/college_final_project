@@ -45,6 +45,23 @@ export const isExcludedDistrict = (district, excludedDistricts = []) => {
   return excludedDistricts.some((excluded) => normalizeLocationName(excluded) === normalizedDistrict);
 };
 
+export const formatOpenDataRequestError = (error) => {
+  const status = error.response?.status;
+  if (status) return `Open Data request failed with HTTP ${status}`;
+
+  const code = error.code;
+  if (code === 'ECONNABORTED' || code === 'ETIMEDOUT') {
+    return `Open Data request timed out (${code})`;
+  }
+  if (code === 'ENOTFOUND' || code === 'EAI_AGAIN') {
+    return `Open Data host DNS lookup failed (${code})`;
+  }
+  if (['ECONNREFUSED', 'ECONNRESET', 'EHOSTUNREACH', 'ENETUNREACH'].includes(code)) {
+    return `Open Data connection failed (${code})`;
+  }
+  return `Open Data request failed (${code || 'unknown network error'})`;
+};
+
 export const resolveDistrictName = (districtName, aliases = {}) => {
   const normalized = normalizeLocationName(districtName);
   const alias = Object.entries(aliases).find(([source]) => normalizeLocationName(source) === normalized);
@@ -294,8 +311,9 @@ class DataSyncService {
           params: { 'api-key': apiKey, format: 'json', limit: pageSize, offset },
         });
       } catch (error) {
-        const status = error.response?.status;
-        throw new Error(status ? `Open Data request failed with HTTP ${status}` : 'Open Data request failed due to a network error');
+        const message = formatOpenDataRequestError(error);
+        console.error(`Open Data request failed for ${schemeCode}: ${message}`);
+        throw new Error(message);
       }
       const page = response.data?.records ?? response.data?.data ?? response.data;
       if (!Array.isArray(page)) {
