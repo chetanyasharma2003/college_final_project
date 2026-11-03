@@ -108,6 +108,15 @@ app.use('/api/v1/auth/register', authLimiter);
 
 // ============= ROUTES =============
 
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Government Schemes Analytics API',
+    status: 'ok',
+    health: '/health',
+    api: '/api/v1',
+  });
+});
+
 // Comprehensive health check
 app.get('/health', (req, res) => {
   const healthy = Boolean(res.locals.dbHealthy);
