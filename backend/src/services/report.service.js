@@ -2,6 +2,12 @@ import prisma from '../config/prisma.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  averageKpiCompletion,
+  comparativeStatus,
+  completionPercentage,
+  sourceReportKpiIds,
+} from '../utils/source-report-metrics.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsDir = path.join(__dirname, '../../uploads');
@@ -26,10 +32,7 @@ class ReportService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const scheme = await prisma.scheme.findUnique({
-      where: { id: schemeId },
-      include: { kpi_definitions: true },
-    });
+    const scheme = await prisma.scheme.findUnique({ where: { id: schemeId } });
 
     if (!scheme) {
       const error = new Error('Scheme not found');
@@ -37,9 +40,15 @@ class ReportService {
       throw error;
     }
 
+    const definitions = await prisma.kPIDefinition.findMany({
+      where: { scheme_id: schemeId },
+      select: { id: true, kpi_name: true },
+    });
+    const sourceKpiIds = sourceReportKpiIds(scheme, definitions);
+
     const kpiValues = await prisma.kPIValue.findMany({
       where: {
-        kpi: { scheme_id: schemeId },
+        kpi_id: { in: sourceKpiIds },
         state_id: stateId || undefined,
         date: { gte: startDate },
       },
@@ -57,23 +66,12 @@ class ReportService {
       on_track: kpiValues.filter((k) => k.status === 'on_track').length,
       at_risk: kpiValues.filter((k) => k.status === 'at_risk').length,
       critical: kpiValues.filter((k) => k.status === 'critical').length,
-      overall_completion:
-        kpiValues.length > 0
-          ? Math.round(
-              (kpiValues.reduce(
-                (sum, k) =>
-                  sum +
-                  (Number(k.value) / Number(k.target_value || 100)) * 100,
-                0
-              ) /
-                kpiValues.length) *
-                100
-            ) / 100
-          : 0,
+      overall_completion: averageKpiCompletion(kpiValues),
       key_metrics: kpiValues.slice(0, 5).map((k) => ({
         name: k.kpi.kpi_name,
         value: Number(k.value),
-        target: Number(k.target_value),
+        target: k.target_value == null ? null : Number(k.target_value),
+        completion: completionPercentage(k.value, k.target_value),
         status: k.status,
       })),
     };
@@ -91,9 +89,21 @@ class ReportService {
     }
     if (!endDate) endDate = new Date();
 
+    const scheme = await prisma.scheme.findUnique({ where: { id: schemeId } });
+    if (!scheme) {
+      const error = new Error('Scheme not found');
+      error.statusCode = 404;
+      throw error;
+    }
+    const definitions = await prisma.kPIDefinition.findMany({
+      where: { scheme_id: schemeId },
+      select: { id: true, kpi_name: true },
+    });
+    const sourceKpiIds = sourceReportKpiIds(scheme, definitions);
+
     const kpiValues = await prisma.kPIValue.findMany({
       where: {
-        kpi: { scheme_id: schemeId },
+        kpi_id: { in: sourceKpiIds },
         state_id: stateId || undefined,
         date: { gte: startDate, lte: endDate },
       },
@@ -105,16 +115,14 @@ class ReportService {
       .map(escapeCSVField)
       .join(',');
     const csvRows = kpiValues.map((kpi) => {
-        const completion = Math.round(
-          (Number(kpi.value) / Number(kpi.target_value || 100)) * 100
-        );
+        const completion = completionPercentage(kpi.value, kpi.target_value);
         return [
           kpi.date.toISOString().split('T')[0],
           kpi.kpi.kpi_name,
           kpi.state?.name || 'National',
           Number(kpi.value),
-          Number(kpi.target_value),
-          `${completion}%`,
+          kpi.target_value == null ? null : Number(kpi.target_value),
+          completion == null ? null : `${Math.round(completion)}%`,
           kpi.status,
         ].map(escapeCSVField).join(',');
       })
@@ -139,14 +147,21 @@ class ReportService {
     }
     if (!endDate) endDate = new Date();
 
-    const scheme = await prisma.scheme.findUnique({
-      where: { id: schemeId },
-      include: { kpi_definitions: true },
+    const scheme = await prisma.scheme.findUnique({ where: { id: schemeId } });
+    if (!scheme) {
+      const error = new Error('Scheme not found');
+      error.statusCode = 404;
+      throw error;
+    }
+    const definitions = await prisma.kPIDefinition.findMany({
+      where: { scheme_id: schemeId },
+      select: { id: true, kpi_name: true },
     });
+    const sourceKpiIds = sourceReportKpiIds(scheme, definitions);
 
     const kpiValues = await prisma.kPIValue.findMany({
       where: {
-        kpi: { scheme_id: schemeId },
+        kpi_id: { in: sourceKpiIds },
         state_id: stateId || undefined,
         date: { gte: startDate, lte: endDate },
       },
@@ -156,7 +171,7 @@ class ReportService {
 
     const predictions = await prisma.prediction.findMany({
       where: {
-        kpi: { scheme_id: schemeId },
+        kpi_id: { in: sourceKpiIds },
         location_id: stateId || null,
       },
       take: 12,
@@ -175,29 +190,15 @@ class ReportService {
         on_track: kpiValues.filter((k) => k.status === 'on_track').length,
         at_risk: kpiValues.filter((k) => k.status === 'at_risk').length,
         critical: kpiValues.filter((k) => k.status === 'critical').length,
-        avg_completion:
-          kpiValues.length > 0
-            ? Math.round(
-                (kpiValues.reduce(
-                  (sum, k) =>
-                    sum +
-                    (Number(k.value) / Number(k.target_value || 100)) * 100,
-                  0
-                ) /
-                  kpiValues.length) *
-                  100
-              ) / 100
-            : 0,
+        avg_completion: averageKpiCompletion(kpiValues),
       },
       kpi_details: kpiValues.map((kpi) => ({
         kpi_name: kpi.kpi.kpi_name,
         state: kpi.state?.name || 'National',
         date: kpi.date.toISOString().split('T')[0],
         value: Number(kpi.value),
-        target: Number(kpi.target_value),
-        completion: Math.round(
-          (Number(kpi.value) / Number(kpi.target_value || 100)) * 100
-        ),
+        target: kpi.target_value == null ? null : Number(kpi.target_value),
+        completion: completionPercentage(kpi.value, kpi.target_value),
         status: kpi.status,
       })),
       predictions: predictions.slice(0, 3).map((p) => ({
@@ -237,30 +238,26 @@ class ReportService {
     });
 
     const comparison = [];
+    const definitions = schemes.length ? await prisma.kPIDefinition.findMany({
+      where: { scheme_id: { in: schemes.map(({ id }) => id) } },
+      select: { id: true, scheme_id: true, kpi_name: true },
+    }) : [];
 
     for (const scheme of schemes) {
+      const sourceKpiIds = sourceReportKpiIds(
+        scheme,
+        definitions.filter((definition) => definition.scheme_id === scheme.id),
+      );
       const kpiValues = await prisma.kPIValue.findMany({
         where: {
-          kpi: { scheme_id: scheme.id },
+          kpi_id: { in: sourceKpiIds },
           state_id: stateId || undefined,
         },
         include: { kpi: true },
         take: 100,
       });
 
-      const avgCompletion =
-        kpiValues.length > 0
-          ? Math.round(
-              (kpiValues.reduce(
-                (sum, k) =>
-                  sum +
-                  (Number(k.value) / Number(k.target_value || 100)) * 100,
-                0
-              ) /
-                kpiValues.length) *
-                100
-            ) / 100
-          : 0;
+      const avgCompletion = averageKpiCompletion(kpiValues);
 
       comparison.push({
         scheme_name: scheme.name,
@@ -268,15 +265,18 @@ class ReportService {
         budget: scheme.budget,
         kpi_count: kpiValues.length,
         avg_completion: avgCompletion,
-        status:
-          avgCompletion >= 80 ? 'on_track' : avgCompletion >= 60 ? 'at_risk' : 'critical',
+        status: comparativeStatus(kpiValues, avgCompletion),
       });
     }
 
     return {
       generated_date: new Date().toISOString(),
       scheme_count: schemes.length,
-      comparison: comparison.sort((a, b) => b.avg_completion - a.avg_completion),
+      comparison: comparison.sort((a, b) => {
+        if (a.avg_completion == null) return b.avg_completion == null ? 0 : 1;
+        if (b.avg_completion == null) return -1;
+        return b.avg_completion - a.avg_completion;
+      }),
     };
   }
 
