@@ -11,6 +11,14 @@ import { HelmetProvider } from 'react-helmet-async'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.getRegistrations()
+      .then((registrations) => Promise.all(registrations.map((registration) => registration.update())))
+      .catch((error) => console.warn('Unable to update registered service workers:', error))
+  })
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
