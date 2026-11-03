@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 19:22 IST
+**Last updated:** 2026-11-03 19:25 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -21,7 +21,7 @@ Important accuracy rule: **do not claim that every scheme is real-time, complete
 | All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
 | District/block/village data | 706 source-referenced districts remain; synthetic block/village rows were removed. An NRLM village-wise resource is listed by OGD but has not been schema-verified or integrated; no village KPI data are currently served |
 | Scheduled imports | Render and GitHub-hosted runners cannot reach data.gov.in. A local sync on this Mac succeeded 7/7 (888 records, 0 failed). A macOS LaunchAgent is installed and polls every seven days through the reachable local network; the source update cadence remains unverified. |
-| Production endpoints | Source-only cleanup commit `c514249`, frontend deploy commit `79cecd4`, Render automation commit `170548c`, UI safety commit `4b5e731`, and final commit `f885959` passed main CI. Backend health returns HTTP 200 with database connected; frontend returns HTTP 200 and serves the new Render-scheduler/local-sync copy. Both Render services auto-deploy after CI checks pass. |
+| Production endpoints | Source-only cleanup commit `c514249`, frontend deploy commit `79cecd4`, Render automation commit `170548c`, UI safety commit `4b5e731`, local sync setup `f885959`, and screenshot fixes `9bfb910` passed main CI. Backend health returns HTTP 200 with database connected; frontend returns HTTP 200 and serves the screenshot fixes. Both Render services auto-deploy after CI checks pass. |
 | Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Weekly local polling is configured, but real-time/all-scheme coverage remains unsupported and credential rotation remains open. No defensible completion percentage is claimed. |
 
 ## 3. Recent verified work
@@ -164,7 +164,7 @@ All three geography migrations were applied to the configured Neon database; it 
 - Fixed national chart aggregation: use the official national total when supplied, otherwise sum the lowest available state/district rows, never average national and state subtotals together. PMAY-U national rows match the sum of their state rows. Removed the KPI history endpoint's per-row lookup and raised the safe cap to 10,000 so PMGSY's 7,601 observations are not truncated at 500.
 - A one-date chart now identifies itself as a “Source snapshot” and says that one reporting date cannot make a trend. The top summary calls the seven items official data feeds across six scheme families (PMAY-G/U are separate feeds).
 - Geographic drill-down now explains when the selected feed reports only state/UT values, so an empty district heatmap for those sources is clearly a source-coverage limit rather than an import error.
-- Added unit tests for missing targets and source rankings; targeted test run passed 3/3. These UI/API changes are pending push, GitHub CI, and Render deployment.
+- Added unit tests for missing targets and source rankings; targeted run passed 3/3 and CI passed on commit `9bfb910`. The live Render frontend returns HTTP 200 and its bundles contain the target, raw-value ranking, source snapshot, feed-count, and geography explanations. Backend health returns HTTP 200 with Neon connected. Latest seven import rows remain 7/7 successful.
 
 ## 4. How to continue
 
