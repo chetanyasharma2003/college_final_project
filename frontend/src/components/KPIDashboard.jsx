@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 import client from '../api/client';
 import KPICard from './KPICard';
 import ExportButton from './ExportButton';
+import { findArrayPayload } from '../utils/arrayPayload';
 
 const SOURCE_URLS = {
   'PMAY-G': 'https://www.data.gov.in/resource/stateuts-wise-number-eligible-beneficiaries-pradhan-mantri-awaas-yojana-gramin-pmay-g-pmay',
@@ -18,8 +19,10 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
   const [kpiData, setKpiData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const requestVersion = useRef(0);
 
   useEffect(() => {
+    requestVersion.current += 1;
     if (!schemeCode) {
       setKpiData([]);
       setError(null);
@@ -27,16 +30,21 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
       return undefined;
     }
 
+    setKpiData([]);
+    setError(null);
     fetchAllKPIs();
     const interval = setInterval(fetchAllKPIs, 5 * 60 * 1000);
     window.addEventListener('kpi-data:updated', fetchAllKPIs);
     return () => {
+      requestVersion.current += 1;
       clearInterval(interval);
       window.removeEventListener('kpi-data:updated', fetchAllKPIs);
     };
   }, [schemeCode, stateId]);
 
   const fetchAllKPIs = async () => {
+    const currentRequest = requestVersion.current + 1;
+    requestVersion.current = currentRequest;
     if (!schemeCode) {
       setKpiData([]);
       setError(null);
@@ -50,12 +58,23 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
         ? `/kpis/status/${schemeCode}?stateId=${stateId}`
         : `/kpis/status/${schemeCode}`;
       const response = await client.get(url);
-      setKpiData(response.data.kpi_status || []);
+      if (currentRequest !== requestVersion.current) return;
+      const payload = findArrayPayload(
+        response.data?.kpi_status,
+        response.data?.data?.kpi_status,
+        response.data?.data,
+        response.data,
+      );
+      if (!payload) throw new Error('The server returned an unexpected KPI status response.');
+      setKpiData(payload);
       setError(null);
     } catch (err) {
-      setError(err.message);
+      if (currentRequest === requestVersion.current) {
+        setKpiData([]);
+        setError(err.message);
+      }
     } finally {
-      setLoading(false);
+      if (currentRequest === requestVersion.current) setLoading(false);
     }
   };
 

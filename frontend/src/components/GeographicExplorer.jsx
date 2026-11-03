@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import client from '../api/client';
 import { useGeographic } from '../api/hooks';
+import { arrayOrEmpty } from '../utils/arrayPayload';
 
 const cellTone = (status) => ({
   on_track: 'bg-emerald-500/25 text-emerald-100',
@@ -46,7 +47,15 @@ export default function GeographicExplorer() {
     let active = true;
     if (!stateId || !selectedScheme) { setHeatmap({ kpis: [], districts: [] }); return () => { active = false; }; }
     client.get('/geo/performance-heatmap', { params: { stateId, schemeId: selectedScheme } })
-      .then(({ data }) => { if (active) { setHeatmap(data.data); setHeatmapError(''); } })
+      .then(({ data }) => {
+        if (active) {
+          setHeatmap({
+            kpis: arrayOrEmpty(data?.data?.kpis),
+            districts: arrayOrEmpty(data?.data?.districts),
+          });
+          setHeatmapError('');
+        }
+      })
       .catch((error) => { if (active) setHeatmapError(error.response?.data?.message || 'Heatmap data is unavailable.'); });
     return () => { active = false; };
   }, [stateId, selectedScheme, reloadVersion]);
@@ -62,7 +71,7 @@ export default function GeographicExplorer() {
     let active = true;
     if (!location || !selectedScheme) { setLocationKpis([]); return () => { active = false; }; }
     client.get('/geo/location-kpis', { params: { ...location, schemeId: selectedScheme } })
-      .then(({ data }) => { if (active) { setLocationKpis(data.data); setLocationError(''); } })
+      .then(({ data }) => { if (active) { setLocationKpis(arrayOrEmpty(data?.data)); setLocationError(''); } })
       .catch((error) => { if (active) setLocationError(error.response?.data?.message || 'Location KPIs are unavailable.'); });
     return () => { active = false; };
   }, [location, selectedScheme, reloadVersion]);

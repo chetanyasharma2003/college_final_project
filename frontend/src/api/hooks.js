@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { logout as clearAuth, setToken, setUser as setReduxUser } from '../store/authSlice';
 import client from './client';
+import { arrayOrEmpty } from '../utils/arrayPayload';
 
 // Auth Hooks
 export const useAuth = () => {
@@ -282,7 +283,7 @@ export const useKPIStatus = (schemeCode) => {
       setLoading(true);
       const response = await client.get(`/kpis/status/${schemeCode}`);
       const kpiData = response.data?.data?.kpi_status || response.data?.kpi_status || [];
-      setKpiStatus(kpiData);
+      setKpiStatus(arrayOrEmpty(kpiData));
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -318,7 +319,7 @@ export const useGeographic = () => {
     try {
       setLoading(true);
       const response = await client.get('/geo/states');
-      setStates(response.data.data);
+      setStates(arrayOrEmpty(response.data?.data));
     } finally {
       setLoading(false);
     }
@@ -327,7 +328,7 @@ export const useGeographic = () => {
   const fetchDistricts = useCallback(async (stateId) => {
     try {
       const response = await client.get(`/geo/districts?stateId=${stateId}`);
-      setDistricts(response.data.data);
+      setDistricts(arrayOrEmpty(response.data?.data));
     } catch (err) {
       console.error(err);
     }
@@ -336,7 +337,7 @@ export const useGeographic = () => {
   const fetchBlocks = useCallback(async (districtId) => {
     try {
       const response = await client.get(`/geo/blocks?districtId=${districtId}`);
-      setBlocks(response.data.data);
+      setBlocks(arrayOrEmpty(response.data?.data));
     } catch (err) {
       console.error(err);
     }
@@ -345,7 +346,7 @@ export const useGeographic = () => {
   const fetchVillages = useCallback(async (blockId) => {
     try {
       const response = await client.get(`/geo/villages?blockId=${blockId}`);
-      setVillages(response.data.data);
+      setVillages(arrayOrEmpty(response.data?.data));
     } catch (err) {
       console.error(err);
     }
