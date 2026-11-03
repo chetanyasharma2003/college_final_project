@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 17:42 IST
+**Last updated:** 2026-11-03 17:46 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -21,8 +21,8 @@ Important accuracy rule: **do not claim that every scheme is real-time, complete
 | All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
 | District/block/village data | Only show levels present in source data. Source districts can be created for configured district feeds; no official village feed is currently established |
 | Scheduled imports on Render | Disabled/Render outbound requests to data.gov.in previously failed (`ECONNREFUSED` / `EHOSTUNREACH`). Local `sync:official` is the current import path |
-| Production endpoints | PRs #10 and #11 are merged; main CI passed for both. Render backend health is HTTP 200 with the database connected, the schemes API filters legacy KPIs, and the active Render frontend returns HTTP 200. A report date-window fix for historical snapshots is implemented locally and awaits review/deployment. |
-| Overall scope completion | Core application is deployed. Real-time/all-scheme coverage remains unsupported; historical report-window deployment, authenticated flow verification, and credential rotation remain open. No defensible completion percentage is claimed. |
+| Production endpoints | PRs #10–#12 are merged; main CI passed for each. Render backend health is HTTP 200 with the database connected, the schemes API filters legacy KPIs, default reports include historical source snapshots, and the active Render frontend returns HTTP 200. |
+| Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Real-time/all-scheme coverage remains unsupported; refreshes are manual and credential rotation remains open. No defensible completion percentage is claimed. |
 
 ## 3. Recent verified work
 
@@ -69,13 +69,15 @@ Changes shipped:
 - `backend/src/services/report.service.js` now filters executive, CSV, JSON, prediction, and comparative report data to KPI definitions mapped to official sources.
 - Report completion stays unavailable when the source has no target, and comparative output distinguishes unrated/no-data schemes from low completion.
 - `backend/src/utils/source-report-metrics.js` and `backend/tests/source-report-metrics.test.js` cover source filtering and no-target handling.
-- PR [#11](https://github.com/chetanyasharma2003/college_final_project/pull/11) merged as `d2e674683035378ee2b61e1f245df1eb50cd4966`; its PR and main-branch CI checks passed. Deployment verification is in progress.
+- PR [#11](https://github.com/chetanyasharma2003/college_final_project/pull/11) merged as `d2e674683035378ee2b61e1f245df1eb50cd4966`; its PR and main-branch CI checks passed. Its report source filter and no-target handling are included in the live PR #12 release.
 
-### Historical snapshot report-window fix in progress
+### Merged historical snapshot report-window fix (PR #12)
 
 - The configured feeds are mostly historical snapshots, but report defaults used rolling 30/90-day windows. That made the default executive, PDF, CSV, and JSON reports omit many available source records.
-- Local follow-up changes use all available source records when no date filter is requested and label the executive/JSON period from actual record dates. Explicit date filters remain supported.
-- This change is not deployed yet; it is being prepared for PR review and CI.
+- The merged change uses all available source records when no date filter is requested and labels the executive/JSON period from actual record dates. Explicit date filters remain supported.
+- PR [#12](https://github.com/chetanyasharma2003/college_final_project/pull/12) merged as `65b7164e6dea292966592b95001c0fe02c3522ce`; PR and main-branch CI passed, and Render deployed it.
+- Production authenticated smoke: PMAY-U executive, JSON, and PDF reports returned all 108 source observations with date `2026-01-22`, no legacy KPI names, and no fabricated target/completion. The temporary viewer account and its audit rows were removed.
+- The admin source-monitoring overview returned 8 schemes, 36 states/UTs, and 8 feed records. The temporary admin account and its audit rows were removed.
 
 All three geography migrations were applied to the configured Neon database; it has 36 current state/UT rows. The private ignored local import config uses the Neon pooler; a connection probe passed. No credentials or connection strings belong in this file, commits, screenshots, or chat.
 
@@ -84,6 +86,7 @@ All three geography migrations were applied to the configured Neon database; it 
 - Root `npm test`: passed after allowing the Redis tests to open their temporary loopback servers.
 - Latest root `npm test`: passed with 3 frontend tests and 48 backend tests, including report source-filter/no-target coverage.
 - PR #11 required CI and merged-main CI both passed; the merged workflow runs the same root suite.
+- PR #12 required CI and merged-main CI both passed.
 - GitHub Actions `Project CI` on `main`: passed after merge.
 - Frontend production build: passed.
 - Frontend tests: 3 passed.
@@ -102,24 +105,24 @@ All three geography migrations were applied to the configured Neon database; it 
 - Direct Neon connections closed during the previous slow row-by-row import. Switching the private local import config to the user-provided pooler, and changing to transactional bulk replacement, resolved the import issue.
 - Post-merge Render health returned HTTP 200 with the database connected; the backend restarted after merge. The schemes API no longer returns the legacy KPI names, confirming the source filter is deployed.
 - A review of protected report endpoints found they still included legacy KPI rows and substituted an arbitrary target of 100. PR #11 filters reports to source-mapped KPIs and leaves completion unrated when no source target exists.
-- The report defaults also used recent rolling windows despite the historical snapshot dates. A local follow-up now defaults to all available source data and labels its date coverage; deployment is pending PR #12.
+- The report defaults also used recent rolling windows despite the historical snapshot dates. PR #12 now defaults to all available source data and labels its actual date coverage; the production report smoke check confirmed the result.
 
 ### Latest continuation (3 November 2026)
 
 - `https://college-final-project-backend-m86r.onrender.com/health`: HTTP 200, `database: connected`, after the merge deployment.
 - `https://college-final-project-backend-m86r.onrender.com/api/v1/schemes`: HTTP 200; returns only the seven feeds' source-mapped KPIs. Legacy demo KPI names are no longer exposed.
 - `https://frontend-ae3v.onrender.com/`: HTTP 200. The documented `college-final-project.vercel.app` and older `frontend-eta-smoky-88.vercel.app` links returned 404; deployment docs use the active Render URL.
-- Authenticated login, source-monitoring, geography, and report/export flows were not tested because no authorized test account was available.
-- PRs #10 and #11 are merged and main CI passed. Refreshes remain manual because configured feeds have `syncFrequency: null` and Render access to data.gov.in previously failed.
-- PR #12 should merge only after its required full-suite CI check passes; then recheck report/PDF output in production.
+- An ephemeral viewer account verified login, profile, source KPIs, geography, and executive/JSON/PDF reporting; an ephemeral admin verified source monitoring. Both accounts and their audit rows were deleted after testing.
+- PRs #10–#12 are merged and main CI passed. Refreshes remain manual because configured feeds have `syncFrequency: null` and Render access to data.gov.in previously failed.
+- PR #12 is merged and deployed. Production health is HTTP 200 with the database connected; authenticated PMAY-U reports return 108 observations dated 22 January 2026, and the admin source-monitoring summary returns 8 schemes, 36 states/UTs, and 8 feeds.
+- Final production checks: schemes API returns 8 entries with no legacy KPI names; geography API returns 36 state/UT entries; frontend returns HTTP 200; browser CORS preflight allows the active Render frontend.
+- Temporary viewer/admin users and their associated audit rows were removed after the smoke checks.
 - README and deployment docs now state that imports are manual. `ENABLE_DATA_SYNC_SCHEDULER=true` alone does not schedule these configured feeds because each has `syncFrequency: null`.
 
 ## 4. How to continue
 
-1. **Deliver historical report fix.** Review PR #12 and merge after CI passes; confirm Render deploys it.
-2. **Authenticated smoke tests.** Use an authorized test account to check login, dashboard, source monitoring, geography, and report/export.
-3. **Refresh schedule.** Imports remain manual because the feeds have no verified cadence and data.gov.in connectivity failed from Render previously. Do not imply automatic refresh is active.
-4. **Credential hygiene.** API/database credentials were exposed during prior troubleshooting. Rotate them in the private hosting/database settings and verify only that new values work; never put them in this log.
+1. **Refresh schedule.** Imports remain manual because the feeds have no verified cadence and data.gov.in connectivity failed from Render previously. Do not imply automatic refresh is active.
+2. **Credential hygiene.** API/database credentials were exposed during prior troubleshooting. Rotate them in private hosting/database settings. This workspace has no Render/Neon control-plane integration, so rotation could not be performed here. Verify new values without writing them to this log.
 
 ## 5. Acceptance checklist to reach the college scope honestly
 
@@ -132,8 +135,8 @@ All three geography migrations were applied to the configured Neon database; it 
 - [x] Geographic aliases/territories are mapped; all non-total source geographies in configured feeds resolve.
 - [x] Persisted row/KPI counts and import history are verified; repeated sync did not duplicate rows.
 - [x] PMAY-U subtotal rows are excluded; historical merged-UT metrics preserve source breakdown and do not invent missing values.
-- [x] PRs #10 and #11 are merged; main CI passed and Render backend health/database and source-mapped schemes API are verified live.
-- [ ] Authenticated login, dashboard, source-monitoring, geography, and report/export flows are smoke-tested with an authorized account.
+- [x] PRs #10–#12 are merged; main CI passed and Render backend health/database and source-mapped schemes API are verified live.
+- [x] Authenticated login/profile, source KPI list, geography heatmap, admin source monitoring, and executive/JSON/PDF report flows are smoke-tested; temporary accounts and their audit records were removed.
 - [x] Scheduled refresh is clearly described as unavailable/manual; do not imply it is active.
 - [x] Geography claims are limited to source-backed state and district records; no official village feed is claimed.
 
