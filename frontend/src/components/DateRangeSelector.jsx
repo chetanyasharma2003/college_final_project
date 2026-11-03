@@ -3,7 +3,7 @@ import { Calendar } from 'lucide-react';
 
 export default function DateRangeSelector({ onDateRangeChange }) {
   const [startDate, setStartDate] = useState(
-    new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split('T')[0]
+    '2020-01-01'
   );
   const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
   const [showDropdown, setShowDropdown] = useState(false);

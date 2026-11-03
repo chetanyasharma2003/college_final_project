@@ -142,6 +142,12 @@ export const useSchemes = () => {
     fetchSchemes();
   }, [fetchSchemes]);
 
+  useEffect(() => {
+    const handleSchemesUpdated = () => fetchSchemes();
+    window.addEventListener('schemes:updated', handleSchemesUpdated);
+    return () => window.removeEventListener('schemes:updated', handleSchemesUpdated);
+  }, [fetchSchemes]);
+
   const getSchemeById = useCallback(async (id) => {
     try {
       const response = await client.get(`/schemes/${id}`);
@@ -241,6 +247,15 @@ export const useKPIs = (schemeIdOrCode = null, stateId = null) => {
   useEffect(() => {
     fetchKPIs();
     fetchLatestKPIValues();
+  }, [fetchKPIs, fetchLatestKPIValues]);
+
+  useEffect(() => {
+    const refreshKpis = () => {
+      fetchKPIs();
+      fetchLatestKPIValues();
+    };
+    window.addEventListener('kpi-data:updated', refreshKpis);
+    return () => window.removeEventListener('kpi-data:updated', refreshKpis);
   }, [fetchKPIs, fetchLatestKPIValues]);
 
   return {

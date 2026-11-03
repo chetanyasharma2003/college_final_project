@@ -9,6 +9,7 @@ export default function AdminMonitoring() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState(null);
+  const [syncProgress, setSyncProgress] = useState(null);
   const [syncError, setSyncError] = useState('');
 
   const refreshOverview = async () => {
@@ -29,10 +30,30 @@ export default function AdminMonitoring() {
     setSyncing(true);
     setSyncError('');
     setSyncResult(null);
+    setSyncProgress(null);
     try {
-      const { data } = await client.post('/data-sync/all');
-      setSyncResult(data.data);
+      const { data: started } = await client.post('/data-sync/all');
+      const { jobId } = started.data;
+      let completedJob = null;
+      for (let attempt = 0; attempt < 180; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        const { data: response } = await client.get(`/data-sync/jobs/${jobId}`);
+        const job = response.data;
+        setSyncProgress(job);
+        if (job.status === 'completed') {
+          completedJob = job;
+          break;
+        }
+        if (job.status === 'failed') {
+          throw new Error(job.error || 'Official source sync failed.');
+        }
+      }
+      if (!completedJob) throw new Error('Sync is still running. Check Recent data imports before starting another run.');
+
+      setSyncResult(completedJob.result);
       await refreshOverview();
+      window.dispatchEvent(new Event('schemes:updated'));
+      window.dispatchEvent(new Event('kpi-data:updated'));
     } catch (requestError) {
       setSyncError(requestError.response?.data?.message || requestError.message || 'Official data sync failed.');
     } finally {
@@ -85,13 +106,20 @@ export default function AdminMonitoring() {
           </ul>
         </div>
       )}
-      <p className="mb-4 text-sm text-slate-300">{overview.counts.schemes} schemes · {overview.counts.states} states · {overview.counts.active_users} active users</p>
+      {syncing && syncProgress && (
+        <p className="mb-4 text-sm text-blue-200" aria-live="polite">
+          Importing source feeds: {syncProgress.completedSchemes} of {syncProgress.totalSchemes} complete.
+        </p>
+      )}
+      <p className="mb-4 text-sm text-slate-300">
+        {overview.ready_data_sources} of {overview.data_sources.filter((source) => source.resource_configured).length} official data feeds configured · {overview.counts.states} states · {overview.counts.active_users} active users
+      </p>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-left text-sm">
-        <thead><tr className="border-b border-white/15 text-slate-300"><th className="p-2">Scheme</th><th className="p-2">KPIs</th><th className="p-2">Records</th><th className="p-2">Source host</th><th className="p-2">Dataset</th><th className="p-2">Mapping</th><th className="p-2">Credential</th></tr></thead>
-          <tbody>{overview.schemes.map((scheme) => {
-            const source = overview.data_sources.find((item) => item.code === scheme.code);
-            return <tr key={scheme.code} className="border-b border-white/10"><td className="p-2">{scheme.code}</td><td className="p-2">{scheme.kpi_definitions}</td><td className="p-2">{scheme.generic_data}</td><td className="p-2">{source?.endpoint_host || 'Not configured'}</td><td className="p-2">{source?.resource_configured ? 'Configured' : 'Missing'}</td><td className="p-2">{source?.field_mapping_configured ? 'Configured' : 'Missing'}</td><td className="p-2">{source?.credentials_configured ? 'Configured' : 'Missing'}</td></tr>;
+          <thead><tr className="border-b border-white/15 text-slate-300"><th className="p-2">Official feed</th><th className="p-2">KPIs</th><th className="p-2">Records</th><th className="p-2">Dataset</th><th className="p-2">Mapping</th><th className="p-2">Credential</th></tr></thead>
+          <tbody>{overview.data_sources.filter((source) => source.resource_configured).map((source) => {
+            const scheme = overview.schemes.find((item) => item.code === source.code);
+            return <tr key={source.code} className="border-b border-white/10"><td className="p-2">{source.code}</td><td className="p-2">{scheme?.kpi_definitions || 0}</td><td className="p-2">{scheme?.generic_data || 0}</td><td className="p-2">{source.resource_configured ? 'Configured' : 'Missing'}</td><td className="p-2">{source.field_mapping_configured ? 'Configured' : 'Missing'}</td><td className="p-2">{source.credentials_configured ? 'Configured' : 'Missing'}</td></tr>;
           })}</tbody>
         </table>
       </div>

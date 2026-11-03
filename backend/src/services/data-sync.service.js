@@ -146,7 +146,7 @@ class DataSyncService {
     };
   }
 
-  static async syncAllSchemeData() {
+  static async syncAllSchemeData(onSchemeComplete = () => {}) {
     const results = {
       success: 0,
       failed: 0,
@@ -159,6 +159,7 @@ class DataSyncService {
     for (const schemeCode of schemes) {
       const result = await this.syncSchemeData(schemeCode);
       results.schemes[schemeCode] = result;
+      onSchemeComplete(schemeCode, result);
       if (result.status === 'success') results.success++;
       else results.failed++;
       results.totalRecords += result.recordsLoaded || 0;

@@ -1,32 +1,68 @@
 import express from 'express';
+import { randomUUID } from 'node:crypto';
 import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
 import DataSyncService from '../services/data-sync.service.js';
 
 const router = express.Router();
+const syncJobs = new Map();
 
-// POST - Sync सभी schemes का real API data
 router.post('/all', verifyAuth, checkRole(['ADMIN']), async (req, res) => {
-  try {
-    console.log('\n📥 Data sync शुरू हुआ सभी schemes के लिए...');
+  const id = randomUUID();
+  const job = {
+    id,
+    status: 'running',
+    completedSchemes: 0,
+    totalSchemes: 7,
+    schemes: {},
+    startedAt: new Date().toISOString(),
+    result: null,
+    error: null,
+  };
+  syncJobs.set(id, job);
 
-    const result = await DataSyncService.syncAllSchemeData();
+  setImmediate(async () => {
+    try {
+      job.result = await DataSyncService.syncAllSchemeData((schemeCode, result) => {
+        job.schemes[schemeCode] = result;
+        job.completedSchemes += 1;
+      });
+      job.status = 'completed';
+      job.completedAt = new Date().toISOString();
+    } catch (error) {
+      job.status = 'failed';
+      job.error = error.message;
+      job.completedAt = new Date().toISOString();
+      console.error('Official data sync job failed:', error.message);
+    }
 
-    console.log('\n✅ Data sync complete:', result);
+    const cleanup = setTimeout(() => syncJobs.delete(id), 60 * 60 * 1000);
+    cleanup.unref?.();
+  });
 
-    res.json({
-      status: 'success',
-      data: result,
-      message: `${result.totalRecords} records successfully synced`,
-      timestamp: new Date().toISOString()
-    });
-  } catch (error) {
-    console.error('❌ Sync failed:', error);
-    res.status(500).json({
-      status: 'error',
-      message: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
+  res.status(202).json({
+    status: 'success',
+    data: { jobId: id, status: job.status },
+    message: 'Official source sync started.',
+  });
+});
+
+router.get('/jobs/:jobId', verifyAuth, checkRole(['ADMIN']), (req, res) => {
+  const job = syncJobs.get(req.params.jobId);
+  if (!job) return res.status(404).json({ status: 'error', message: 'Sync job not found or expired' });
+  return res.json({
+    status: 'success',
+    data: {
+      id: job.id,
+      status: job.status,
+      completedSchemes: job.completedSchemes,
+      totalSchemes: job.totalSchemes,
+      schemes: job.schemes,
+      result: job.result,
+      error: job.error,
+      startedAt: job.startedAt,
+      completedAt: job.completedAt || null,
+    },
+  });
 });
 
 router.post('/:schemeCode', verifyAuth, checkRole(['ADMIN']), async (req, res) => {

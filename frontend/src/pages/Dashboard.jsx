@@ -12,7 +12,6 @@ import TrendChart from '../components/TrendChart';
 import TopPerformers from '../components/TopPerformers';
 import ErrorBoundary from '../components/ErrorBoundary';
 import Chatbot from '../components/Chatbot';
-import MLInsights from '../components/MLInsights';
 import KPIAlerts from '../components/KPIAlerts';
 import KPIComparison from '../components/KPIComparison';
 import { BarChart3, FileText, TrendingUp, Map as MapIcon } from 'lucide-react';
@@ -24,15 +23,13 @@ export default function Dashboard() {
   const { user } = useSelector((state) => state.auth);
   const { schemes, selectedScheme, kpiValues } = useSelector((state) => state.data);
   const { schemes: schemesData, loading: schemesLoading } = useSchemes();
-  const [selectedSchemeCode, setSelectedSchemeCode] = useState('PMAY');
-  const [selectedSchemeName, setSelectedSchemeName] = useState('PMAY - Pradhan Mantri Awas Yojana');
+  const [selectedSchemeCode, setSelectedSchemeCode] = useState('');
+  const [selectedSchemeName, setSelectedSchemeName] = useState('Official scheme data');
   const [selectedStateForFilter, setSelectedStateForFilter] = useState(null);
   const [selectedDateRange, setSelectedDateRange] = useState(() => {
     const end = new Date();
-    const start = new Date(end);
-    start.setFullYear(start.getFullYear() - 1);
     return {
-      startDate: start.toISOString().split('T')[0],
+      startDate: '2020-01-01',
       endDate: end.toISOString().split('T')[0],
     };
   });
@@ -42,15 +39,17 @@ export default function Dashboard() {
   const { kpiStatus, loading: kpiStatusLoading } = useKPIStatus(selectedSchemeCode);
 
   useEffect(() => {
-    if (schemesData.length > 0 && schemes.length === 0) {
-      dispatch(setSchemes(schemesData));
-      // Set default scheme to PMAY
-      const pmayScheme = schemesData.find(s => s.code === 'PMAY');
-      if (pmayScheme) {
-        dispatch(setSelectedScheme(pmayScheme.id));
-      }
+    if (schemesData.length === 0) return;
+    const sourceSchemes = schemesData.filter((scheme) => scheme.code !== 'PMAY');
+    dispatch(setSchemes(sourceSchemes));
+
+    if (!sourceSchemes.some((scheme) => scheme.id === selectedScheme)) {
+      const preferred = sourceSchemes.find((scheme) => scheme.code === 'PMAY-U')
+        || sourceSchemes.find((scheme) => scheme.code === 'PMAY-G')
+        || sourceSchemes[0];
+      dispatch(setSelectedScheme(preferred?.id || null));
     }
-  }, [schemesData, schemes, dispatch]);
+  }, [schemesData, selectedScheme, dispatch]);
 
   // Update selected scheme code when scheme selection changes
   useEffect(() => {
@@ -191,14 +190,10 @@ export default function Dashboard() {
           </ErrorBoundary>
         </div>
 
-        {/* AI/ML Insights */}
-        {selectedScheme && (
-          <div className="mb-8">
-            <ErrorBoundary>
-              <MLInsights schemeId={selectedScheme} />
-            </ErrorBoundary>
-          </div>
-        )}
+        <div className="mb-8 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-blue-100">
+          Performance ratings and forecasts are shown only when the official source provides validated targets and enough dated observations.
+          Current source feeds do not consistently provide these, so unsupported health scores and predictions are not generated.
+        </div>
 
 
         {/* Charts Section */}

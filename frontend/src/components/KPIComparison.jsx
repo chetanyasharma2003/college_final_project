@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useKPIs } from '../api/hooks';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
@@ -11,6 +11,15 @@ export default function KPIComparison() {
   const { kpiValues: kpi1Data = [] } = useKPIs(scheme1Code);
   const { kpiValues: kpi2Data = [] } = useKPIs(scheme2Code);
 
+  useEffect(() => {
+    if (!schemes.some((scheme) => scheme.code === scheme1Code)) {
+      setScheme1Code(schemes[0]?.code || '');
+    }
+    if (!schemes.some((scheme) => scheme.code === scheme2Code)) {
+      setScheme2Code(schemes[1]?.code || '');
+    }
+  }, [scheme1Code, scheme2Code, schemes]);
+
   const scheme1Name = useMemo(
     () => schemes.find(s => s?.code === scheme1Code)?.name || scheme1Code,
     [scheme1Code, schemes]
@@ -22,7 +31,7 @@ export default function KPIComparison() {
   );
 
   const getTrendIcon = (current, target) => {
-    if (!target || target === 0) return null;
+    if (current == null || !target || target === 0) return null;
     const percentage = (current / target) * 100;
     if (percentage >= 100) return <ArrowUpRight size={16} className="text-green-400" />;
     if (percentage >= 75) return <ArrowUpRight size={16} className="text-yellow-400" />;
@@ -52,13 +61,13 @@ export default function KPIComparison() {
 
           <div className="space-y-3">
             {kpi1Data.slice(0, 3).map((kpi, idx) => {
-              const safeValue = Number(kpi.current_value) || 0;
-              const safeTarget = Number(kpi.target_value) || 1;
+              const safeValue = kpi.current_value == null ? null : Number(kpi.current_value);
+              const safeTarget = Number(kpi.target_value) || null;
               return (
                 <div key={idx} className="flex justify-between items-center pb-2 border-b border-white/5">
                   <span className="text-sm text-gray-300">{kpi.kpi_name || 'KPI'}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-semibold text-sm">{safeValue.toLocaleString()}</span>
+                    <span className="text-white font-semibold text-sm">{safeValue == null ? 'No data' : `${safeValue.toLocaleString()} ${kpi.unit || ''}`}</span>
                     {getTrendIcon(safeValue, safeTarget)}
                   </div>
                 </div>
@@ -81,13 +90,13 @@ export default function KPIComparison() {
 
           <div className="space-y-3">
             {kpi2Data.slice(0, 3).map((kpi, idx) => {
-              const safeValue = Number(kpi.current_value) || 0;
-              const safeTarget = Number(kpi.target_value) || 1;
+              const safeValue = kpi.current_value == null ? null : Number(kpi.current_value);
+              const safeTarget = Number(kpi.target_value) || null;
               return (
                 <div key={idx} className="flex justify-between items-center pb-2 border-b border-white/5">
                   <span className="text-sm text-gray-300">{kpi.kpi_name || 'KPI'}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-semibold text-sm">{safeValue.toLocaleString()}</span>
+                    <span className="text-white font-semibold text-sm">{safeValue == null ? 'No data' : `${safeValue.toLocaleString()} ${kpi.unit || ''}`}</span>
                     {getTrendIcon(safeValue, safeTarget)}
                   </div>
                 </div>

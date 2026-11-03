@@ -49,7 +49,7 @@ function matches(row, where) {
   return true;
 }
 const D = (s) => new Date(s);
-function makeDb() {
+function makeDb(schemeCode = 'PMAY-U') {
   const states = [{ id: 1, name: 'Rajasthan', code: 'RA', region: 'North' }, { id: 2, name: 'Assam', code: 'AS', region: 'Northeast' }];
   const districts = [
     { id: 10, name: 'Jaipur', state_id: 1, area_km2: '11152' },
@@ -62,7 +62,7 @@ function makeDb() {
     { id: 1001, name: 'V2', block_id: 100, population: 700, latitude: '27.0', longitude: '75.9' },
     { id: 1002, name: 'V3', block_id: 101, population: 500, latitude: '26.9', longitude: '75.8' },
   ];
-  const kpi = { id: 7, kpi_name: 'Houses Completed', unit: 'units', scheme: { code: 'PMAY', name: 'PMAY' } };
+  const kpi = { id: 7, kpi_name: 'Houses Completed', unit: 'units', scheme: { code: schemeCode, name: schemeCode } };
   const values = [
     // state level (two dates) + a district-level row that must NOT leak into the state heatmap
     { kpi_id: 7, state_id: 1, district_id: null, block_id: null, village_id: null, value: 40, target_value: 100, date: D('2026-09-01') },
@@ -110,6 +110,14 @@ test('heatmap uses only state-level rows and the newest date', async () => {
   assert.equal(raj.progress, 80);
   assert.equal(raj.status, 'on_track');
   assert.equal(res.states.find((s) => s.name === 'Assam').status, 'critical');
+});
+
+test('drilldown rejects synthetic KPI definitions outside a verified source mapping', async () => {
+  const svc = createDrilldownService(makeDb('PMAY'));
+  await assert.rejects(
+    svc.getHeatmap({ kpiId: 7, stateScope: null }),
+    (error) => error instanceof HttpError && error.status === 404,
+  );
 });
 
 test('heatmap respects the user state scope', async () => {

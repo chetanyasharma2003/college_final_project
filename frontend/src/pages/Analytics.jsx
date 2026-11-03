@@ -15,9 +15,7 @@ export default function Analytics() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Scheme Comparison Section */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-6">📊 Scheme Performance Comparison</h2>
           <ErrorBoundary>
             <SchemeComparison />
           </ErrorBoundary>

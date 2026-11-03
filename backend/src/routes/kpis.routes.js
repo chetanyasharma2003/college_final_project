@@ -24,7 +24,8 @@ router.get('/', async (req, res) => {
       });
       kpis = definitions.filter((definition) => {
         const config = SCHEME_CONFIGS[definition.scheme.code];
-        return !config || filterSourceKpiDefinitions([definition], config).length > 0;
+        return Boolean(config?.fieldMapping)
+          && filterSourceKpiDefinitions([definition], config).length > 0;
       });
     }
     res.json({ status: 'success', data: kpis });

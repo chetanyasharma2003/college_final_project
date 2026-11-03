@@ -1,146 +1,111 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { useCallback, useEffect, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import client from '../api/client';
 
-const SCHEME_COLORS = {
-  PMAY: '#3b82f6',
-  MGNREGS: '#10b981',
-  PMGSY: '#f59e0b',
-  NRLM: '#8b5cf6',
-  'DDU-GKY': '#ec4899',
-  SAGY: '#06b6d4',
-};
+const FEEDS = [
+  { code: 'PMAY-G', color: '#3b82f6' },
+  { code: 'PMAY-U', color: '#60a5fa' },
+  { code: 'MGNREGS', color: '#10b981' },
+  { code: 'PMGSY', color: '#f59e0b' },
+  { code: 'NRLM', color: '#8b5cf6' },
+  { code: 'DDU-GKY', color: '#ec4899' },
+  { code: 'SAGY', color: '#06b6d4' },
+];
+
+const formatDate = (value) => value
+  ? new Date(value).toLocaleDateString('en-IN')
+  : 'Not reported';
 
 export default function SchemeComparison() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  const fetchComparisonData = useCallback(async () => {
+    setLoading(true);
+    const comparisons = await Promise.all(FEEDS.map(async (feed) => {
+      try {
+        const response = await client.get(`/kpis/status/${encodeURIComponent(feed.code)}`);
+        const metrics = (response.data?.kpi_status || []).map((item) => ({
+          ...item,
+          current_value: item.current_value == null ? null : Number(item.current_value),
+        }));
+        return { ...feed, metrics, error: null };
+      } catch (error) {
+        return {
+          ...feed,
+          metrics: [],
+          error: error.response?.data?.message || 'Source data is unavailable.',
+        };
+      }
+    }));
+    setData(comparisons);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     fetchComparisonData();
-  }, []);
-
-  const fetchComparisonData = async () => {
-    try {
-      setLoading(true);
-      const schemes = ['PMAY', 'MGNREGS', 'PMGSY', 'NRLM', 'DDU-GKY', 'SAGY'];
-      const comparisons = await Promise.all(schemes.map(async (scheme) => {
-        const response = await client.get(`/kpis/latest?scheme=${encodeURIComponent(scheme)}&limit=2000`);
-        const values = Array.isArray(response.data?.data) ? response.data.data : [];
-        const latestByLocation = new Map();
-
-        values.forEach((item) => {
-          const locationKey = `${item.kpi_id}:${item.state_id ?? 'national'}:${item.district_id ?? ''}`;
-          if (!latestByLocation.has(locationKey)) latestByLocation.set(locationKey, item);
-        });
-
-        const observations = Array.from(latestByLocation.values()).map((item) => {
-          const value = Number(item.value);
-          const target = Number(item.target_value);
-          return Number.isFinite(value) && Number.isFinite(target) && target > 0
-            ? Math.min(Math.max((value / target) * 100, 0), 100)
-            : null;
-        }).filter(value => value != null);
-
-        return {
-          name: scheme,
-          performance: observations.length
-            ? Math.round(observations.reduce((sum, value) => sum + value, 0) / observations.length)
-            : null,
-          kpis: new Set(Array.from(latestByLocation.values(), item => item.kpi_id)).size,
-          values: observations.length,
-          color: SCHEME_COLORS[scheme],
-        };
-      }));
-
-      setData(comparisons.sort((first, second) => (second.performance ?? -1) - (first.performance ?? -1)));
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching comparison:', err);
-      setData([]);
-      setError('Unable to load scheme comparisons. Check data availability and try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    window.addEventListener('kpi-data:updated', fetchComparisonData);
+    return () => window.removeEventListener('kpi-data:updated', fetchComparisonData);
+  }, [fetchComparisonData]);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h3 className="text-2xl font-bold text-white">📊 Scheme Performance Comparison</h3>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="text-2xl font-bold text-white">Official scheme data comparison</h3>
+          <p className="mt-1 text-sm text-gray-300">
+            Source-reported measures and coverage. Different schemes use different indicators, so no unsupported shared performance score is calculated.
+          </p>
+        </div>
         <button
+          type="button"
           onClick={fetchComparisonData}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg text-blue-400 transition disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg border border-blue-500/30 bg-blue-500/20 px-4 py-2 text-blue-200 transition hover:bg-blue-500/30 disabled:opacity-50"
         >
           <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
           Refresh
         </button>
       </div>
 
-      {/* Schemes Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.map(scheme => (
-          <div key={scheme.name} className="bg-white/10 border border-white/20 rounded-lg p-4">
-            <div className="flex justify-between items-start mb-3">
-              <h4 className="text-lg font-bold text-white">{scheme.name}</h4>
-              <span className="text-2xl font-bold" style={{ color: scheme.color }}>
-                  {scheme.performance == null ? 'N/A' : `${scheme.performance}%`}
-              </span>
-            </div>
-            <div className="space-y-2 text-sm text-gray-300">
-              <p>KPI Metrics: <span className="text-white font-semibold">{scheme.kpis}</span></p>
-              <p>Data Points: <span className="text-white font-semibold">{scheme.values}</span></p>
-              {scheme.performance == null && <p className="text-gray-400">No comparable observations</p>}
-            </div>
-              {scheme.performance != null && (
-                <div className="mt-3 w-full bg-white/10 rounded-full h-2 overflow-hidden">
-                  <div className="h-full rounded-full transition-all" style={{ width: `${scheme.performance}%`, backgroundColor: scheme.color }} />
-                </div>
-              )}
-          </div>
-        ))}
-      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {data.map((feed) => {
+          const available = feed.metrics.filter((metric) => metric.current_value != null);
+          const latest = feed.metrics.reduce((date, metric) => (
+            metric.last_updated && (!date || new Date(metric.last_updated) > new Date(date))
+              ? metric.last_updated
+              : date
+          ), null);
 
-      {/* Bar Chart */}
-      {error && <p role="alert" className="text-center text-red-300">{error}</p>}
-
-      {data.some(scheme => scheme.performance != null) && (
-        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6 mt-6">
-          <h4 className="text-lg font-bold text-white mb-4">Performance Score by Scheme</h4>
-          <div className="w-full h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.filter(scheme => scheme.performance != null)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="name" stroke="rgba(255,255,255,0.7)" />
-                <YAxis stroke="rgba(255,255,255,0.7)" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                    borderRadius: '8px',
-                  }}
-                  labelStyle={{ color: '#f0f0f0' }}
-                />
-                <Legend wrapperStyle={{ color: '#e5e7eb' }} />
-                <Bar dataKey="performance" name="Performance %" radius={[8, 8, 0, 0]}>
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+          return (
+            <article key={feed.code} className="rounded-lg border border-white/20 bg-white/10 p-4">
+              <h4 className="mb-3 text-lg font-bold" style={{ color: feed.color }}>{feed.code}</h4>
+              <p className="text-sm text-gray-300">
+                {feed.metrics.length} source KPI(s) · {available.length} with readings
+              </p>
+              <p className="mb-3 text-xs text-gray-400">Latest reporting date: {formatDate(latest)}</p>
+              {feed.error ? (
+                <p role="alert" className="text-sm text-red-300">{feed.error}</p>
+              ) : available.length ? (
+                <ul className="space-y-2 border-t border-white/10 pt-3">
+                  {available.map((metric) => (
+                    <li key={metric.kpi_id} className="flex justify-between gap-3 text-sm">
+                      <span className="text-gray-300">{metric.kpi_name}</span>
+                      <span className="shrink-0 font-semibold text-white">
+                        {metric.current_value.toLocaleString('en-IN')} {metric.unit || ''}
+                      </span>
+                    </li>
                   ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
-
-      {loading && (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin"><div className="text-4xl">⏳</div></div>
-        </div>
-      )}
+                </ul>
+              ) : (
+                <p className="border-t border-white/10 pt-3 text-sm text-gray-400">
+                  {feed.metrics.length ? 'No imported observations yet.' : 'No source KPI definitions yet. Run an official data sync from the admin dashboard.'}
+                </p>
+              )}
+            </article>
+          );
+        })}
+      </div>
     </div>
   );
 }

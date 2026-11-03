@@ -22,7 +22,11 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
   useEffect(() => {
     fetchAllKPIs();
     const interval = setInterval(fetchAllKPIs, 5 * 60 * 1000);
-    return () => clearInterval(interval);
+    window.addEventListener('kpi-data:updated', fetchAllKPIs);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('kpi-data:updated', fetchAllKPIs);
+    };
   }, [schemeCode, stateId]);
 
   const fetchAllKPIs = async () => {
@@ -210,8 +214,10 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
       {!loading && kpiData.length === 0 && (
         <div className="bg-white/5 border border-white/10 rounded-xl p-12 text-center">
           <AlertCircle size={48} className="mx-auto mb-4 text-gray-400" />
-          <h3 className="text-xl font-semibold text-white mb-2">No KPI Data Available</h3>
-          <p className="text-gray-400 mb-4">No KPI definitions found for this scheme.</p>
+          <h3 className="text-xl font-semibold text-white mb-2">No official KPI definitions available</h3>
+          <p className="text-gray-400 mb-4">
+            This source has not been imported yet. An admin can run “Sync official source data” from the monitoring panel above.
+          </p>
           <button
             onClick={fetchAllKPIs}
             className="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg text-blue-400 transition"
