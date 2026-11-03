@@ -28,3 +28,25 @@ export const comparativeStatus = (kpiValues, averageCompletion) => {
   if (averageCompletion == null) return 'not_rated';
   return averageCompletion >= 80 ? 'on_track' : averageCompletion >= 60 ? 'at_risk' : 'critical';
 };
+
+export const sourceDateBounds = (kpiValues) => {
+  const dates = kpiValues
+    .map(({ date }) => date == null ? null : date instanceof Date ? date : new Date(date))
+    .filter(Boolean)
+    .filter((date) => Number.isFinite(date.getTime()))
+    .sort((a, b) => a - b);
+  return {
+    start: dates[0] || null,
+    end: dates.at(-1) || null,
+  };
+};
+
+export const sourceDataPeriod = (kpiValues) => {
+  const { start, end } = sourceDateBounds(kpiValues);
+  if (!start) return 'Source dates unavailable';
+  const startLabel = start.toISOString().slice(0, 10);
+  const endLabel = end.toISOString().slice(0, 10);
+  return startLabel === endLabel
+    ? `Source snapshot: ${startLabel}`
+    : `Source dates: ${startLabel} to ${endLabel}`;
+};

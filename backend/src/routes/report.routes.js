@@ -70,7 +70,7 @@ router.get('/detailed/:schemeId', verifyAuth, async (req, res) => {
     const report = await ReportService.generateExecutiveSummary(
       Number(schemeId),
       stateId,
-      30
+      null
     );
 
     res.json({
@@ -98,7 +98,7 @@ router.get('/executive-summary/:schemeId', verifyAuth, async (req, res) => {
     const summary = await ReportService.generateExecutiveSummary(
       Number(schemeId),
       req.stateAccess || requestedStateId,
-      Number(days) || 30
+      days == null ? null : Number(days)
     );
 
     res.json({
