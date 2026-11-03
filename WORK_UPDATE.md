@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 18:43 IST
+**Last updated:** 2026-11-03 18:55 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -20,7 +20,7 @@ Important accuracy rule: **do not claim that every scheme is real-time, complete
 | Official data import to Neon | **Complete for the seven configured source snapshots.** Latest import: 7/7 successful, 888 records, 0 failed. A later row-level provenance audit retained 8,241 KPI observations that exactly match these official raw records |
 | All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
 | District/block/village data | 706 source-referenced districts remain; synthetic block/village rows were removed. An NRLM village-wise resource is listed by OGD but has not been schema-verified or integrated; no village KPI data are currently served |
-| Scheduled imports | Render cannot reach data.gov.in (`ECONNREFUSED`), while a direct local PMAY-U API probe succeeds. Local `sync:official` remains the verified import path. A GitHub-hosted runner is technically viable, but storing the Neon URL and OGD API key as GitHub Actions secrets needs explicit user approval after auto-review rejected the transfer. |
+| Scheduled imports | Render cannot reach data.gov.in (`ECONNREFUSED`), while a direct local PMAY-U API probe succeeds. The user approved storing the Neon URL and OGD API key as encrypted GitHub Actions secrets. A manual hosted import workflow is being prepared; recurring polling will be enabled only after a successful hosted run. |
 | Production endpoints | Source-only cleanup commit `c514249`, frontend deploy commit `79cecd4`, Render automation commit `170548c`, and UI safety commit `4b5e731` passed main CI. Backend health/database and frontend both return HTTP 200; live schemes, geography, CORS, and updated frontend copy were checked. Both Render services auto-deploy after CI checks pass. |
 | Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Real-time/all-scheme coverage remains unsupported; refreshes are manual and credential rotation remains open. No defensible completion percentage is claimed. |
 
@@ -148,11 +148,12 @@ All three geography migrations were applied to the configured Neon database; it 
 - A direct request to the configured PMAY-U OGD resource from the private local environment returned HTTP 200 with one record (`total: 39`). This confirms the configured resource/key work from the local network and isolates the refusal to Render's outbound path.
 - Updated `frontend/src/components/AdminMonitoring.jsx` to require a successful Render connectivity test before enabling the seven-feed sync action. A failed check now explains the Render network error, confirms that no source records were imported, and shows the verified local command `cd backend && npm run sync:official`.
 - Commit `4b5e731` passed GitHub CI and Render frontend deploy `dep-dbktrsh7lnhs738avqt0` is `live`; production serves the new sync guard.
-- Attempted to save the existing `DATABASE_URL` and `DATA_GOV_API_KEY` as encrypted GitHub Actions repository secrets to run imports on a GitHub-hosted runner. Automatic approval review rejected transmitting these credentials to GitHub because destination-specific approval was not explicit. No values were sent or saved; do not bypass this review. Request explicit approval before setting up that runner.
+- After the user explicitly approved this destination and purpose, saved `DATABASE_URL` and `DATA_GOV_API_KEY` as encrypted GitHub Actions repository secrets. Secret values are not stored in the repository or work log.
+- Added `.github/workflows/official-data-sync.yml` with a manual-only hosted import job and updated `backend/scripts/sync-official-data.js` to accept process environment credentials when the ignored local file is absent. The initial hosted run is pending; weekly polling remains off until it succeeds.
 
 ## 4. How to continue
 
-1. **Refresh schedule.** Imports remain manual because the feeds have no verified cadence and data.gov.in connectivity failed from Render previously. Do not imply automatic refresh is active.
+1. **Refresh schedule.** Run and verify the manual GitHub Actions import first. Enable weekly polling only if all configured feeds import successfully; describe it as a polling interval, not an official source update cadence or real-time data.
 2. **Credential hygiene.** Rotate/revoke the Render API key shared in chat after the deadline. API/database credentials were also exposed during prior troubleshooting; rotate those in private hosting/database settings. Do not write replacement values to this log.
 
 ## 5. Acceptance checklist to reach the college scope honestly
