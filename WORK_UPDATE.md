@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 18:25 IST
+**Last updated:** 2026-11-03 18:33 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -21,7 +21,7 @@ Important accuracy rule: **do not claim that every scheme is real-time, complete
 | All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
 | District/block/village data | 706 source-referenced districts remain; synthetic block/village rows were removed. An NRLM village-wise resource is listed by OGD but has not been schema-verified or integrated; no village KPI data are currently served |
 | Scheduled imports on Render | Disabled/Render outbound requests to data.gov.in previously failed (`ECONNREFUSED` / `EHOSTUNREACH`). Local `sync:official` is the current import path |
-| Production endpoints | Source-only cleanup commit `c514249`, frontend deploy commit `79cecd4`, handoff commit `d94c985`, and Render automation commit `170548c` passed main CI. Render backend health is HTTP 200 with database connected. Frontend commit `79cecd4` is live with updated source-backed UI copy. Both Render services now auto-deploy only after CI checks pass. |
+| Production endpoints | Source-only cleanup commit `c514249`, frontend deploy commit `79cecd4`, handoff commit `d94c985`, Render automation commit `170548c`, and latest log commit `2c0f077` passed main CI. Backend health/database and frontend both return HTTP 200; live schemes, geography, CORS, and updated frontend copy were checked. Both Render services auto-deploy after CI checks pass. |
 | Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Real-time/all-scheme coverage remains unsupported; refreshes are manual and credential rotation remains open. No defensible completion percentage is claimed. |
 
 ## 3. Recent verified work
@@ -138,6 +138,8 @@ All three geography migrations were applied to the configured Neon database; it 
 - The Render API key was supplied in chat and used only in memory; it was not written to repo files, logs, or this handoff. Rotate/revoke it after the deadline. Existing source imports remain manual: configured feeds have no verified refresh cadence, and Render previously could not reach data.gov.in.
 - Updated both existing GitHub-backed Render services to `autoDeployTrigger: checksPass` through the Render API; GET/PATCH confirmed the setting. `render.yaml` now records the same setting for the backend. The current GitHub Actions CI is the gate for future service deployments.
 - Commit `170548c` records this config and passed GitHub Actions. It changed only `render.yaml`/handoff paths, so Render did not create a new application deploy; backend remains live at `c514249`, and frontend remains live at `79cecd4`.
+- Latest live check (3 November 2026): `/health` HTTP 200/database connected; schemes API HTTP 200 with 8 schemes and 31 source KPI definitions; geography API HTTP 200 with 36 states/UTs and 706 districts; blocks and villages both return count 0; frontend HTTP 200 with updated source-backed UI copy and no old sample-data wording; CORS preflight allows `https://frontend-ae3v.onrender.com`.
+- Render API confirms both backend (`c514249`) and frontend (`79cecd4`) deploys are `live`, and both services use `autoDeployTrigger: checksPass`. Latest GitHub CI for `2c0f077` passed; repo `main` was clean after push.
 - OGD lists the NRLM village-wise SHG/member resource, but the linked catalog API identifier is not a data resource endpoint (`Meta not found` when probed as one). Its actual fields and location mapping are still unverified; no village KPI data were fabricated or added.
 
 ## 4. How to continue
