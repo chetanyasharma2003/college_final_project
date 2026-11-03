@@ -277,3 +277,9 @@ All three geography migrations were applied to the configured Neon database; it 
 - The heatmap does not need district area. Updated the drill-down query to omit `area_km2` and return it as unknown (`null`) in the response, avoiding this nullability mismatch without fabricating area data.
 - Read-only reproduction against the configured project database returned district drill-down results for all 36 states on PMGSY and MGNREGS. The production Render logs identified the separate nullable-area failure.
 - PR and CI status will be recorded after publishing this focused backend change; the live Render fix is pending deployment verification.
+
+### Heatmap click affordance follow-up (4 November 2026)
+
+- The user showed PMGSY and NRLM heatmap screenshots and noted that the state entries did not look clickable. PMGSY/MGNREGS already support state-to-district requests; the UI did not show a clear action.
+- Updated the heatmap to normalize the scheme code, show a source-aware drill-down hint, give eligible map markers a pointer cursor, and label each eligible state row “Open districts →”. Rows remain keyboard accessible. State-only feeds now explain why district drill-down is unavailable.
+- Verification and frontend deployment are pending.
