@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { getDataGovApiKey, SCHEME_CONFIGS } from '../src/config/scheme-integrations.js';
 import DataSyncService, {
   aggregateSourceCategories,
+  formatOpenDataRequestError,
   isExcludedCategory,
   isExcludedDistrict,
   isNationalAggregate,
@@ -35,6 +36,14 @@ test('uses the scheme-specific API key before the legacy shared key', async () =
   }, async () => {
     assert.equal(getDataGovApiKey('MGNREGS'), 'scheme-key');
   });
+});
+
+test('reports safe Open Data HTTP and network failure details without error payloads', () => {
+  assert.equal(formatOpenDataRequestError({ response: { status: 403 } }), 'Open Data request failed with HTTP 403');
+  assert.equal(formatOpenDataRequestError({ code: 'ECONNABORTED' }), 'Open Data request timed out (ECONNABORTED)');
+  assert.equal(formatOpenDataRequestError({ code: 'ENOTFOUND' }), 'Open Data host DNS lookup failed (ENOTFOUND)');
+  assert.equal(formatOpenDataRequestError({ code: 'ECONNRESET' }), 'Open Data connection failed (ECONNRESET)');
+  assert.equal(formatOpenDataRequestError({}), 'Open Data request failed (unknown network error)');
 });
 
 test('normalizes hyphenated scheme codes and falls back to the legacy key', async () => {
