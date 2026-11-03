@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 17:23 IST
+**Last updated:** 2026-11-03 17:26 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -32,7 +32,7 @@ Prior session history records PRs #3–#9 as merged, covering source-attributed 
 
 ### This working branch
 
-Branch: `fix/speed-official-import`, based on `origin/main`; implementation commit `8c98bba` is pushed to `origin/fix/speed-official-import`. This handoff records the follow-on production checks and pending PR/deployment work.
+Branch: `fix/speed-official-import`, based on `origin/main`; implementation commit `8c98bba` and follow-up commits are pushed to `origin/fix/speed-official-import`. PR #10 is open, and its strict `verify` CI check passed on code commit `ae003ea`.
 
 Changes in the PR branch:
 
@@ -92,12 +92,12 @@ All three geography migrations were applied to the configured Neon database; it 
 - `https://college-final-project-backend-m86r.onrender.com/api/v1/schemes`: HTTP 200; all seven configured feeds and their historical source descriptions were returned. Inspection also found legacy, unverified KPI names in this public scheme summary, so the local API now filters scheme summaries and performance aggregates to source-mapped KPI definitions.
 - `https://frontend-ae3v.onrender.com/`: HTTP 200. The documented `college-final-project.vercel.app` and older `frontend-eta-smoky-88.vercel.app` links returned 404; active deployment docs now use the working Render frontend.
 - The production scheme API still runs the deployed code, so the new source filter is local until this branch is delivered and deployed.
-- Browser interaction and authenticated login/report flows were not verified in this run. PR #10 is open against `main`; the earlier workflow check is pending, and the updated CI workflow will run after the next push.
+- Browser interaction and authenticated login/report flows were not verified in this run. PR #10 is open against `main`; the updated full-suite CI check passed on code commit `ae003ea`.
 - README and deployment docs now state that imports are manual. `ENABLE_DATA_SYNC_SCHEDULER=true` alone does not schedule these configured feeds because each has `syncFrequency: null`.
 
 ## 4. How to continue
 
-1. **Review PR #10.** The branch is pushed and PR #10 is open. Let the updated CI workflow finish; merge only after it passes. Never stage ignored `.env` files or local credentials.
+1. **Merge PR #10 after owner approval.** The full suite passed on code commit `ae003ea`; check that the current PR head is green before merging. After approval and merge, confirm Render applies migrations and smoke-test authenticated flows with an authorized account. Never stage ignored `.env` files or local credentials.
 2. **Deploy and smoke-test.** Confirm Render is using the intended Neon database and applies migrations, then test login, dashboard, source monitoring, geography, and report/export with an authorized account.
 3. **Refresh schedule.** Render imports remain disabled because the feeds have no verified cadence and data.gov.in connectivity failed previously. The manual import path and this limitation are documented; do not imply automatic refresh is active.
 4. **Credential hygiene.** API/database credentials were exposed during prior troubleshooting. Rotate them after the urgent import/deployment work and verify replacement values only in private environment configuration; never put them in this log.
