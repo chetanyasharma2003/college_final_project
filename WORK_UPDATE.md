@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 18:02 IST
+**Last updated:** 2026-11-03 18:07 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -8,7 +8,7 @@
 
 The target is a centralized cloud dashboard for six scheme families: PMAY, MGNREGS, PMGSY, NRLM, DDU-GKY, and SAGY. It should integrate public datasets, show source-backed KPIs and analytics, support geographic drill-down where the source has that geography, provide visualizations/comparisons/reports, and use the React + Node/Express + PostgreSQL architecture described in the project abstract.
 
-Important accuracy rule: **do not claim that every scheme is real-time, complete across every state/UT, or available to village level unless the source actually supports that claim.** The current geography table has 36 current state/UT records. PMAY-G, PMAY-U, MGNREGS, NRLM, DDU-GKY, and SAGY sources currently configured are historical snapshots; PMGSY has district data but its record-level reporting cutoff is not stated. The UI/docs should disclose each source's date and coverage. No missing targets, boundaries, metrics, or village data should be fabricated.
+Important accuracy rule: **do not claim that every scheme is real-time, complete across every state/UT, or available to village level unless the source actually supports that claim.** The current geography table has 36 current state/UT records. PMAY-G, PMAY-U, MGNREGS, NRLM, DDU-GKY, and SAGY sources currently configured are historical snapshots; PMGSY has district data but its record-level reporting cutoff is not stated. The OGD catalog lists an NRLM village-wise SHG/member resource, but its API field schema and location mapping have not been verified for ingestion. The UI/docs should disclose each configured source's date and coverage. No missing targets, boundaries, metrics, or village data should be fabricated.
 
 ## 2. Current status at a glance
 
@@ -19,9 +19,9 @@ Important accuracy rule: **do not claim that every scheme is real-time, complete
 | Verified source mappings | Seven feeds configured (PMAY-G and PMAY-U are separate feeds for the PMAY family); mappings and source limitations are documented in `README.md` |
 | Official data import to Neon | **Complete for the seven configured source snapshots.** Latest import: 7/7 successful, 888 records, 0 failed. A later row-level provenance audit retained 8,241 KPI observations that exactly match these official raw records |
 | All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
-| District/block/village data | 706 source-referenced districts remain; synthetic block/village rows were removed. No official village KPI feed is currently established |
+| District/block/village data | 706 source-referenced districts remain; synthetic block/village rows were removed. An NRLM village-wise resource is listed by OGD but has not been schema-verified or integrated; no village KPI data are currently served |
 | Scheduled imports on Render | Disabled/Render outbound requests to data.gov.in previously failed (`ECONNREFUSED` / `EHOSTUNREACH`). Local `sync:official` is the current import path |
-| Production endpoints | PRs #10–#12 are merged; main CI passed for each. Render backend health is HTTP 200 with the database connected, the schemes API filters legacy KPIs, default reports include historical source snapshots, and the active Render frontend returns HTTP 200. |
+| Production endpoints | PRs #10–#12 are merged; main CI passed for each. Latest source-only cleanup commit `c514249` passed CI and Render backend health is HTTP 200 with database connected. The active frontend returns HTTP 200 but still serves its prior bundle; its manual Render deployment is pending because no Render control-plane tool or deploy credential is available here. |
 | Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Real-time/all-scheme coverage remains unsupported; refreshes are manual and credential rotation remains open. No defensible completion percentage is claimed. |
 
 ## 3. Recent verified work
@@ -127,8 +127,8 @@ All three geography migrations were applied to the configured Neon database; it 
 - Applied the cleanup transaction to the configured Neon database. Post-transaction verification passed: exactly 8,241 source-matched KPI observations remain; non-source KPI definitions and predictions, blocks/villages, and unsourced area/population fields are absent. The 888 official generic source records and 706 source-referenced district records remain.
 - Feed-matched KPI observation counts retained: PMAY-G 27, PMAY-U 108, MGNREGS 31, PMGSY 7,601, NRLM 105, DDU-GKY 244, SAGY 125.
 - The cleanup command is reproducible and dry-run by default: `cd backend && npm run purge:synthetic -- --env-file=.env.real-data`. Applying it requires explicit `--apply --confirm-production-cleanup` flags.
-- This database cleanup does not make snapshots real-time or create missing official village feeds. Source freshness remains historical/uncadenced, and the dashboard must disclose source dates and geographic coverage.
-- Documentation and UI copy now describe source-reported dates and source-supported geography instead of real-time or generated sample coverage. Changes are pending GitHub push and Render redeployment.
+- This database cleanup does not make snapshots real-time or integrate the NRLM village-wise resource. Source freshness remains historical/uncadenced, and the dashboard must disclose source dates and geographic coverage.
+- Documentation and UI copy now describe source-reported dates and source-supported geography instead of real-time or generated sample coverage. Commit `c514249` is pushed to `main`; GitHub Actions passed and Render backend restarted with HTTP 200/database connected. The Render frontend still serves its old bundle and needs a manual deployment from the Render control plane, which is unavailable in this workspace.
 
 ## 4. How to continue
 
@@ -149,7 +149,7 @@ All three geography migrations were applied to the configured Neon database; it 
 - [x] PRs #10–#12 are merged; main CI passed and Render backend health/database and source-mapped schemes API are verified live.
 - [x] Authenticated login/profile, source KPI list, geography heatmap, admin source monitoring, and executive/JSON/PDF report flows are smoke-tested; temporary accounts and their audit records were removed.
 - [x] Scheduled refresh is clearly described as unavailable/manual; do not imply it is active.
-- [x] Geography claims are limited to source-backed state and district records; no official village feed is claimed.
+- [x] Geography claims are limited to source-backed state and district records; the listed NRLM village-wise resource is disclosed as pending schema verification/integration.
 
 ## 6. Handoff rules
 

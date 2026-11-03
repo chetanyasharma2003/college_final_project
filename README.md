@@ -57,7 +57,7 @@ The connected Open Government Data resources are not all live feeds and do not a
 | DDU-GKY | [Candidates trained and placed for FY 2020-21 to FY 2023-24](https://www.data.gov.in/resource/state-wise-details-candidates-trained-and-placed-under-ddu-gky-2020-21-2023-24) | Historical state/UT annual counts |
 | SAGY | [Gram Panchayats identified under Phases I-IV](https://www.data.gov.in/resource/stateut-wise-gram-panchayats-identified-under-saansad-adarsh-gram-yojana-sagy-sagy-website) | State/UT snapshot as of 3 March 2020 |
 
-These are six scheme families, with PMAY represented by separate PMAY-G and PMAY-U sources. No verified source currently supports real-time data for all schemes or village-level KPIs. Unmatched geographies are not guessed; those records are excluded from geographic aggregates and reported in import results. PMGSY and MGNREGS district names are provisioned only from their source rows, without fabricated area or boundary data. A partial import is not complete national coverage.
+These are six scheme families, with PMAY represented by separate PMAY-G and PMAY-U sources. The configured feeds do not provide real-time data for all schemes or a currently integrated village-level KPI. The OGD catalog lists an NRLM village-wise SHG/member resource, but its API field schema and location mapping have not yet been verified for ingestion. Unmatched geographies are not guessed; those records are excluded from geographic aggregates and reported in import results. PMGSY and MGNREGS district names are provisioned only from their source rows, without fabricated area or boundary data. A partial import is not complete national coverage.
 
 ### Refresh behavior
 

@@ -187,7 +187,7 @@ Ports:
 - State and district aggregation where source data supplies those locations; no generated block/village observations
 - Performance analytics
 
-Production does not use synthetic KPI, block, or village observations. Historical source data is displayed with its reporting dates; the current feeds do not provide real-time coverage across every scheme or village-level KPIs.
+Production does not use synthetic KPI, block, or village observations. Historical source data is displayed with its reporting dates; the configured feeds do not provide real-time coverage across every scheme. The OGD catalog lists an NRLM village-wise SHG/member resource, but its API schema has not yet been verified and integrated, so no village KPI data is currently served.
 
 ### 🎨 Frontend
 - Responsive dashboard
