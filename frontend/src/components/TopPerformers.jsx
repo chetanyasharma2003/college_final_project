@@ -7,6 +7,13 @@ export default function TopPerformers({ schemeCode = 'PMAY' }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!schemeCode) {
+      setTopPerformers([]);
+      setError(null);
+      setLoading(false);
+      return undefined;
+    }
+
     fetchTopPerformers();
     window.addEventListener('kpi-data:updated', fetchTopPerformers);
     return () => window.removeEventListener('kpi-data:updated', fetchTopPerformers);
