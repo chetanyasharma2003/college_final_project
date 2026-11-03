@@ -167,10 +167,10 @@ Ports:
 ## 🎯 Features & Capabilities
 
 ### ✅ Currently Working
-- [x] Dashboard with real-time KPI display
+- [x] Dashboard with source-reported KPI observations and reporting dates
 - [x] 6 Government schemes (PMAY, MGNREGS, PMGSY, NRLM, DDU-GKY, SAGY)
 - [x] Authentication & role-based access
-- [x] Geographic analytics (state → district → block)
+- [x] Geographic analytics at source-supported levels (state and district for current feeds)
 - [x] Interactive visualizations (Recharts)
 - [x] ML Analytics (anomaly detection, pattern analysis)
 - [x] Report generation & export
@@ -181,11 +181,13 @@ Ports:
 - [x] Production-grade error handling
 
 ### 🔄 Data
-- Real-time KPI calculation
+- Official source snapshot ingestion; configured feeds do not provide a verified refresh cadence
 - Time-series data tracking
 - Scheme-specific metrics
-- Geographic aggregation
+- State and district aggregation where source data supplies those locations; no generated block/village observations
 - Performance analytics
+
+Production does not use synthetic KPI, block, or village observations. Historical source data is displayed with its reporting dates; the current feeds do not provide real-time coverage across every scheme or village-level KPIs.
 
 ### 🎨 Frontend
 - Responsive dashboard

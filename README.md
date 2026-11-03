@@ -4,7 +4,7 @@
 
 **Institute:** Swami Keshvanand Institute of Technology, Management & Gramothan  
 **Project ID:** 2026-27-IT  
-**Status:** Core dashboard and source integrations are implemented; production release checks remain pending. Source freshness and geographic coverage vary by scheme.
+**Status:** Core dashboard and source integrations are deployed to Render. Production KPI observations are retained only when they match configured official source records. Source freshness and geographic coverage vary by scheme.
 **Timeline:** 16 weeks (12-14 weeks full-time)  
 
 ---
@@ -26,7 +26,7 @@ Build a **centralized analytics dashboard** that:
 - Generates comparative analysis & forecasts
 - Exports reports in multiple formats
 
-The connected Open Government Data resources are not all live feeds and do not all contain district or village fields. The dashboard therefore presents historical source-reported data with its reporting period and coverage; it must not be interpreted as a real-time feed or as complete village-level coverage.
+The connected Open Government Data resources are not all live feeds and do not all contain district or village fields. The dashboard therefore presents source-reported data with its reporting period and coverage; it must not be interpreted as a real-time feed or as complete village-level coverage. Synthetic demo seed data is disabled for production and has been removed from the live database.
 
 ### Target Users
 - Government officials & administrators
@@ -62,6 +62,8 @@ These are six scheme families, with PMAY represented by separate PMAY-G and PMAY
 ### Refresh behavior
 
 The configured feeds are historical snapshots or otherwise have no verified automatic refresh schedule. Scheduled imports are disabled: every configured source has no sync frequency, and the backend scheduler is off unless `ENABLE_DATA_SYNC_SCHEDULER=true` is set. Setting that flag alone does not schedule these feeds. To refresh the configured snapshots manually, provide the private database and data.gov.in settings in `backend/.env.real-data`, then run `cd backend && npm run sync:official`. The Render deployment does not currently run scheduled source imports; dashboard values should not be described as real-time.
+
+To audit an existing database for generated demo records, run `cd backend && npm run purge:synthetic -- --env-file=.env.real-data`. This is a dry run by default. Applying the cleanup requires both `--apply` and `--confirm-production-cleanup`; it preserves KPI observations only when their dates and values match a configured source field in the raw imported record.
 
 ---
 
@@ -326,7 +328,7 @@ gov-schemes-analytics/
 
 ### Phase 4: KPI Module (Week 7-8)
 - [ ] KPI calculation engine
-- [ ] Real-time data display
+- [ ] Real-time data display (the configured official feeds are historical snapshots)
 - [ ] KPI trend tracking
 
 ### Phase 5: Visualization (Week 9-10)
@@ -387,7 +389,7 @@ npm run test:coverage     # Coverage report
 **PostgreSQL 16** with schema for:
 - User management & authentication
 - Scheme & KPI definitions
-- Geographic data (states, districts, blocks, villages)
+- Geographic tables for states, districts, blocks, and villages; current source data populates state/district levels only
 - Reported KPI values with timestamps
 - Scheme-specific data (PMAY, MGNREGS, etc.)
 - Predictions & forecasts
@@ -467,12 +469,12 @@ vercel deploy --prod
 
 By project completion, this system should:
 
-✅ **Functional**
-- All 6 schemes integrated & displaying live data
-- KPIs calculating correctly & updating on schedule
-- Drill-down working to village level
+✅ **Functional goals currently supported by sources**
+- Six scheme families integrated with source-reported observations; data is not live
+- KPI values have official source dates; no verified automatic refresh schedule is active
+- State drill-down for state sources and district drill-down for district sources; no source-backed village KPI feed is currently configured
 - Comparisons generating accurate insights
-- Predictions generating with >75% accuracy
+- Forecast accuracy is not claimed for snapshots without a source-backed time series
 - Chatbot answering >90% of queries correctly
 
 ✅ **Performance**

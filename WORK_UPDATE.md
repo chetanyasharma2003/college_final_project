@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 17:49 IST
+**Last updated:** 2026-11-03 18:02 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -17,9 +17,9 @@ Important accuracy rule: **do not claim that every scheme is real-time, complete
 | React dashboard, charts, comparisons, geographic pages, CSV/PDF/reporting surfaces | Implemented; automated frontend build/tests pass |
 | Express API, authentication/RBAC, KPI/analytics, drill-down, source monitoring | Implemented; backend tests pass |
 | Verified source mappings | Seven feeds configured (PMAY-G and PMAY-U are separate feeds for the PMAY family); mappings and source limitations are documented in `README.md` |
-| Official data import to Neon | **Complete for the seven configured source snapshots.** Latest run: 7/7 successful, 888 records, 0 failed; repeat run retained exactly 888 generic records and 7,305 KPI observations |
+| Official data import to Neon | **Complete for the seven configured source snapshots.** Latest import: 7/7 successful, 888 records, 0 failed. A later row-level provenance audit retained 8,241 KPI observations that exactly match these official raw records |
 | All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
-| District/block/village data | Only show levels present in source data. Source districts can be created for configured district feeds; no official village feed is currently established |
+| District/block/village data | 706 source-referenced districts remain; synthetic block/village rows were removed. No official village KPI feed is currently established |
 | Scheduled imports on Render | Disabled/Render outbound requests to data.gov.in previously failed (`ECONNREFUSED` / `EHOSTUNREACH`). Local `sync:official` is the current import path |
 | Production endpoints | PRs #10–#12 are merged; main CI passed for each. Render backend health is HTTP 200 with the database connected, the schemes API filters legacy KPIs, default reports include historical source snapshots, and the active Render frontend returns HTTP 200. |
 | Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Real-time/all-scheme coverage remains unsupported; refreshes are manual and credential rotation remains open. No defensible completion percentage is claimed. |
@@ -119,6 +119,16 @@ All three geography migrations were applied to the configured Neon database; it 
 - Final production checks: schemes API returns 8 entries with no legacy KPI names; geography API returns 36 state/UT entries; frontend returns HTTP 200; browser CORS preflight allows the active Render frontend.
 - Temporary viewer/admin users and their associated audit rows were removed after the smoke checks.
 - README and deployment docs now state that imports are manual. `ENABLE_DATA_SYNC_SCHEDULER=true` alone does not schedule these configured feeds because each has `syncFrequency: null`.
+
+### Production source-only cleanup (3 November 2026)
+
+- Audited every persisted KPI value against the matching configured official raw record, source field, geography, and reporting date.
+- The guarded `backend/scripts/purge-synthetic-demo-data.js` dry run found 8,241 exact source matches among 24,657 KPI values. It identified 16,416 unmatched demo values, 18 non-source KPI definitions, 3 synthetic predictions, 108 generated blocks, and 324 generated villages.
+- Applied the cleanup transaction to the configured Neon database. Post-transaction verification passed: exactly 8,241 source-matched KPI observations remain; non-source KPI definitions and predictions, blocks/villages, and unsourced area/population fields are absent. The 888 official generic source records and 706 source-referenced district records remain.
+- Feed-matched KPI observation counts retained: PMAY-G 27, PMAY-U 108, MGNREGS 31, PMGSY 7,601, NRLM 105, DDU-GKY 244, SAGY 125.
+- The cleanup command is reproducible and dry-run by default: `cd backend && npm run purge:synthetic -- --env-file=.env.real-data`. Applying it requires explicit `--apply --confirm-production-cleanup` flags.
+- This database cleanup does not make snapshots real-time or create missing official village feeds. Source freshness remains historical/uncadenced, and the dashboard must disclose source dates and geographic coverage.
+- Documentation and UI copy now describe source-reported dates and source-supported geography instead of real-time or generated sample coverage. Changes are pending GitHub push and Render redeployment.
 
 ## 4. How to continue
 

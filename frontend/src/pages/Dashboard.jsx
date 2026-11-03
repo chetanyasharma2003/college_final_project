@@ -172,7 +172,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Real-time KPI Dashboard by Scheme */}
+        {/* Source-reported KPI dashboard by scheme */}
         <div className="mb-8">
           <ErrorBoundary>
             <KPIDashboard

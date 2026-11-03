@@ -190,8 +190,7 @@ export default function IndiaHeatmap() {
           )}
           {allEmpty && view.level !== 'state' && (
             <p className="text-xs text-amber-200 bg-amber-500/10 rounded p-2 mb-2">
-              No KPI values at this level yet. Detailed sample data covers Rajasthan, Maharashtra, Uttar Pradesh,
-              Madhya Pradesh, Gujarat and Karnataka.
+              No source-backed KPI observations are available at this level for the selected scheme.
             </p>
           )}
           <ul className="space-y-1">

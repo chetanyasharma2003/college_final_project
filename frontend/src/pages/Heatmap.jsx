@@ -14,7 +14,7 @@ export default function Heatmap() {
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-1">
             🗺️ <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Geographic Heatmap</span>
           </h1>
-          <p className="text-blue-200">Compare KPI progress across states and drill down to district, block and village</p>
+          <p className="text-blue-200">Explore KPI observations at the geographic levels reported by each official source.</p>
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 py-8">

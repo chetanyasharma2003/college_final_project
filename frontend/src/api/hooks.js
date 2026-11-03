@@ -270,7 +270,7 @@ export const useKPIs = (schemeIdOrCode = null, stateId = null) => {
   };
 };
 
-// KPI Status Hook (Real-time KPI values by scheme)
+// KPI status hook (official source observations by scheme)
 export const useKPIStatus = (schemeCode) => {
   const [kpiStatus, setKpiStatus] = useState([]);
   const [loading, setLoading] = useState(false);
