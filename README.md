@@ -61,7 +61,9 @@ These are six scheme families, with PMAY represented by separate PMAY-G and PMAY
 
 ### Refresh behavior
 
-The configured feeds are historical snapshots or otherwise have no verified automatic refresh schedule. Scheduled imports are disabled: every configured source has no sync frequency, and the backend scheduler is off unless `ENABLE_DATA_SYNC_SCHEDULER=true` is set. Setting that flag alone does not schedule these feeds. To refresh the configured snapshots manually, provide the private database and data.gov.in settings in `backend/.env.real-data`, then run `cd backend && npm run sync:official`. The Render deployment does not currently run scheduled source imports; dashboard values should not be described as real-time.
+The configured feeds are historical snapshots or otherwise have no verified source update cadence. A local macOS LaunchAgent polls them every seven days and imports any available source records into Neon. Install it from the repository root with `cd backend && ./scripts/install-local-sync-agent.sh`; it requires `backend/.env.real-data` and a logged-in Mac with network access to data.gov.in. If the Mac is asleep when an interval elapses, launchd runs the missed job after wake. Run an immediate manual refresh with `cd backend && npm run sync:official`.
+
+Render and GitHub-hosted runners cannot currently reach the data.gov.in API, so the scheduled importer runs on the configured local Mac. The weekly interval is only a polling cadence, not a promise that sources update weekly; source report dates and geography limits remain as documented above. Dashboard values should not be described as real-time.
 
 To audit an existing database for generated demo records, run `cd backend && npm run purge:synthetic -- --env-file=.env.real-data`. This is a dry run by default. Applying the cleanup requires both `--apply` and `--confirm-production-cleanup`; it preserves KPI observations only when their dates and values match a configured source field in the raw imported record.
 
@@ -471,7 +473,7 @@ By project completion, this system should:
 
 ✅ **Functional goals currently supported by sources**
 - Six scheme families integrated with source-reported observations; data is not live
-- KPI values have official source dates; no verified automatic refresh schedule is active
+- KPI values have official source dates; a local Mac polls weekly, but the sources have no verified update cadence
 - State drill-down for state sources and district drill-down for district sources; no source-backed village KPI feed is currently configured
 - Comparisons generating accurate insights
 - Forecast accuracy is not claimed for snapshots without a source-backed time series

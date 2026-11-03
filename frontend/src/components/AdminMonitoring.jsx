@@ -90,7 +90,7 @@ export default function AdminMonitoring() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 id="admin-monitoring-title" className="text-xl font-bold">Admin system monitoring</h2>
         <span className={overview.scheduler_enabled ? 'text-emerald-300' : 'text-amber-200'}>
-          Scheduled imports {overview.scheduler_enabled ? 'enabled' : 'disabled'} · {overview.ready_data_sources} source(s) configured
+          Render scheduler {overview.scheduler_enabled ? 'enabled' : 'disabled'} · {overview.ready_data_sources} source(s) configured
         </span>
       </div>
       <div className="mb-5 flex flex-wrap items-center gap-3">
@@ -132,7 +132,7 @@ export default function AdminMonitoring() {
           <p>Import is blocked because the Render connection check failed. The failed run imported 0 records; existing source data remains available.</p>
           {isNetworkFailure(connectionCheck.message) && (
             <p className="mt-2">
-              Render cannot open a connection to the official API. On a machine with access to data.gov.in, run <code className="rounded bg-black/20 px-1">cd backend &amp;&amp; npm run sync:official</code> using the private <code>.env.real-data</code> file.
+              Render cannot open a connection to the official API. Weekly imports run from the configured project Mac when it is logged in and online. To import now, run <code className="rounded bg-black/20 px-1">cd backend &amp;&amp; npm run sync:official</code> on a machine with data.gov.in access and the private <code>.env.real-data</code> file.
             </p>
           )}
         </div>

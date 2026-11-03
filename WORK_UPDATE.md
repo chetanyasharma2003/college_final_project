@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 18:55 IST
+**Last updated:** 2026-11-03 19:07 IST
 **Project:** Government Schemes Analytics Dashboard
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -20,9 +20,9 @@ Important accuracy rule: **do not claim that every scheme is real-time, complete
 | Official data import to Neon | **Complete for the seven configured source snapshots.** Latest import: 7/7 successful, 888 records, 0 failed. A later row-level provenance audit retained 8,241 KPI observations that exactly match these official raw records |
 | All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
 | District/block/village data | 706 source-referenced districts remain; synthetic block/village rows were removed. An NRLM village-wise resource is listed by OGD but has not been schema-verified or integrated; no village KPI data are currently served |
-| Scheduled imports | Render cannot reach data.gov.in (`ECONNREFUSED`), while a direct local PMAY-U API probe succeeds. The user approved storing the Neon URL and OGD API key as encrypted GitHub Actions secrets. A manual hosted import workflow is being prepared; recurring polling will be enabled only after a successful hosted run. |
+| Scheduled imports | Render and GitHub-hosted runners cannot reach data.gov.in. A local sync on this Mac succeeded 7/7 (888 records, 0 failed). A macOS LaunchAgent is installed and polls every seven days through the reachable local network; the source update cadence remains unverified. |
 | Production endpoints | Source-only cleanup commit `c514249`, frontend deploy commit `79cecd4`, Render automation commit `170548c`, and UI safety commit `4b5e731` passed main CI. Backend health/database and frontend both return HTTP 200; live schemes, geography, CORS, and updated frontend copy were checked. Both Render services auto-deploy after CI checks pass. |
-| Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Real-time/all-scheme coverage remains unsupported; refreshes are manual and credential rotation remains open. No defensible completion percentage is claimed. |
+| Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Weekly local polling is configured, but real-time/all-scheme coverage remains unsupported and credential rotation remains open. No defensible completion percentage is claimed. |
 
 ## 3. Recent verified work
 
@@ -148,12 +148,17 @@ All three geography migrations were applied to the configured Neon database; it 
 - A direct request to the configured PMAY-U OGD resource from the private local environment returned HTTP 200 with one record (`total: 39`). This confirms the configured resource/key work from the local network and isolates the refusal to Render's outbound path.
 - Updated `frontend/src/components/AdminMonitoring.jsx` to require a successful Render connectivity test before enabling the seven-feed sync action. A failed check now explains the Render network error, confirms that no source records were imported, and shows the verified local command `cd backend && npm run sync:official`.
 - Commit `4b5e731` passed GitHub CI and Render frontend deploy `dep-dbktrsh7lnhs738avqt0` is `live`; production serves the new sync guard.
-- After the user explicitly approved this destination and purpose, saved `DATABASE_URL` and `DATA_GOV_API_KEY` as encrypted GitHub Actions repository secrets. Secret values are not stored in the repository or work log.
-- Added `.github/workflows/official-data-sync.yml` with a manual-only hosted import job and updated `backend/scripts/sync-official-data.js` to accept process environment credentials when the ignored local file is absent. The initial hosted run is pending; weekly polling remains off until it succeeds.
+- After the user explicitly approved this destination and purpose, temporarily saved `DATABASE_URL` and `DATA_GOV_API_KEY` as encrypted GitHub Actions repository secrets. The hosted import run `41644507077` confirmed that GitHub-hosted runners also cannot access OGD (3 feeds returned `ECONNREFUSED`, 4 timed out; 0 records imported). Both unused secrets and the manual-only workflow were then removed.
+- CI passed for commit `ccb2791`; `backend/scripts/sync-official-data.js` now also accepts process environment credentials when the ignored local file is absent.
+- Ran `cd backend && npm run sync:official` from the Mac's network. All seven configured feeds succeeded and imported 888 records (PMAY-G 27, PMAY-U 36, MGNREGS 31, PMGSY 691, NRLM 35, DDU-GKY 31, SAGY 37).
+- Added `backend/scripts/install-local-sync-agent.sh`, updated the README, and installed the macOS LaunchAgent `com.collegefinalproject.official-data-sync`. It runs `npm run sync:official` every 604800 seconds, using the ignored local `.env.real-data`; output goes to `~/Library/Logs/college-final-project-official-sync.log`. `launchctl print` confirms it is loaded. It requires this Mac to be logged in and able to access data.gov.in; the interval is polling only, not an official source cadence.
+- Verified the installed LaunchAgent with `launchctl kickstart`: it exited 0 and imported the same seven feeds/888 records successfully.
+- Removed the GitHub-hosted import workflow and the temporary `DATABASE_URL` / `DATA_GOV_API_KEY` Actions secrets after the hosted run confirmed that cloud egress to OGD is blocked. These secrets are not currently stored in GitHub.
+- Updated the admin panel to distinguish the disabled Render scheduler from the local Mac schedule; this UI change is pending CI and the Render frontend deploy.
 
 ## 4. How to continue
 
-1. **Refresh schedule.** Run and verify the manual GitHub Actions import first. Enable weekly polling only if all configured feeds import successfully; describe it as a polling interval, not an official source update cadence or real-time data.
+1. **Refresh schedule.** The local LaunchAgent is installed. Check it with `launchctl print gui/$(id -u)/com.collegefinalproject.official-data-sync`; inspect `~/Library/Logs/college-final-project-official-sync.log` for counts or failures. Reinstall/update it with `cd backend && ./scripts/install-local-sync-agent.sh`.
 2. **Credential hygiene.** Rotate/revoke the Render API key shared in chat after the deadline. API/database credentials were also exposed during prior troubleshooting; rotate those in private hosting/database settings. Do not write replacement values to this log.
 
 ## 5. Acceptance checklist to reach the college scope honestly
@@ -169,7 +174,7 @@ All three geography migrations were applied to the configured Neon database; it 
 - [x] PMAY-U subtotal rows are excluded; historical merged-UT metrics preserve source breakdown and do not invent missing values.
 - [x] PRs #10–#12 are merged; main CI passed and Render backend health/database and source-mapped schemes API are verified live.
 - [x] Authenticated login/profile, source KPI list, geography heatmap, admin source monitoring, and executive/JSON/PDF report flows are smoke-tested; temporary accounts and their audit records were removed.
-- [x] Scheduled refresh is clearly described as unavailable/manual; do not imply it is active.
+- [x] Weekly local polling is configured, documented as best-effort, and not described as an official source update cadence or real-time data.
 - [x] Geography claims are limited to source-backed state and district records; the listed NRLM village-wise resource is disclosed as pending schema verification/integration.
 
 ## 6. Handoff rules
