@@ -2,23 +2,11 @@ import { useEffect, useState } from 'react';
 import client from '../api/client';
 
 const dateLabel = (value) => value ? new Date(value).toLocaleString() : 'No import recorded';
-const isNetworkFailure = (message = '') => /\((ECONNREFUSED|ECONNRESET|EHOSTUNREACH|ENETUNREACH|ETIMEDOUT|ENOTFOUND|EAI_AGAIN)\)/.test(message);
 
 export default function AdminMonitoring() {
   const [overview, setOverview] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
-  const [syncResult, setSyncResult] = useState(null);
-  const [syncProgress, setSyncProgress] = useState(null);
-  const [syncError, setSyncError] = useState('');
-  const [connectionCheck, setConnectionCheck] = useState(null);
-  const [checkingConnection, setCheckingConnection] = useState(false);
-
-  const refreshOverview = async () => {
-    const { data } = await client.get('/admin/overview');
-    setOverview(data.data);
-  };
 
   useEffect(() => {
     let active = true;
@@ -29,58 +17,6 @@ export default function AdminMonitoring() {
     return () => { active = false; };
   }, []);
 
-  const syncOfficialData = async () => {
-    if (connectionCheck?.reachable !== true) return;
-    setSyncing(true);
-    setSyncError('');
-    setSyncResult(null);
-    setSyncProgress(null);
-    try {
-      const { data: started } = await client.post('/data-sync/all');
-      const { jobId } = started.data;
-      let completedJob = null;
-      for (let attempt = 0; attempt < 180; attempt += 1) {
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        const { data: response } = await client.get(`/data-sync/jobs/${jobId}`);
-        const job = response.data;
-        setSyncProgress(job);
-        if (job.status === 'completed') {
-          completedJob = job;
-          break;
-        }
-        if (job.status === 'failed') {
-          throw new Error(job.error || 'Official source sync failed.');
-        }
-      }
-      if (!completedJob) throw new Error('Sync is still running. Check Recent data imports before starting another run.');
-
-      setSyncResult(completedJob.result);
-      await refreshOverview();
-      window.dispatchEvent(new Event('schemes:updated'));
-      window.dispatchEvent(new Event('kpi-data:updated'));
-    } catch (requestError) {
-      setSyncError(requestError.response?.data?.message || requestError.message || 'Official data sync failed.');
-    } finally {
-      setSyncing(false);
-    }
-  };
-
-  const testDataSourceConnection = async () => {
-    setCheckingConnection(true);
-    setConnectionCheck(null);
-    try {
-      const { data } = await client.post('/admin/test-data-source');
-      setConnectionCheck(data.data);
-    } catch (requestError) {
-      setConnectionCheck({
-        reachable: false,
-        message: requestError.response?.data?.message || requestError.message || 'Unable to test the data.gov.in connection.',
-      });
-    } finally {
-      setCheckingConnection(false);
-    }
-  };
-
   if (loading) return <section aria-live="polite">Loading administration status…</section>;
   if (error) return <section role="alert" className="rounded-xl border border-red-400/30 bg-red-500/10 p-5 text-red-200">{error}</section>;
   if (!overview) return null;
@@ -89,85 +25,11 @@ export default function AdminMonitoring() {
     <section className="mb-8 rounded-2xl border border-white/15 bg-slate-900/70 p-5 text-white" aria-labelledby="admin-monitoring-title">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 id="admin-monitoring-title" className="text-xl font-bold">Admin system monitoring</h2>
-        <span className={overview.scheduler_enabled ? 'text-emerald-300' : 'text-amber-200'}>
-          Cloud scheduler {overview.scheduler_enabled ? 'enabled' : 'off'} · {overview.ready_data_sources} feeds configured
-        </span>
+        <span className="text-slate-300">{overview.ready_data_sources} official feeds configured</span>
       </div>
-      <div className="mb-5 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={testDataSourceConnection}
-          disabled={checkingConnection || syncing}
-          className="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {checkingConnection ? 'Checking Render connection…' : 'Check Render connection'}
-        </button>
-        <button
-          type="button"
-          onClick={syncOfficialData}
-          disabled={syncing || checkingConnection || overview.ready_data_sources === 0 || connectionCheck?.reachable !== true}
-          className="rounded-lg border border-blue-400/40 bg-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-100 transition hover:bg-blue-500/30 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {syncing
-            ? 'Importing official data…'
-            : connectionCheck?.reachable === true
-              ? 'Import official data now'
-              : 'Cloud import unavailable'}
-        </button>
-        <p className="text-sm text-slate-300">
-          {connectionCheck?.reachable === true
-            ? 'Render can reach data.gov.in. Start the import when ready.'
-            : 'Scheduled imports are managed through the configured operations environment. This check only verifies whether Render can reach data.gov.in.'}
-        </p>
-      </div>
-      {connectionCheck && (
-        <p
-          role={connectionCheck.reachable ? 'status' : 'alert'}
-          className={`mb-4 rounded-lg border p-3 text-sm ${connectionCheck.reachable
-            ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200'
-            : 'border-amber-400/30 bg-amber-500/10 text-amber-100'}`}
-        >
-          data.gov.in connection: {connectionCheck.message}
-          {connectionCheck.http_status ? ` (HTTP ${connectionCheck.http_status})` : ''}
-        </p>
-      )}
-      {connectionCheck?.reachable === false && (
-        <div role="status" className="mb-4 rounded-lg border border-amber-400/30 bg-amber-500/10 p-3 text-sm text-amber-100">
-          <p>Render could not reach data.gov.in, so imports cannot start from Render. This connection check does not import records; existing source data remains available.</p>
-          {isNetworkFailure(connectionCheck.message) && (
-            <details className="mt-2 rounded-lg border border-white/10 bg-black/10 p-3">
-              <summary className="cursor-pointer font-semibold">Manual import instructions</summary>
-              <p className="mt-2">Run the official sync command from the configured operations environment with its private <code>.env.real-data</code> configuration:</p>
-              <code className="mt-2 inline-block rounded bg-black/20 px-2 py-1">cd backend &amp;&amp; npm run sync:official</code>
-            </details>
-          )}
-        </div>
-      )}
-      {syncError && <p role="alert" className="mb-4 rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-sm text-red-200">{syncError}</p>}
-      {syncResult && (
-        <div className="mb-5 rounded-lg border border-white/10 bg-white/5 p-4" aria-live="polite">
-          <p className="mb-3 text-sm font-semibold">
-            Sync finished: {syncResult.success} successful, {syncResult.failed} failed, {syncResult.totalRecords} records imported.
-          </p>
-          <ul className="space-y-2 text-sm text-slate-300">
-            {Object.entries(syncResult.schemes || {}).map(([code, result]) => (
-              <li key={code} className="border-b border-white/10 pb-2 last:border-0">
-                <span className={result.status === 'success' ? 'text-emerald-300' : result.status === 'partial' ? 'text-amber-200' : 'text-red-300'}>
-                  {code}: {result.status}
-                </span>
-                {' · '}{result.recordsLoaded || 0} records
-                {result.error && ` · ${result.error}`}
-                {result.errors?.length > 0 && ` · ${result.errors.join('; ')}`}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {syncing && syncProgress && (
-        <p className="mb-4 text-sm text-blue-200" aria-live="polite">
-          Importing source feeds: {syncProgress.completedSchemes} of {syncProgress.totalSchemes} complete.
-        </p>
-      )}
+      <p className="mb-5 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+        Official data imports are managed through the configured operations environment. This page shows the latest recorded imports; existing source data remains available between refreshes.
+      </p>
       <p className="mb-4 text-sm text-slate-300">
         {overview.ready_data_sources} of {overview.data_sources.filter((source) => source.resource_configured).length} official data feeds configured · {overview.counts.states} states · {overview.counts.active_users} active users
       </p>

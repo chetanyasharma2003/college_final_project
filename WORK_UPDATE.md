@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-03 22:45 IST
+**Last updated:** 2026-11-04 11:24 IST
 **Project:** Unified Performance Dashboard for all MoRD Schemes (repository application name: Centralized Government Scheme Analytics Dashboard)
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -282,4 +282,11 @@ All three geography migrations were applied to the configured Neon database; it 
 
 - The user showed PMGSY and NRLM heatmap screenshots and noted that the state entries did not look clickable. PMGSY/MGNREGS already support state-to-district requests; the UI did not show a clear action.
 - Updated the heatmap to normalize the scheme code, show a source-aware drill-down hint, give eligible map markers a pointer cursor, and label each eligible state row “Open districts →”. Rows remain keyboard accessible. State-only feeds now explain why district drill-down is unavailable.
-- Verification and frontend deployment are pending.
+- `git diff --check` passed and GitHub Actions CI passed for PR #18. The pull request was squash-merged as `cd90f792799cb48dd463efb5a54d1e66d3706a20`, authored by Chetanya Prakash Sharma.
+- Render frontend verification returned HTTP 200 and served `/assets/Heatmap-bbf7c098.js`; the bundle contains the new click action, source limitation guidance, and pointer cursor styling.
+
+### Admin OGD connection message cleanup (4 November 2026)
+
+- Prior Render and GitHub-hosted runner checks recorded in this log show cloud egress failures, while the configured operations environment successfully imported all seven feeds (888 records, zero failures). The `ECONNREFUSED` shown in Admin came from manually testing the Render-to-OGD path; it was not an import run or dashboard database failure.
+- Removed the Render connection-test and cloud-import controls from the Admin panel. It now explains that imports are managed through the configured operations environment and displays the latest recorded imports, without surfacing the raw network error.
+- This UI change does not restore Render outbound access to data.gov.in. CI and live deployment verification are pending.
