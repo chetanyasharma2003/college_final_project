@@ -1,6 +1,6 @@
 # College Final Project — Work Update
 
-**Last updated:** 2026-11-04 11:24 IST
+**Last updated:** 2026-11-04 14:14 IST
 **Project:** Unified Performance Dashboard for all MoRD Schemes (repository application name: Centralized Government Scheme Analytics Dashboard)
 **Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
 
@@ -290,3 +290,10 @@ All three geography migrations were applied to the configured Neon database; it 
 - Prior Render and GitHub-hosted runner checks recorded in this log show cloud egress failures, while the configured operations environment successfully imported all seven feeds (888 records, zero failures). The `ECONNREFUSED` shown in Admin came from manually testing the Render-to-OGD path; it was not an import run or dashboard database failure.
 - Removed the Render connection-test and cloud-import controls from the Admin panel. It now explains that imports are managed through the configured operations environment and displays the latest recorded imports, without surfacing the raw network error.
 - This UI change does not restore Render outbound access to data.gov.in. CI and live deployment verification are pending.
+
+### Source-backed district clickability (4 November 2026)
+
+- Reviewed the supplied NRLM and PMGSY heatmap screenshots. NRLM's state/UT-only notice is correct; PMGSY's source supports district records.
+- Read-only Neon aggregation found district KPI observations for PMGSY in 30 states/UTs (691 districts, 7,601 KPI observations) and for MGNREGS only in Karnataka (31 districts, 31 observations). PMAY-G, PMAY-U, NRLM, DDU-GKY, and SAGY have no district KPI observations. No block or village KPI observations are configured.
+- The heatmap previously enabled every state row whenever MGNREGS or PMGSY was selected. Updated row and map-marker interaction to require a source-backed value for the selected KPI, and clarified when a state has no district observation. Only supported states are now clickable.
+- In the isolated `main` checkout, `npm test` passed: production build, 7 frontend tests, and 52 backend tests. `git diff --check` passed. No data import or database write was performed.
