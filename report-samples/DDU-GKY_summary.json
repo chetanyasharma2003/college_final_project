@@ -3,45 +3,45 @@
   "scheme_code": "DDU-GKY",
   "ministry": "Ministry of Rural Development",
   "budget": null,
-  "period": "Source dates: 2021-03-31 to 2024-03-31",
+  "period": "Source dates: 2020-03-31 to 2024-03-31",
   "generated_date": "2026-11-15",
-  "total_observations": 238,
+  "total_observations": 469,
   "indicator_count": 8,
-  "on_track": 0,
+  "on_track": 231,
   "at_risk": 0,
   "critical": 0,
   "key_metrics": [
     {
-      "name": "Candidates Trained (2023-24)",
-      "value": 2936,
-      "target": null,
-      "completion": null,
-      "status": "no_target"
-    },
-    {
       "name": "Candidates Placed (2023-24)",
-      "value": 3840,
+      "value": 138,
       "target": null,
       "completion": null,
       "status": "no_target"
     },
     {
       "name": "Candidates Trained (2023-24)",
-      "value": 1387,
+      "value": 4732,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Candidates Trained (2023-24)",
+      "value": 3504,
       "target": null,
       "completion": null,
       "status": "no_target"
     },
     {
       "name": "Candidates Placed (2023-24)",
-      "value": 857,
+      "value": 1646,
       "target": null,
       "completion": null,
       "status": "no_target"
     },
     {
-      "name": "Candidates Placed (2023-24)",
-      "value": 252,
+      "name": "Candidates Trained (2023-24)",
+      "value": 375,
       "target": null,
       "completion": null,
       "status": "no_target"

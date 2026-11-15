@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-11-15T08:40:46.540Z",
+  "timestamp": "2026-11-15T08:55:47.800Z",
   "schemes": [
     {
       "scheme_id": 2,
@@ -8,7 +8,7 @@
       "csv_file": "DDU-GKY_sample.csv",
       "json_file": "DDU-GKY_sample.json",
       "pdf_summary_file": "DDU-GKY_summary.json",
-      "records": 238
+      "records": 469
     },
     {
       "scheme_id": 6,
@@ -26,7 +26,7 @@
       "csv_file": "NRLM_sample.csv",
       "json_file": "NRLM_sample.json",
       "pdf_summary_file": "NRLM_summary.json",
-      "records": 93
+      "records": 189
     },
     {
       "scheme_id": 3,
@@ -35,7 +35,7 @@
       "csv_file": "PMAY-G_sample.csv",
       "json_file": "PMAY-G_sample.json",
       "pdf_summary_file": "PMAY-G_summary.json",
-      "records": 25
+      "records": 51
     },
     {
       "scheme_id": 4,
@@ -44,7 +44,7 @@
       "csv_file": "PMAY-U_sample.csv",
       "json_file": "PMAY-U_sample.json",
       "pdf_summary_file": "PMAY-U_summary.json",
-      "records": 96
+      "records": 124
     },
     {
       "scheme_id": 7,
@@ -53,7 +53,7 @@
       "csv_file": "PMGSY_sample.csv",
       "json_file": "PMGSY_sample.json",
       "pdf_summary_file": "PMGSY_summary.json",
-      "records": 0
+      "records": 1
     },
     {
       "scheme_id": 1,
@@ -70,6 +70,6 @@
     "csv_generated": 7,
     "pdf_generated": 7,
     "json_generated": 7,
-    "total_records": 568
+    "total_records": 950
   }
 }

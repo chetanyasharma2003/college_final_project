@@ -2,13 +2,13 @@
   "metadata": {
     "scheme_name": "Pradhan Mantri Awaas Yojana-Gramin",
     "scheme_code": "PMAY-G",
-    "generated_date": "2026-11-15T08:40:46.603Z",
+    "generated_date": "2026-11-15T08:55:47.882Z",
     "period_start": "2022-04-06",
-    "period_end": "2022-04-06",
-    "total_records": 25
+    "period_end": "2023-12-31",
+    "total_records": 51
   },
   "performance": {
-    "on_track": 0,
+    "on_track": 26,
     "at_risk": 0,
     "critical": 0
   },
@@ -237,6 +237,240 @@
       "target": null,
       "completion": null,
       "status": "no_target"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Andaman and Nicobar Islands",
+      "date": "2023-12-31",
+      "value": 1,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Andhra Pradesh",
+      "date": "2023-12-31",
+      "value": 272,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Arunachal Pradesh",
+      "date": "2023-12-31",
+      "value": 1884,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Assam",
+      "date": "2023-12-31",
+      "value": 263551,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Bihar",
+      "date": "2023-12-31",
+      "value": 2280292,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Chhattisgarh",
+      "date": "2023-12-31",
+      "value": 12145,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Gujarat",
+      "date": "2023-12-31",
+      "value": 199235,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Haryana",
+      "date": "2023-12-31",
+      "value": 1457,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Himachal Pradesh",
+      "date": "2023-12-31",
+      "value": 2793,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Jammu and Kashmir",
+      "date": "2023-12-31",
+      "value": 5177,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Jharkhand",
+      "date": "2023-12-31",
+      "value": 113675,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Kerala",
+      "date": "2023-12-31",
+      "value": 20366,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Ladakh",
+      "date": "2023-12-31",
+      "value": 684,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Madhya Pradesh",
+      "date": "2023-12-31",
+      "value": 58426,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Maharashtra",
+      "date": "2023-12-31",
+      "value": 227851,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Manipur",
+      "date": "2023-12-31",
+      "value": 1654,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Meghalaya",
+      "date": "2023-12-31",
+      "value": 3,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Mizoram",
+      "date": "2023-12-31",
+      "value": 845,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Odisha",
+      "date": "2023-12-31",
+      "value": 98052,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Punjab",
+      "date": "2023-12-31",
+      "value": 678,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Rajasthan",
+      "date": "2023-12-31",
+      "value": 38404,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Tamil Nadu",
+      "date": "2023-12-31",
+      "value": 97718,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Tripura",
+      "date": "2023-12-31",
+      "value": 108870,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Uttar Pradesh",
+      "date": "2023-12-31",
+      "value": 261422,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "Uttarakhand",
+      "date": "2023-12-31",
+      "value": 258,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    },
+    {
+      "kpi_name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "state": "West Bengal",
+      "date": "2023-12-31",
+      "value": 75733,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
     }
   ],
   "predictions": []

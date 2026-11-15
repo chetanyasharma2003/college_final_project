@@ -3,12 +3,20 @@
   "scheme_code": "PMGSY",
   "ministry": "Ministry of Rural Development",
   "budget": null,
-  "period": "Source dates unavailable",
+  "period": "Source snapshot: 2020-03-31",
   "generated_date": "2026-11-15",
-  "total_observations": 0,
-  "indicator_count": 0,
-  "on_track": 0,
+  "total_observations": 1,
+  "indicator_count": 1,
+  "on_track": 1,
   "at_risk": 0,
   "critical": 0,
-  "key_metrics": []
+  "key_metrics": [
+    {
+      "name": "Bridges Balance",
+      "value": 66,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    }
+  ]
 }

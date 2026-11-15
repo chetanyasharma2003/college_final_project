@@ -2,16 +2,26 @@
   "metadata": {
     "scheme_name": "Pradhan Mantri Gram Sadak Yojana",
     "scheme_code": "PMGSY",
-    "generated_date": "2026-11-15T08:40:46.622Z",
-    "period_start": null,
-    "period_end": null,
-    "total_records": 0
+    "generated_date": "2026-11-15T08:55:47.906Z",
+    "period_start": "2020-03-31",
+    "period_end": "2020-03-31",
+    "total_records": 1
   },
   "performance": {
-    "on_track": 0,
+    "on_track": 1,
     "at_risk": 0,
     "critical": 0
   },
-  "kpi_details": [],
+  "kpi_details": [
+    {
+      "kpi_name": "Bridges Balance",
+      "state": "National",
+      "date": "2020-03-31",
+      "value": 66,
+      "target": null,
+      "completion": null,
+      "status": "on_track"
+    }
+  ],
   "predictions": []
 }

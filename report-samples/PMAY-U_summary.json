@@ -3,17 +3,17 @@
   "scheme_code": "PMAY-U",
   "ministry": "Ministry of Housing and Urban Affairs",
   "budget": null,
-  "period": "Source snapshot: 2026-01-22",
+  "period": "Source dates: 2020-12-31 to 2026-01-22",
   "generated_date": "2026-11-15",
-  "total_observations": 96,
+  "total_observations": 124,
   "indicator_count": 3,
-  "on_track": 0,
+  "on_track": 28,
   "at_risk": 0,
   "critical": 0,
   "key_metrics": [
     {
       "name": "Houses Sanctioned",
-      "value": 274065,
+      "value": 75882,
       "target": null,
       "completion": null,
       "status": "no_target"

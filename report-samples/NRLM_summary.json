@@ -3,11 +3,11 @@
   "scheme_code": "NRLM",
   "ministry": "Ministry of Rural Development",
   "budget": null,
-  "period": "Source dates: 2022-03-31 to 2024-03-31",
+  "period": "Source dates: 2021-03-31 to 2024-03-31",
   "generated_date": "2026-11-15",
-  "total_observations": 93,
+  "total_observations": 189,
   "indicator_count": 3,
-  "on_track": 0,
+  "on_track": 96,
   "at_risk": 0,
   "critical": 0,
   "key_metrics": [
@@ -20,28 +20,28 @@
     },
     {
       "name": "Funds Allocation (2023-24)",
-      "value": 32587.14,
+      "value": 4644.38,
       "target": null,
       "completion": null,
       "status": "no_target"
     },
     {
       "name": "Funds Allocation (2023-24)",
-      "value": 54852.58,
+      "value": 1700,
       "target": null,
       "completion": null,
       "status": "no_target"
     },
     {
       "name": "Funds Allocation (2023-24)",
-      "value": 16428.04,
+      "value": 49358.92,
       "target": null,
       "completion": null,
       "status": "no_target"
     },
     {
       "name": "Funds Allocation (2023-24)",
-      "value": 14621.75,
+      "value": 750,
       "target": null,
       "completion": null,
       "status": "no_target"

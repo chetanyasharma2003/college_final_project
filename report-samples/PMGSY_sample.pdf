@@ -9,7 +9,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 4 0 obj
-<< /Length 423 >>
+<< /Length 491 >>
 stream
 BT
 /F1 11 Tf
@@ -17,12 +17,13 @@ BT
 0 -16 Td () Tj
 0 -16 Td (Scheme: Pradhan Mantri Gram Sadak Yojana \(PMGSY\)) Tj
 0 -16 Td (Ministry: Ministry of Rural Development) Tj
-0 -16 Td (Period: Source dates unavailable) Tj
+0 -16 Td (Period: Source snapshot: 2020-03-31) Tj
 0 -16 Td (Generated: 2026-11-15) Tj
-0 -16 Td (Source observations: 0 across 0 indicators) Tj
-0 -16 Td (On track: 0 | At risk: 0 | Critical: 0) Tj
+0 -16 Td (Source observations: 1 across 1 indicators) Tj
+0 -16 Td (On track: 1 | At risk: 0 | Critical: 0) Tj
 0 -16 Td () Tj
 0 -16 Td (Key metrics:) Tj
+0 -16 Td (Bridges Balance: 66 \(no source target; on_track\)) Tj
 ET
 endstream
 endobj
@@ -36,9 +37,9 @@ xref
 0000000058 00000 n 
 0000000115 00000 n 
 0000000185 00000 n 
-0000000659 00000 n 
+0000000727 00000 n 
 trailer
 << /Size 6 /Root 1 0 R >>
 startxref
-785
+853
 %%EOF

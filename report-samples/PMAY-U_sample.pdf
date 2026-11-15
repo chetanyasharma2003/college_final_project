@@ -9,7 +9,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
 endobj
 4 0 obj
-<< /Length 792 >>
+<< /Length 804 >>
 stream
 BT
 /F1 11 Tf
@@ -17,13 +17,13 @@ BT
 0 -16 Td () Tj
 0 -16 Td (Scheme: Pradhan Mantri Awas Yojana-Urban \(PMAY-U\)) Tj
 0 -16 Td (Ministry: Ministry of Housing and Urban Affairs) Tj
-0 -16 Td (Period: Source snapshot: 2026-01-22) Tj
+0 -16 Td (Period: Source dates: 2020-12-31 to 2026-01-22) Tj
 0 -16 Td (Generated: 2026-11-15) Tj
-0 -16 Td (Source observations: 96 across 3 indicators) Tj
-0 -16 Td (On track: 0 | At risk: 0 | Critical: 0) Tj
+0 -16 Td (Source observations: 124 across 3 indicators) Tj
+0 -16 Td (On track: 28 | At risk: 0 | Critical: 0) Tj
 0 -16 Td () Tj
 0 -16 Td (Key metrics:) Tj
-0 -16 Td (Houses Sanctioned: 274065 \(no source target; no_target\)) Tj
+0 -16 Td (Houses Sanctioned: 75882 \(no source target; no_target\)) Tj
 0 -16 Td (Houses Completed: 692373 \(no source target; no_target\)) Tj
 0 -16 Td (Houses Occupied: 601901 \(no source target; no_target\)) Tj
 0 -16 Td (Houses Sanctioned: 115213 \(no source target; no_target\)) Tj
@@ -41,9 +41,9 @@ xref
 0000000058 00000 n 
 0000000115 00000 n 
 0000000185 00000 n 
-0000001028 00000 n 
+0000001040 00000 n 
 trailer
 << /Size 6 /Root 1 0 R >>
 startxref
-1154
+1166
 %%EOF

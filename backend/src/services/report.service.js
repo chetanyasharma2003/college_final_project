@@ -3,8 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {
-  averageKpiCompletion,
-  comparativeStatus,
   completionPercentage,
   sourceDataPeriod,
   sourceDateBounds,
@@ -17,6 +15,8 @@ const uploadsDir = path.join(__dirname, '../../uploads');
 export const escapeCSVField = (value) => {
   if (value == null) return '""';
   let text = String(value);
+  // Strip leading ASCII control/whitespace characters before checking formulas.
+  // eslint-disable-next-line no-control-regex
   if (typeof value === 'string' && /^[\s\u0000-\u001f]*[=+\-@]/.test(text)) text = `'${text}`;
   return `"${text.replace(/"/g, '""')}"`;
 };
@@ -56,6 +56,7 @@ class ReportService {
         date: startDate ? { gte: startDate } : undefined,
       },
       include: { kpi: true, state: true },
+      orderBy: { date: 'desc' },
     });
 
     const summaryData = {
@@ -65,11 +66,11 @@ class ReportService {
       budget: scheme.budget,
       period: startDate ? `Last ${days} days` : sourceDataPeriod(kpiValues),
       generated_date: new Date().toISOString().split('T')[0],
-      total_kpis: kpiValues.length,
+      total_observations: kpiValues.length,
+      indicator_count: new Set(kpiValues.map((value) => value.kpi_id)).size,
       on_track: kpiValues.filter((k) => k.status === 'on_track').length,
       at_risk: kpiValues.filter((k) => k.status === 'at_risk').length,
       critical: kpiValues.filter((k) => k.status === 'critical').length,
-      overall_completion: averageKpiCompletion(kpiValues),
       key_metrics: kpiValues.slice(0, 5).map((k) => ({
         name: k.kpi.kpi_name,
         value: Number(k.value),
@@ -170,6 +171,7 @@ class ReportService {
       where: {
         kpi_id: { in: sourceKpiIds },
         location_id: stateId || null,
+        model_type: 'linear_trend',
       },
       take: 12,
     });
@@ -188,7 +190,6 @@ class ReportService {
         on_track: kpiValues.filter((k) => k.status === 'on_track').length,
         at_risk: kpiValues.filter((k) => k.status === 'at_risk').length,
         critical: kpiValues.filter((k) => k.status === 'critical').length,
-        avg_completion: averageKpiCompletion(kpiValues),
       },
       kpi_details: kpiValues.map((kpi) => ({
         kpi_name: kpi.kpi.kpi_name,
@@ -201,7 +202,7 @@ class ReportService {
       })),
       predictions: predictions.slice(0, 3).map((p) => ({
         predicted_value: Number(p.predicted_value),
-        confidence: p.confidence_score,
+        method: p.model_type,
         forecast_date: p.prediction_date.toISOString().split('T')[0],
       })),
     };
@@ -251,30 +252,59 @@ class ReportService {
           kpi_id: { in: sourceKpiIds },
           state_id: stateId || undefined,
         },
-        include: { kpi: true },
-        take: 100,
+        include: {
+          kpi: { select: { id: true, kpi_name: true, unit: true } },
+          state: { select: { id: true, name: true } },
+          district: { select: { id: true, name: true } },
+        },
+        orderBy: { date: 'desc' },
+        take: 10000,
       });
-
-      const avgCompletion = averageKpiCompletion(kpiValues);
-
+      const latestByLocation = new Map();
+      for (const value of kpiValues) {
+        const locationKey = value.district_id != null
+          ? `district:${value.district_id}`
+          : value.state_id != null
+            ? `state:${value.state_id}`
+            : 'national';
+        const key = `${value.kpi_id}:${locationKey}`;
+        if (!latestByLocation.has(key)) latestByLocation.set(key, value);
+      }
+      const latestRecords = Array.from(latestByLocation.values());
+      const indicators = new Map();
+      for (const value of latestRecords) {
+        const indicator = indicators.get(value.kpi_id) || {
+          kpi_name: value.kpi.kpi_name,
+          unit: value.kpi.unit,
+          observations: [],
+        };
+        indicator.observations.push({
+          state: value.state?.name || null,
+          district: value.district?.name || null,
+          date: value.date.toISOString().split('T')[0],
+          value: Number(value.value),
+          target: value.target_value == null ? null : Number(value.target_value),
+        });
+        indicators.set(value.kpi_id, indicator);
+      }
+      const latestDate = latestRecords.reduce((latest, value) => (
+        !latest || value.date > latest ? value.date : latest
+      ), null);
       comparison.push({
         scheme_name: scheme.name,
         scheme_code: scheme.code,
-        budget: scheme.budget,
-        kpi_count: kpiValues.length,
-        avg_completion: avgCompletion,
-        status: comparativeStatus(kpiValues, avgCompletion),
+        indicator_count: indicators.size,
+        observation_count: latestRecords.length,
+        latest_report_date: latestDate?.toISOString().split('T')[0] || null,
+        indicators: Array.from(indicators.values()),
       });
     }
 
     return {
       generated_date: new Date().toISOString(),
       scheme_count: schemes.length,
-      comparison: comparison.sort((a, b) => {
-        if (a.avg_completion == null) return b.avg_completion == null ? 0 : 1;
-        if (b.avg_completion == null) return -1;
-        return b.avg_completion - a.avg_completion;
-      }),
+      note: 'Indicators, units, reporting periods, and coverage differ by scheme. No shared performance score is calculated.',
+      comparison,
     };
   }
 
