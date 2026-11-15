@@ -17,7 +17,7 @@ class MLAnalyticsService {
       const recentValues = await prisma.kPIValue.findMany({
         where: { kpi_id: kpiId },
         orderBy: { date: 'desc' },
-        take: 90, // Last 90 days
+        take: 90, // Latest 90 observations; dates may span more than 90 days.
         select: { value: true, date: true, target_value: true },
       });
 
@@ -32,7 +32,7 @@ class MLAnalyticsService {
       );
 
       const anomalies = recentValues
-        .map((v, i) => ({
+        .map((v) => ({
           date: v.date,
           value: Number(v.value),
           zscore: Math.abs((Number(v.value) - mean) / std),
@@ -100,13 +100,13 @@ class MLAnalyticsService {
         recommendations.push({
           severity: 'CRITICAL',
           message: `KPI is significantly below target (${Math.round(achievementRate)}% vs 100%)`,
-          action: 'Immediate intervention required',
+            action: 'Review the observation date, source, and configured target.',
         });
       } else if (achievementRate < 80) {
         recommendations.push({
           severity: 'HIGH',
           message: `KPI is underperforming (${Math.round(achievementRate)}% vs 100%)`,
-          action: 'Increase resource allocation',
+            action: 'Review the observation date, source, and configured target.',
         });
       }
 
@@ -114,13 +114,13 @@ class MLAnalyticsService {
         recommendations.push({
           severity: 'HIGH',
           message: 'KPI is declining rapidly',
-          action: 'Review and adjust strategy',
+            action: 'Check the dated observations and source context before interpreting the change.',
         });
       } else if (trendPercent > 10) {
         recommendations.push({
           severity: 'LOW',
           message: 'KPI shows positive momentum',
-          action: 'Maintain current strategy',
+            action: 'Check the dated observations and source context before interpreting the change.',
         });
       }
 

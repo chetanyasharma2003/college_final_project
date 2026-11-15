@@ -266,7 +266,7 @@ export class SchemesService {
   // Delete scheme (Admin only)
   static async deleteScheme(schemeId) {
     try {
-      const scheme = await prisma.scheme.delete({
+      await prisma.scheme.delete({
         where: { id: parseInt(schemeId) },
       });
 

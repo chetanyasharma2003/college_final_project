@@ -74,7 +74,7 @@ async function seed() {
 
     // 1. Create Users
     console.log('Creating users...');
-    const adminUser = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email: 'admin@govschemes.in',
         password_hash: await bcrypt.hash(adminPassword, 10),
@@ -84,7 +84,7 @@ async function seed() {
       },
     });
 
-    const analystUser = await prisma.user.create({
+    await prisma.user.create({
       data: {
         email: 'analyst@govschemes.in',
         password_hash: await bcrypt.hash(analystPassword, 10),

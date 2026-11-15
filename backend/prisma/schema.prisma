@@ -333,7 +333,7 @@ model Prediction {
   confidence_score        Decimal?        @db.Decimal(5, 2)
   prediction_date         DateTime
   forecast_period         String          @db.VarChar(20) // next_month, next_quarter, next_year
-  model_type              String?         @default("arima") // arima, prophet, lstm
+  model_type              String?         @default("linear_trend") // linear_trend; legacy rows may use older labels
   created_at              DateTime        @default(now())
   updated_at              DateTime        @updatedAt
 

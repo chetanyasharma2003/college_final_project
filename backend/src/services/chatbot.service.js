@@ -1,6 +1,12 @@
 import prisma from '../config/prisma.js';
-import AnalyticsService from './analytics.service.js';
 import PredictionService from './prediction.service.js';
+import ReportService from './report.service.js';
+import { SCHEME_CONFIGS } from '../config/scheme-integrations.js';
+import KPIManagementService from './kpi-management.service.js';
+
+const matchMentionedScheme = (schemes, query) => [...schemes]
+  .sort((first, second) => second.code.length - first.code.length)
+  .find((scheme) => query.includes(scheme.code.toLowerCase()) || query.includes(scheme.name.toLowerCase()));
 
 class ChatbotService {
   /**
@@ -32,13 +38,12 @@ class ChatbotService {
         response = {
           type: 'help',
           message:
-            'I can help you with: performance analysis, scheme comparison, forecasts, rankings, and status updates.',
+            'I can look up source-reported readings, compare available feed records, or show an exploratory projection when the KPI has enough dated history.',
           examples: [
-            'How is PMAY performing in Maharashtra?',
-            'Compare PMAY and MGNREGS',
-            'Will PM-KISAN reach target?',
-            'Which state has best performance?',
-            'Show me MGNREGS status',
+            'What indicators are available for PMAY-U in Maharashtra?',
+            'Compare reported PMAY-G and MGNREGS values',
+            'Which states report the highest PMGSY values?',
+            'What is the latest NRLM source date?',
           ],
         };
     }
@@ -54,7 +59,7 @@ class ChatbotService {
    */
   static extractIntent(query) {
     // Performance queries
-    if (/how.*(perform|doing|progress)/.test(query)) {
+    if (/indicator|available|source reading|how.*(perform|doing|progress)/.test(query)) {
       return { type: 'performance' };
     }
 
@@ -92,12 +97,7 @@ class ChatbotService {
     let schemeMatch = null;
     let stateMatch = null;
 
-    for (const scheme of schemes) {
-      if (query.includes(scheme.code.toLowerCase()) || query.includes(scheme.name.toLowerCase())) {
-        schemeMatch = scheme;
-        break;
-      }
-    }
+    schemeMatch = matchMentionedScheme(schemes, query);
 
     stateMatch = stateAccess
       ? states.find(state => state.id === stateAccess)
@@ -110,45 +110,44 @@ class ChatbotService {
       };
     }
 
+    const sourceConfig = SCHEME_CONFIGS[schemeMatch.code];
+    const definitions = sourceConfig?.fieldMapping
+      ? await KPIManagementService.getSchemeKPIs(schemeMatch.code)
+      : [];
+    if (definitions.length === 0) {
+      return { type: 'no_data', scheme: schemeMatch.name, message: 'No verified source mapping is configured for this scheme.' };
+    }
+
     const kpiValues = await prisma.kPIValue.findMany({
       where: {
-        kpi: { scheme_id: schemeMatch.id },
+        kpi_id: { in: definitions.map(({ id }) => id) },
         state_id: stateMatch?.id,
       },
-      include: { kpi: true },
-      take: 10,
+      include: { kpi: true, state: true, district: true },
+      take: 20,
       orderBy: { date: 'desc' },
     });
 
     if (kpiValues.length === 0) {
       return {
         type: 'no_data',
-        message: `No performance data available for ${schemeMatch.name}${stateMatch ? ` in ${stateMatch.name}` : ''}`,
+        message: `No source observations are available for ${schemeMatch.name}${stateMatch ? ` in ${stateMatch.name}` : ''}.`,
       };
     }
 
-    const avgCompletion =
-      kpiValues.reduce(
-        (sum, k) => sum + (Number(k.value) / Number(k.target_value || 100)) * 100,
-        0
-      ) / kpiValues.length;
-
     return {
-      type: 'performance',
+      type: 'source_readings',
       scheme: schemeMatch.name,
-      state: stateMatch?.name || 'All India',
-      overall_completion: Math.round(avgCompletion * 100) / 100,
-      status:
-        avgCompletion >= 80 ? 'On Track' : avgCompletion >= 50 ? 'At Risk' : 'Critical',
+      state: stateMatch?.name || 'configured locations',
       key_metrics: kpiValues.slice(0, 3).map((k) => ({
         name: k.kpi.kpi_name,
         value: Number(k.value),
-        target: Number(k.target_value),
-        completion: Math.round(
-          (Number(k.value) / Number(k.target_value || 100)) * 100
-        ),
+        unit: k.kpi.unit,
+        target: k.target_value == null ? null : Number(k.target_value),
+        state: k.state?.name || k.district?.name || null,
+        date: k.date,
       })),
-      message: `${schemeMatch.name} is ${avgCompletion >= 80 ? 'performing well' : avgCompletion >= 50 ? 'at risk' : 'in critical condition'}${stateMatch ? ` in ${stateMatch.name}` : ''}. Current completion: ${Math.round(avgCompletion)}%`,
+      message: `Here are the latest available source readings for ${schemeMatch.name}${stateMatch ? ` in ${stateMatch.name}` : ''}. These values are not a shared performance score.`,
     };
   }
 
@@ -157,8 +156,6 @@ class ChatbotService {
    */
   static async handleComparisonQuery(intent, query, stateAccess = null) {
     const schemes = await prisma.scheme.findMany();
-    const states = await prisma.state.findMany();
-
     const mentionedSchemes = schemes.filter(
       (s) =>
         query.includes(s.code.toLowerCase()) || query.includes(s.name.toLowerCase())
@@ -171,17 +168,22 @@ class ChatbotService {
       };
     }
 
-    const comparison = await AnalyticsService.compareSchemes(
+    const report = await ReportService.generateComparativeReport(
       mentionedSchemes.map((s) => s.id),
       stateAccess
     );
+    const comparison = report.comparison.map((scheme) => ({
+      ...scheme,
+      indicators: scheme.indicators.slice(0, 3).map((indicator) => ({
+        ...indicator,
+        observations: indicator.observations.slice(0, 3),
+      })),
+    }));
 
     return {
       type: 'comparison',
-      message: `Comparing ${mentionedSchemes.map((s) => s.code).join(' vs ')}`,
-      comparison: comparison.slice(0, 5),
-      winner: comparison[0].scheme_code,
-      winner_completion: comparison[0].avg_completion,
+      message: `Latest source readings for ${mentionedSchemes.map((s) => s.code).join(' and ')}. Their indicators and coverage differ, so no overall winner is calculated.`,
+      comparison,
     };
   }
 
@@ -191,9 +193,7 @@ class ChatbotService {
   static async handleForecastQuery(intent, query, stateAccess = null) {
     const schemes = await prisma.scheme.findMany();
 
-    const scheme = schemes.find(
-      (s) => query.includes(s.code.toLowerCase()) || query.includes(s.name.toLowerCase())
-    );
+    const scheme = matchMentionedScheme(schemes, query);
 
     if (!scheme) {
       return {
@@ -202,9 +202,10 @@ class ChatbotService {
       };
     }
 
-    const kpiDef = await prisma.kPIDefinition.findFirst({
-      where: { scheme_id: scheme.id },
-    });
+    const definitions = SCHEME_CONFIGS[scheme.code]?.fieldMapping
+      ? await KPIManagementService.getSchemeKPIs(scheme.code)
+      : [];
+    const kpiDef = definitions[0];
 
     if (!kpiDef) {
       return {
@@ -226,9 +227,8 @@ class ChatbotService {
       type: 'forecast',
       scheme: scheme.name,
       kpi: kpiDef.kpi_name,
-      message: `${scheme.name} is ${prediction.trend}. Next month forecast: ${prediction.next_month_prediction}`,
+      message: `The reported value for ${kpiDef.kpi_name} is trending ${prediction.trend}. Exploratory next-month estimate: ${prediction.next_month_prediction}; this is not a validated performance forecast.`,
       forecast: prediction.forecasts.slice(0, 3),
-      confidence: prediction.prediction_confidence,
     };
   }
 
@@ -236,57 +236,58 @@ class ChatbotService {
    * Handle ranking queries
    */
   static async handleRankingQuery(intent, query, stateAccess = null) {
-    let rankings = await AnalyticsService.getRankings();
-    if (stateAccess) {
-      const state = await prisma.state.findUnique({ where: { id: stateAccess } });
-      rankings = rankings.filter(item => item.state_name === state?.name);
+    const schemes = await prisma.scheme.findMany();
+    const scheme = matchMentionedScheme(schemes, query);
+    if (!scheme) {
+      return { type: 'help', message: 'Specify one scheme and, if possible, an indicator. Different schemes cannot be ranked on a shared performance scale.' };
     }
-
-    const isStates = /state/.test(query);
-    const isSchemes = /scheme/.test(query);
-
-    let topPerformers;
-
-    if (isSchemes) {
-      topPerformers = rankings
-        .reduce((acc, r) => {
-          const existing = acc.find((x) => x.scheme_name === r.scheme_name);
-          if (existing) {
-            existing.count++;
-          } else {
-            acc.push({ scheme_name: r.scheme_name, count: 1, completion: r.completion });
-          }
-          return acc;
-        }, [])
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 5);
-
-      return {
-        type: 'ranking',
-        category: 'schemes',
-        message: 'Top performing schemes',
-        data: topPerformers,
+    const config = SCHEME_CONFIGS[scheme.code];
+    const definitions = config?.fieldMapping ? await KPIManagementService.getSchemeKPIs(scheme.code) : [];
+    if (definitions.length === 0) {
+      return { type: 'no_data', scheme: scheme.name, message: 'No source-mapped indicators are configured for this scheme.' };
+    }
+    const definition = definitions.find((item) => query.includes(item.kpi_name.toLowerCase())) || definitions[0];
+    const rows = await prisma.kPIValue.findMany({
+      where: {
+        kpi_id: definition.id,
+        state_id: stateAccess || { not: null },
+        district_id: config.aggregateByDistrict ? { not: null } : null,
+        block_id: null,
+        village_id: null,
+      },
+      include: { state: { select: { id: true, name: true } } },
+      orderBy: [{ date: 'desc' }, { id: 'desc' }],
+      take: 10000,
+    });
+    const latestLocationRows = new Map();
+    for (const row of rows) {
+      const locationKey = config.aggregateByDistrict ? row.district_id : row.state_id;
+      if (locationKey != null && !latestLocationRows.has(locationKey)) latestLocationRows.set(locationKey, row);
+    }
+    const stateValues = new Map();
+    for (const row of latestLocationRows.values()) {
+      const state = stateValues.get(row.state_id) || {
+        state_name: row.state.name,
+        value: 0,
+        source_date: row.date,
+        locations_covered: 0,
       };
+      state.value += Number(row.value);
+      if (row.date > state.source_date) state.source_date = row.date;
+      state.locations_covered += 1;
+      stateValues.set(row.state_id, state);
     }
-
-    topPerformers = rankings
-      .reduce((acc, r) => {
-        const existing = acc.find((x) => x.state_name === r.state_name);
-        if (existing) {
-          existing.count++;
-        } else {
-          acc.push({ state_name: r.state_name, count: 1, completion: r.completion });
-        }
-        return acc;
-      }, [])
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-
+    const data = Array.from(stateValues.values())
+      .sort((first, second) => second.value - first.value)
+      .slice(0, 5)
+      .map((item) => ({ ...item, value: Math.round(item.value * 100) / 100 }));
     return {
-      type: 'ranking',
-      category: 'states',
-      message: 'Top performing states',
-      data: topPerformers,
+      type: 'source_ranking',
+      scheme: scheme.name,
+      indicator: definition.kpi_name,
+      unit: definition.unit,
+      message: `Highest reported ${definition.kpi_name} values for ${scheme.code}. Larger counts or allocations do not necessarily mean better performance.`,
+      data,
     };
   }
 
@@ -296,44 +297,39 @@ class ChatbotService {
   static async handleStatusQuery(intent, query, stateAccess = null) {
     const schemes = await prisma.scheme.findMany();
 
-    const scheme = schemes.find(
-      (s) => query.includes(s.code.toLowerCase()) || query.includes(s.name.toLowerCase())
-    );
+    const scheme = matchMentionedScheme(schemes, query);
 
     if (!scheme) {
-      // Overall status
-      const allKPIs = await prisma.kPIValue.findMany({
-        where: { ...(stateAccess && { state_id: stateAccess }) },
-        take: 100,
-        orderBy: { date: 'desc' },
-      });
-
       return {
-        type: 'status',
-        message: 'Overall dashboard status',
-        total_kpis: allKPIs.length,
-        on_track: allKPIs.filter((k) => k.status === 'on_track').length,
-        at_risk: allKPIs.filter((k) => k.status === 'at_risk').length,
-        critical: allKPIs.filter((k) => k.status === 'critical').length,
+        type: 'help',
+        message: 'Specify a scheme to review its latest source observations. Feed indicators and coverage differ, so the dashboard does not calculate one combined status.',
       };
     }
 
+    const definitions = SCHEME_CONFIGS[scheme.code]?.fieldMapping
+      ? await KPIManagementService.getSchemeKPIs(scheme.code)
+      : [];
+    if (definitions.length === 0) {
+      return { type: 'no_data', scheme: scheme.name, message: 'No source-mapped indicators are configured for this scheme.' };
+    }
     const kpiValues = await prisma.kPIValue.findMany({
-      where: { kpi: { scheme_id: scheme.id }, ...(stateAccess && { state_id: stateAccess }) },
-      include: { kpi: true },
-      take: 20,
+      where: { kpi_id: { in: definitions.map(({ id }) => id) }, ...(stateAccess && { state_id: stateAccess }) },
+      include: { kpi: true, state: true },
+      take: 100,
       orderBy: { date: 'desc' },
     });
 
+    const latestUpdate = kpiValues[0]?.date || null;
     return {
       type: 'status',
       scheme: scheme.name,
-      message: `Current status of ${scheme.name}`,
-      total_kpis: kpiValues.length,
-      on_track: kpiValues.filter((k) => k.status === 'on_track').length,
-      at_risk: kpiValues.filter((k) => k.status === 'at_risk').length,
-      critical: kpiValues.filter((k) => k.status === 'critical').length,
-      latest_update: kpiValues[0]?.date,
+      message: kpiValues.length
+        ? `${kpiValues.length} latest source observations are available for ${scheme.name}. The counts below describe observations, not one overall programme score.`
+        : `No source observations are available for ${scheme.name}.`,
+      observation_count: kpiValues.length,
+      rated_observations: kpiValues.filter((item) => item.target_value != null && ['achieved', 'on_track', 'at_risk', 'critical'].includes(item.status)).length,
+      unrated_observations: kpiValues.filter((item) => item.target_value == null).length,
+      latest_update: latestUpdate,
     };
   }
 
@@ -347,7 +343,6 @@ class ChatbotService {
         query_text: queryText,
         response_text: JSON.stringify(response),
         query_type: queryType,
-        confidence_score: 0.85,
       },
     });
   }
@@ -357,14 +352,11 @@ class ChatbotService {
    */
   static getSampleQueries() {
     return [
-      'How is PMAY performing in Maharashtra?',
-      'Compare PMAY and MGNREGS',
-      'Will PM-KISAN reach its target?',
-      'Which state has the best performance?',
-      'Show me recent status updates',
-      'What is the latest MGNREGS data?',
-      'Compare Maharashtra vs Uttar Pradesh',
-      'Forecast PM-KISAN for next quarter',
+      'What indicators are available for PMAY-U in Maharashtra?',
+      'Compare reported PMAY-G and MGNREGS values',
+      'Which states report the highest PMGSY values?',
+      'What is the latest available NRLM data?',
+      'Forecast DDU-GKY for next month',
     ];
   }
 }

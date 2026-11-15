@@ -1,4 +1,3 @@
-import prisma from '../config/prisma.js';
 import DataSyncService from './data-sync.service.js';
 
 class MGNREGSDataService {

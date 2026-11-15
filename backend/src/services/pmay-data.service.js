@@ -1,4 +1,3 @@
-import prisma from '../config/prisma.js';
 import { DATA_VALIDATION_RULES } from '../config/scheme-integrations.js';
 import DataSyncService from './data-sync.service.js';
 
@@ -47,7 +46,7 @@ class PMAYDataService {
   /**
    * Load PMAY data into database
    */
-  static async loadPMAYDataToDB(rawData) {
+  static async loadPMAYDataToDB(_rawData) {
     throw new Error('Legacy PMAY data writes were removed. Use the canonical PMAY sync endpoint.');
   }
 
