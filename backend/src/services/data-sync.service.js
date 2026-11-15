@@ -386,6 +386,8 @@ class DataSyncService {
       if (Number.isFinite(parsedTotal) && parsedTotal >= 0) total = parsedTotal;
       offset += page.length;
       if (page.length < pageSize || (total != null && offset >= total)) break;
+    // Pagination exits when the source reports a short or final page.
+    // eslint-disable-next-line no-constant-condition
     } while (true);
 
     return aggregateAliasedStateRows(aggregateSourceCategories(records, config), config);

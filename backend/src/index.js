@@ -214,7 +214,7 @@ app.use((req, res) => {
 });
 
 // Global error handler - Production Grade
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   const timestamp = new Date().toISOString();
   const errorId = `ERR_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -272,13 +272,6 @@ const stopDataSyncScheduler = startDataSyncScheduler();
 server.keepAliveTimeout = 65_000;
 server.headersTimeout = 66_000; // must be > keepAliveTimeout
 server.maxConnections = 1000; // Allow many concurrent connections per process
-
-// Enable SO_REUSEADDR to reuse port immediately after restart
-server.setsockopt = server.setsockopt || ((level, optname, value) => {
-  if (level === 'socket' && optname === 'SO_REUSEADDR') {
-    // Force address reuse
-  }
-});
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {

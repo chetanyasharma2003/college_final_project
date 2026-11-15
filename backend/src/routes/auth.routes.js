@@ -1,6 +1,6 @@
 import express from 'express';
 import AuthService from '../services/auth.service.js';
-import { verifyAuth, checkRole } from '../middleware/auth.middleware.js';
+import { verifyAuth } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 

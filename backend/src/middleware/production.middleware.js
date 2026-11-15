@@ -28,7 +28,7 @@ export const requestTimeout = (req, res, next) => {
 };
 
 // Error recovery middleware
-export const errorRecovery = (err, req, res, next) => {
+export const errorRecovery = (err, req, res, _next) => {
   console.error('🔴 ERROR:', {
     message: err.message,
     path: req.path,
