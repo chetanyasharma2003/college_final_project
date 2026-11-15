@@ -6,6 +6,8 @@ export const serializeCSV = (data) => {
   const escapeField = (value) => {
     if (value == null) return '""';
     let text = String(value);
+    // Keep the control-character check to prevent formula injection after leading whitespace.
+    // eslint-disable-next-line no-control-regex
     if (typeof value === 'string' && /^[\s\u0000-\u001f]*[=+\-@]/.test(text)) {
       text = `'${text}`;
     }

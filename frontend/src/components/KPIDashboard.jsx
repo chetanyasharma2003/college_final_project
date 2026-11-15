@@ -50,9 +50,16 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
         ? `/kpis/status/${schemeCode}?stateId=${stateId}`
         : `/kpis/status/${schemeCode}`;
       const response = await client.get(url);
-      setKpiData(response.data.kpi_status || []);
+      const payload = Array.isArray(response.data)
+        ? response.data
+        : response.data?.kpi_status ?? response.data?.data?.kpi_status ?? response.data?.data;
+      if (!Array.isArray(payload)) {
+        throw new Error('The server returned an unexpected KPI status response.');
+      }
+      setKpiData(payload);
       setError(null);
     } catch (err) {
+      setKpiData([]);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -67,9 +74,7 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
     at_risk: kpiData.filter(k => k.status === 'at_risk').length,
     no_data: kpiData.filter(k => k.status === 'no_data').length,
     no_target: kpiData.filter(k => k.status === 'no_target').length,
-    avg_progress: kpiData.some(k => k.progress_percentage != null)
-      ? Math.round(kpiData.filter(k => k.progress_percentage != null).reduce((sum, k) => sum + k.progress_percentage, 0) / kpiData.filter(k => k.progress_percentage != null).length)
-      : null,
+    reported: kpiData.filter((kpi) => kpi.current_value != null).length,
   };
   const latestSourceUpdate = kpiData
     .map(kpi => kpi.last_updated ? new Date(kpi.last_updated) : null)
@@ -195,12 +200,10 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
           <p className="text-gray-400 text-sm mb-1">Not Rated</p>
           <p className="text-3xl font-bold text-gray-300">{stats.no_target}</p>
         </div>
-        <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
-          <p className="text-purple-400 text-sm mb-1">Target-based average</p>
-          <p className={`font-bold text-purple-400 ${stats.avg_progress == null ? 'text-lg' : 'text-3xl'}`}>
-            {stats.avg_progress == null ? 'Not available' : `${stats.avg_progress}%`}
-          </p>
-          {stats.avg_progress == null && <p className="mt-1 text-xs text-gray-400">No official targets in this source</p>}
+        <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+          <p className="text-gray-400 text-sm mb-1">With reported values</p>
+          <p className="text-3xl font-bold text-white">{stats.reported}</p>
+          <p className="mt-1 text-xs text-gray-400">No shared score across different indicators</p>
         </div>
       </div>
 
@@ -233,7 +236,7 @@ export default function KPIDashboard({ schemeCode, schemeName, stateId = null })
           <AlertCircle size={48} className="mx-auto mb-4 text-gray-400" />
           <h3 className="text-xl font-semibold text-white mb-2">No official KPI definitions available</h3>
           <p className="text-gray-400 mb-4">
-            This source has not been imported yet. An admin can run “Sync official source data” from the monitoring panel above.
+            No source-mapped KPI readings are available for this feed. An admin can check its import status in the monitoring panel above.
           </p>
           <button
             onClick={fetchAllKPIs}

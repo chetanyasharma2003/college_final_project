@@ -1,16 +1,19 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-white mb-4">404</h1>
-        <p className="text-xl text-slate-300 mb-8">Page not found</p>
+    <div className="app-theme app-not-found">
+      <Helmet><title>Page not found | Unified Performance Dashboard</title></Helmet>
+      <div>
+        <p className="app-eyebrow">PAGE NOT FOUND</p>
+        <h1>404</h1>
+        <p>The page you requested is not available.</p>
         <Link
           to="/dashboard"
-          className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition font-medium"
+          className="app-back-link"
         >
-          Back to Dashboard
+          Return to overview
         </Link>
       </div>
     </div>

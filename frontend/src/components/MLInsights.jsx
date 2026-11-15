@@ -26,13 +26,13 @@ export default function MLInsights({ schemeId }) {
     fetchInsights();
   }, [schemeId]);
 
-  if (loading) return <div className="ml-insights-loading">Loading AI insights...</div>;
+  if (loading) return <div className="ml-insights-loading">Loading data insights...</div>;
   if (error) return <div className="ml-insights-error">{error}</div>;
   if (!insights) return null;
 
   return (
     <div className="ml-insights-container">
-      <h2>🤖 AI Analytics Insights</h2>
+      <h2>Data insights</h2>
 
       {/* Performance Summary */}
       {insights.performance_summary && (
@@ -58,7 +58,7 @@ export default function MLInsights({ schemeId }) {
       {/* Risk KPIs */}
       {insights.risk_analysis && insights.risk_analysis.length > 0 && (
         <div className="insight-card risk-kpis">
-          <h3>⚠️ KPIs Requiring Attention</h3>
+          <h3>Indicators requiring review</h3>
           <div className="risk-list">
             {insights.risk_analysis.map((kpi, idx) => (
               <div key={idx} className="risk-item">

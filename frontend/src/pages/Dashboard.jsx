@@ -1,28 +1,31 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { useSchemes, useKPIs, useGeographic, useKPIStatus } from '../api/hooks';
+import { useSchemes, useKPIs, useGeographic } from '../api/hooks';
 import { setSchemes, setKPIValues, setSelectedScheme } from '../store/dataSlice';
 import KPIDashboard from '../components/KPIDashboard';
 import SchemeSelector from '../components/SchemeSelector';
 import StateSelector from '../components/StateSelector';
 import DateRangeSelector from '../components/DateRangeSelector';
-import UserProfile from '../components/UserProfile';
+import AppShell from '../components/AppShell';
 import TrendChart from '../components/TrendChart';
 import TopPerformers from '../components/TopPerformers';
 import ErrorBoundary from '../components/ErrorBoundary';
 import Chatbot from '../components/Chatbot';
-import KPIAlerts from '../components/KPIAlerts';
-import KPIComparison from '../components/KPIComparison';
-import { BarChart3, FileText, TrendingUp, Map as MapIcon } from 'lucide-react';
+import { Activity, Database, MapPin } from 'lucide-react';
 import AdminMonitoring from '../components/AdminMonitoring';
 import GeographicExplorer from '../components/GeographicExplorer';
+import { toLocalDateInputValue } from '../utils/dates';
 
 export default function Dashboard() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { schemes, selectedScheme, kpiValues } = useSelector((state) => state.data);
-  const { schemes: schemesData, loading: schemesLoading } = useSchemes();
+  const { schemes, selectedScheme } = useSelector((state) => state.data);
+  const {
+    schemes: schemesData,
+    loading: schemesLoading,
+    error: schemesError,
+    fetchSchemes,
+  } = useSchemes();
   const [selectedSchemeCode, setSelectedSchemeCode] = useState('');
   const [selectedSchemeName, setSelectedSchemeName] = useState('Official scheme data');
   const [selectedStateForFilter, setSelectedStateForFilter] = useState(null);
@@ -30,13 +33,12 @@ export default function Dashboard() {
     const end = new Date();
     return {
       startDate: '2020-01-01',
-      endDate: end.toISOString().split('T')[0],
+      endDate: toLocalDateInputValue(end),
     };
   });
   // Pass scheme code to useKPIs for proper scheme-specific filtering
   const { kpiValues: kpiValuesData, loading: kpiLoading } = useKPIs(selectedSchemeCode, selectedStateForFilter);
-  const { states } = useGeographic();
-  const { kpiStatus, loading: kpiStatusLoading } = useKPIStatus(selectedSchemeCode);
+  const { states, loading: statesLoading, error: geographyError, fetchStates } = useGeographic();
 
   useEffect(() => {
     if (schemesData.length === 0) return;
@@ -73,129 +75,99 @@ export default function Dashboard() {
     scheme.code.startsWith('PMAY-') ? 'PMAY' : scheme.code
   ))).size;
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 18) return 'Good Afternoon';
-    return 'Good Evening';
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      {/* Header + Filters - Combined Sticky Section */}
-      <div className="border-b border-white/10 bg-white/5 backdrop-blur-lg sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
-                {getGreeting()}, <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">{user?.full_name?.split(' ')[0]}</span>
-              </h1>
-              <p className="text-blue-200 text-sm sm:text-base">Government scheme performance analytics</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <Link
-                to="/analytics"
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg text-white font-semibold transition text-xs sm:text-sm whitespace-nowrap"
-              >
-                <BarChart3 size={16} className="sm:w-5 sm:h-5" />
-                <span className="hidden sm:inline">Analytics</span>
-              </Link>
-              <Link
-                to="/heatmap"
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 rounded-lg text-white font-semibold transition text-xs sm:text-sm whitespace-nowrap"
-              >
-                <MapIcon size={16} className="sm:w-5 sm:h-5" />
-                <span className="hidden sm:inline">Heatmap</span>
-              </Link>
-              <Link
-                to="/features"
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 rounded-lg text-white font-semibold transition text-xs sm:text-sm whitespace-nowrap"
-              >
-                <FileText size={16} className="sm:w-5 sm:h-5" />
-                <span className="hidden sm:inline">Advanced</span>
-              </Link>
-              <div className="text-2xl sm:text-3xl lg:text-4xl">📊</div>
-              <UserProfile />
-            </div>
+    <AppShell
+      title="Programme overview"
+      description="Review official scheme indicators and compare the latest source-reported figures."
+    >
+      <div className="app-filter-panel">
+        <div className="app-section-heading">
+          <div>
+            <h2>Filters</h2>
+            <p>Choose the scheme and geography you want to review.</p>
           </div>
-
-          {/* Filters Inside Sticky Header */}
-          <div className="flex gap-2 sm:gap-3 lg:gap-4 flex-wrap pt-2 border-t border-white/10">
-            <div className="flex-1 min-w-[120px] sm:flex-none">
-              <SchemeSelector schemes={schemes} />
-            </div>
-            <div className="flex-1 min-w-[120px] sm:flex-none">
-              <StateSelector
-                states={states}
-                selected={selectedStateForFilter}
-                onChange={setSelectedStateForFilter}
-              />
-            </div>
-            <div className="flex-1 min-w-[150px] sm:flex-none">
-              <DateRangeSelector onDateRangeChange={setSelectedDateRange} />
-            </div>
+        </div>
+        <div className="app-filter-grid">
+          <div className="app-filter-field">
+            <span>Scheme</span>
+            <SchemeSelector schemes={schemes} isLoading={schemesLoading} />
+          </div>
+          <div className="app-filter-field">
+            <span>State or union territory</span>
+            <StateSelector
+              states={states}
+              isLoading={statesLoading}
+              selected={selectedStateForFilter}
+              onChange={setSelectedStateForFilter}
+            />
+          </div>
+          <div className="app-filter-field">
+            <span>Trend date range</span>
+            <DateRangeSelector onDateRangeChange={setSelectedDateRange} />
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {user?.role === 'ADMIN' && <AdminMonitoring />}
-        <GeographicExplorer />
-        {/* Smart Alerts System */}
-        <KPIAlerts kpiValues={filteredKPIValues} />
+      <div className="app-stat-grid">
+        <article className="app-stat-card">
+          <span className="app-stat-icon"><Database size={18} /></span>
+          <p>Official data feeds</p>
+          <strong>{schemes.length}</strong>
+          <small>Across {schemeFamilyCount} scheme families; PMAY has two feeds</small>
+        </article>
+        <article className="app-stat-card">
+          <span className="app-stat-icon"><Activity size={18} /></span>
+          <p>Source indicators</p>
+          <strong>{filteredKPIValues.length}</strong>
+          <small>Defined for the current scheme and geographic filter</small>
+        </article>
+        <article className="app-stat-card">
+          <span className="app-stat-icon"><MapPin size={18} /></span>
+          <p>States and union territories</p>
+          <strong>{states.length}</strong>
+          <small>Geography available across configured sources</small>
+        </article>
+      </div>
 
-        {/* Stats Summary */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-          <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 sm:p-6">
-            <p className="text-blue-200 text-xs sm:text-sm mb-2">Official data feeds</p>
-            <p className="text-3xl sm:text-4xl font-bold text-white">{schemes.length}</p>
-            <p className="text-blue-300 text-xs mt-2">Across {schemeFamilyCount} scheme families; PMAY has two feeds</p>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 sm:p-6">
-            <p className="text-purple-200 text-xs sm:text-sm mb-2">KPI Metrics</p>
-            <p className="text-3xl sm:text-4xl font-bold text-white">{filteredKPIValues.length}</p>
-            <p className="text-purple-300 text-xs mt-2">Latest reported indicators</p>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
-            <p className="text-pink-200 text-xs sm:text-sm mb-2">Geographic Reach</p>
-            <p className="text-3xl sm:text-4xl font-bold text-white">{states.length}</p>
-            <p className="text-pink-300 text-xs mt-2">States Tracked</p>
-          </div>
+      {schemesError && (
+        <div className="app-error-card mb-5" role="alert">
+          <h2>Scheme feeds could not be loaded</h2>
+          <p>{schemesError}</p>
+          <button type="button" onClick={fetchSchemes}>Retry</button>
         </div>
+      )}
+      {geographyError && (
+        <div className="app-error-card mb-5" role="alert">
+          <h2>Geography list could not be loaded</h2>
+          <p>{geographyError}</p>
+          <button type="button" onClick={fetchStates}>Retry</button>
+        </div>
+      )}
 
+      {user?.role === 'ADMIN' && <AdminMonitoring />}
         {/* Loading State */}
         {(schemesLoading || kpiLoading) && (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin">
-              <div className="text-4xl">⏳</div>
-            </div>
-            <span className="text-white ml-3">Loading data...</span>
+          <div className="app-loading-state">
+            <div className="spinner" />
+            <span>Loading source data…</span>
           </div>
         )}
 
         {/* Source-reported KPI dashboard by scheme */}
-        <div className="mb-8">
-          <ErrorBoundary>
-            <KPIDashboard
-              schemeCode={selectedSchemeCode}
-              schemeName={selectedSchemeName}
-              stateId={selectedStateForFilter}
-            />
-          </ErrorBoundary>
-        </div>
+        {selectedSchemeCode && (
+          <div className="mb-8">
+            <ErrorBoundary>
+              <KPIDashboard
+                schemeCode={selectedSchemeCode}
+                schemeName={selectedSchemeName}
+                stateId={selectedStateForFilter}
+              />
+            </ErrorBoundary>
+          </div>
+        )}
 
-        {/* Scheme Comparison */}
-        <div className="mb-8">
-          <ErrorBoundary>
-            <KPIComparison />
-          </ErrorBoundary>
-        </div>
-
-        <div className="mb-8 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-blue-100">
-          Performance ratings and forecasts are shown only when the official source provides validated targets and enough dated observations.
-          Current source feeds do not consistently provide these, so unsupported health scores and predictions are not generated.
+        <div className="app-note mb-8">
+          Target-based statuses appear only when a target is configured. Exploratory projections require at least three recent source dates with regular reporting intervals.
         </div>
 
 
@@ -209,18 +181,10 @@ export default function Dashboard() {
           </ErrorBoundary>
         </div>
 
-        {/* Empty State */}
-        {!kpiLoading && filteredKPIValues.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-6xl mb-3">📈</p>
-            <p className="text-blue-200 text-lg">No data available for selected filters</p>
-            <p className="text-gray-400 text-sm mt-2">Try selecting different schemes or states</p>
-          </div>
-        )}
-      </div>
+        <GeographicExplorer />
 
-      {/* AI Chatbot */}
+      {/* Data assistant */}
       <Chatbot />
-    </div>
+    </AppShell>
   );
 }

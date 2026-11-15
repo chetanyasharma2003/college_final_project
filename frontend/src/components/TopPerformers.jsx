@@ -4,6 +4,7 @@ import client from '../api/client';
 export default function TopPerformers({ schemeCode = 'PMAY' }) {
   const [rankings, setRankings] = useState([]);
   const [stateCount, setStateCount] = useState(0);
+  const [latestSourceDate, setLatestSourceDate] = useState(null);
   const [metrics, setMetrics] = useState([]);
   const [selectedKpiId, setSelectedKpiId] = useState('');
   const [aggregation, setAggregation] = useState('');
@@ -15,6 +16,7 @@ export default function TopPerformers({ schemeCode = 'PMAY' }) {
     if (!code) {
       setRankings([]);
       setStateCount(0);
+      setLatestSourceDate(null);
       setMetrics([]);
       setLoading(false);
       return;
@@ -32,16 +34,23 @@ export default function TopPerformers({ schemeCode = 'PMAY' }) {
       const response = await client.get(`/analytics/state-values/${encodeURIComponent(code)}${query}`);
       if (version !== requestVersion.current) return;
 
-      const data = response.data?.data || [];
-      const availableMetrics = response.data?.kpis || [];
+      const data = Array.isArray(response.data?.data) ? response.data.data : [];
+      const latestDate = data.reduce((latest, item) => {
+        const date = new Date(item.source_date);
+        return !Number.isNaN(date.getTime()) && (!latest || date > new Date(latest)) ? item.source_date : latest;
+      }, null);
+      const availableMetrics = Array.isArray(response.data?.kpis) ? response.data.kpis : [];
       setRankings(data.slice(0, 5));
       setStateCount(data.length);
+      setLatestSourceDate(latestDate);
       setMetrics(availableMetrics);
       setSelectedKpiId(String(response.data?.selected_kpi_id || ''));
       setAggregation(response.data?.aggregation || '');
     } catch (requestError) {
       if (version === requestVersion.current) {
         setRankings([]);
+        setStateCount(0);
+        setLatestSourceDate(null);
         setError(requestError.response?.data?.message || 'Source values are unavailable.');
       }
     } finally {
@@ -52,6 +61,7 @@ export default function TopPerformers({ schemeCode = 'PMAY' }) {
   useEffect(() => {
     setRankings([]);
     setStateCount(0);
+    setLatestSourceDate(null);
     setMetrics([]);
     setSelectedKpiId('');
     setAggregation('');
@@ -60,13 +70,18 @@ export default function TopPerformers({ schemeCode = 'PMAY' }) {
   }, [schemeCode, loadSourceValues]);
 
   const selectedMetric = metrics.find((metric) => String(metric.id) === selectedKpiId);
-  const sourceDate = rankings.reduce((latest, item) => (
-    !latest || new Date(item.source_date) > new Date(latest) ? item.source_date : latest
-  ), null);
-  const formatValue = (value) => Number(value).toLocaleString('en-IN', { maximumFractionDigits: 2 });
-  const formatDate = (value) => value
-    ? new Date(value).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-    : null;
+  const formatValue = (value) => {
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue)
+      ? numericValue.toLocaleString('en-IN', { maximumFractionDigits: 2 })
+      : 'Not reported';
+  };
+  const formatDate = (value) => {
+    const date = value ? new Date(value) : null;
+    return date && !Number.isNaN(date.getTime())
+      ? date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+      : null;
+  };
 
   return (
     <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-6">
@@ -100,13 +115,13 @@ export default function TopPerformers({ schemeCode = 'PMAY' }) {
       {selectedMetric && (
         <p className="mb-3 text-xs text-gray-400">
           {selectedMetric.name}{selectedMetric.unit ? ` · ${selectedMetric.unit}` : ''}
-          {sourceDate ? ` · source date ${formatDate(sourceDate)}` : ''}
+          {latestSourceDate ? ` · latest source date ${formatDate(latestSourceDate)}` : ''}
         </p>
       )}
 
       {loading ? (
         <div className="flex h-64 items-center justify-center" aria-live="polite">
-          <div className="animate-spin"><div className="text-4xl">⏳</div></div>
+          <div className="spinner" role="status" aria-label="Loading state values" />
         </div>
       ) : error ? (
         <p role="alert" className="text-center text-red-300">{error}</p>

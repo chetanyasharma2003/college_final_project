@@ -153,13 +153,12 @@ export default function PerformanceAnalysis({ schemeCode = 'PMAY' }) {
       <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6">
         <h4 className="text-lg font-semibold text-blue-400 mb-3 flex items-center gap-2">
           <TrendingUp size={20} />
-          Recommendations
+          How to read these values
         </h4>
         <ul className="space-y-2 text-blue-100 text-sm">
-          <li>• Focus on KPIs with gaps &gt; 50% for immediate action</li>
-          <li>• Allocate additional resources to critical performance areas</li>
-          <li>• Monitor gaps daily and track progress towards targets</li>
-          <li>• Implement corrective measures for bottom performers</li>
+          <li>• Gaps are calculated only for records with a configured target.</li>
+          <li>• Check the observation date and source before comparing values.</li>
+          <li>• A gap alone does not explain its cause or identify an intervention.</li>
         </ul>
       </div>
     </div>

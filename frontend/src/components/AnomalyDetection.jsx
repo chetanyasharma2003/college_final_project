@@ -37,7 +37,7 @@ export default function AnomalyDetection({ kpiId, kpiName }) {
   return (
     <div className="anomaly-container">
       <div className="anomaly-header">
-        <h3>📊 {kpiName} Analytics</h3>
+      <h3>{kpiName} analysis</h3>
         <button className="refresh-btn" onClick={fetchAnalytics} disabled={loading}>
           🔄 Refresh
         </button>
@@ -98,8 +98,10 @@ export default function AnomalyDetection({ kpiId, kpiName }) {
                 </div>
               ))}
             </div>
+          ) : anomalies?.status === 'insufficient_data' ? (
+            <div className="anomaly-empty">Not enough observations to check for anomalies.</div>
           ) : (
-            <div className="anomaly-empty">✓ No anomalies detected in recent data</div>
+            <div className="anomaly-empty">No anomalies were flagged in the available observations.</div>
           )}
         </div>
       )}
@@ -150,7 +152,7 @@ export default function AnomalyDetection({ kpiId, kpiName }) {
 
               {patterns.recommendations?.length > 0 && (
                 <div className="pattern-card">
-                  <h4>📋 Recommendations</h4>
+                  <h4>Recommendations</h4>
                   <div className="recommendations-list">
                     {patterns.recommendations.map((rec, idx) => (
                       <div key={idx} className={`recommendation ${rec.severity?.toLowerCase()}`}>
@@ -160,7 +162,7 @@ export default function AnomalyDetection({ kpiId, kpiName }) {
                           </span>
                         </div>
                         <div className="rec-message">{rec.message}</div>
-                        <div className="rec-action">💡 {rec.action}</div>
+                        <div className="rec-action">{rec.action}</div>
                       </div>
                     ))}
                   </div>

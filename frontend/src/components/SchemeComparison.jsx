@@ -1,26 +1,30 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import client from '../api/client';
 
 const FEEDS = [
-  { code: 'PMAY-G', color: '#3b82f6' },
-  { code: 'PMAY-U', color: '#60a5fa' },
-  { code: 'MGNREGS', color: '#10b981' },
-  { code: 'PMGSY', color: '#f59e0b' },
-  { code: 'NRLM', color: '#8b5cf6' },
-  { code: 'DDU-GKY', color: '#ec4899' },
-  { code: 'SAGY', color: '#06b6d4' },
+  { code: 'PMAY-G' },
+  { code: 'PMAY-U' },
+  { code: 'MGNREGS' },
+  { code: 'PMGSY' },
+  { code: 'NRLM' },
+  { code: 'DDU-GKY' },
+  { code: 'SAGY' },
 ];
 
-const formatDate = (value) => value
-  ? new Date(value).toLocaleDateString('en-IN')
-  : 'Not reported';
+const formatDate = (value) => {
+  const date = value ? new Date(value) : null;
+  return date && !Number.isNaN(date.getTime()) ? date.toLocaleDateString('en-IN') : 'Not reported';
+};
 
 export default function SchemeComparison() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const requestVersion = useRef(0);
 
   const fetchComparisonData = useCallback(async () => {
+    const version = requestVersion.current + 1;
+    requestVersion.current = version;
     setLoading(true);
     const comparisons = await Promise.all(FEEDS.map(async (feed) => {
       try {
@@ -38,14 +42,19 @@ export default function SchemeComparison() {
         };
       }
     }));
-    setData(comparisons);
-    setLoading(false);
+    if (version === requestVersion.current) {
+      setData(comparisons);
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     fetchComparisonData();
     window.addEventListener('kpi-data:updated', fetchComparisonData);
-    return () => window.removeEventListener('kpi-data:updated', fetchComparisonData);
+    return () => {
+      requestVersion.current += 1;
+      window.removeEventListener('kpi-data:updated', fetchComparisonData);
+    };
   }, [fetchComparisonData]);
 
   return (
@@ -68,6 +77,10 @@ export default function SchemeComparison() {
         </button>
       </div>
 
+      {loading && data.length === 0 && (
+        <p className="app-loading-state" role="status">Loading scheme source summaries…</p>
+      )}
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {data.map((feed) => {
           const available = feed.metrics.filter((metric) => metric.current_value != null);
@@ -79,7 +92,7 @@ export default function SchemeComparison() {
 
           return (
             <article key={feed.code} className="rounded-lg border border-white/20 bg-white/10 p-4">
-              <h4 className="mb-3 text-lg font-bold" style={{ color: feed.color }}>{feed.code}</h4>
+              <h4 className="mb-3 text-lg font-bold text-green-800">{feed.code}</h4>
               <p className="text-sm text-gray-300">
                 {feed.metrics.length} source KPI(s) · {available.length} with readings
               </p>

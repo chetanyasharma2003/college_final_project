@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useSelector } from 'react-redux';
 import client from '../api/client';
+import { formatLocalDateInput } from '../utils/dates';
 
 export default function TrendChart({ dateRange, stateId = null }) {
   const { selectedScheme, schemes } = useSelector(state => state.data);
@@ -98,7 +99,7 @@ export default function TrendChart({ dateRange, stateId = null }) {
       const total = sourceRows.reduce((sum, item) => sum + (Number(item.value) || 0), 0);
       return {
         dateKey,
-        date: new Date(`${dateKey}T00:00:00`).toLocaleDateString('en-IN', {
+        date: formatLocalDateInput(dateKey, {
           month: 'short',
           day: 'numeric',
         }),
@@ -108,7 +109,7 @@ export default function TrendChart({ dateRange, stateId = null }) {
   }, [kpiValues, activeKpiId]);
 
   const formatDate = (date) => date
-    ? new Date(`${date}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    ? formatLocalDateInput(date, { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
 
   return (
@@ -144,10 +145,8 @@ export default function TrendChart({ dateRange, stateId = null }) {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-80 md:h-96">
-          <div className="animate-spin">
-            <div className="text-4xl">⏳</div>
-          </div>
+        <div className="flex justify-center items-center h-80 md:h-96" role="status" aria-label="Loading trend data">
+          <div className="spinner" />
         </div>
       ) : error ? (
         <div className="flex flex-col justify-center items-center h-80 md:h-96 gap-4">
@@ -163,24 +162,26 @@ export default function TrendChart({ dateRange, stateId = null }) {
         <div className="w-full h-80 md:h-96">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis dataKey="date" stroke="rgba(255,255,255,0.7)" style={{ fontSize: '12px' }} />
-              <YAxis stroke="rgba(255,255,255,0.7)" style={{ fontSize: '12px' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5eae6" />
+              <XAxis dataKey="date" stroke="#68766f" style={{ fontSize: '12px' }} />
+              <YAxis stroke="#68766f" style={{ fontSize: '12px' }} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #dfe6e1',
                   borderRadius: '8px',
+                  color: '#17231f',
                 }}
-                labelStyle={{ color: '#f0f0f0' }}
+                labelStyle={{ color: '#17231f' }}
+                itemStyle={{ color: '#245b48' }}
               />
-              <Legend wrapperStyle={{ color: '#e5e7eb' }} />
+              <Legend wrapperStyle={{ color: '#526158' }} />
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke="#3b82f6"
+                stroke="#245b48"
                 strokeWidth={3}
-                dot={{ fill: '#3b82f6', r: 4 }}
+                dot={{ fill: '#245b48', r: 4 }}
                 activeDot={{ r: 6 }}
                 name={activeMetric?.name || 'KPI Trend'}
                 isAnimationActive={true}
@@ -190,7 +191,7 @@ export default function TrendChart({ dateRange, stateId = null }) {
         </div>
       ) : (
         <div className="flex flex-col justify-center items-center h-80 md:h-96">
-          <p className="text-gray-300 text-lg">📈 No trend data available</p>
+          <p className="text-gray-300 text-lg">No dated observations are available for this selection.</p>
           <p className="text-gray-400 text-sm mt-2">Select a scheme to view trends</p>
         </div>
       )}

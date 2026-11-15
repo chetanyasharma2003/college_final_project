@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FileText, Download, AlertCircle, Loader } from 'lucide-react';
 import client from '../api/client';
+import { toLocalDateInputValue } from '../utils/dates';
 
 export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode = 'PMAY', schemeName = 'PMAY' }) {
   const [reportType, setReportType] = useState('executive');
@@ -9,11 +10,11 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
   const [success, setSuccess] = useState(false);
 
   const reportTypes = [
-    { id: 'executive', label: 'Executive Summary', icon: '📋', description: 'High-level overview (1-2 pages)' },
-    { id: 'detailed', label: 'Detailed Report', icon: '📊', description: 'Complete analysis with recommendations' },
-    { id: 'csv', label: 'CSV Export', icon: '📥', description: 'Spreadsheet format for analysis' },
-    { id: 'pdf', label: 'PDF Summary', icon: '📄', description: 'Downloadable executive summary' },
-    { id: 'comparison', label: 'Comparison Report', icon: '⚖️', description: 'Compare multiple schemes' },
+    { id: 'executive', label: 'Executive Summary', tag: 'SUM', description: 'Source observation counts and selected latest readings' },
+    { id: 'detailed', label: 'Detailed Report', tag: 'FULL', description: 'Dated values, source targets, and statuses where available' },
+    { id: 'csv', label: 'CSV Export', tag: 'CSV', description: 'Tabular source observations for spreadsheet analysis' },
+    { id: 'pdf', label: 'PDF Summary', tag: 'PDF', description: 'Downloadable summary document' },
+    { id: 'comparison', label: 'Comparison Report', tag: 'CMP', description: 'Side-by-side source readings; indicators and coverage differ' },
   ];
 
   const handleGenerateReport = async () => {
@@ -23,7 +24,7 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
       setError(null);
       setSuccess(false);
 
-      const timestamp = new Date().toISOString().split('T')[0];
+      const timestamp = toLocalDateInputValue();
       let response;
       let filename;
 
@@ -54,7 +55,7 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(url);
+      window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -72,13 +73,13 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
         <FileText size={32} className="text-blue-400" />
         <div>
           <h3 className="text-2xl font-bold text-white">Report Generator</h3>
-          <p className="text-gray-400 text-sm">Create comprehensive reports for {schemeName}</p>
+          <p className="text-gray-400 text-sm">Export reported indicators for {schemeName}</p>
         </div>
       </div>
 
       {/* Success Message */}
       {success && (
-        <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 flex items-center gap-2 text-green-400">
+        <div role="status" className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 flex items-center gap-2 text-green-400">
           <span>✓</span>
           <span>Report generated successfully!</span>
         </div>
@@ -86,7 +87,7 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-center gap-2 text-red-400">
+        <div role="alert" className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-center gap-2 text-red-400">
           <AlertCircle size={20} />
           <span>{error}</span>
         </div>
@@ -96,15 +97,17 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {reportTypes.map(type => (
           <button
+            type="button"
             key={type.id}
             onClick={() => setReportType(type.id)}
+            aria-pressed={reportType === type.id}
             className={`p-4 rounded-lg border-2 transition text-left ${
               reportType === type.id
                 ? 'bg-blue-500/20 border-blue-500 text-white'
                 : 'bg-white/5 border-white/10 text-gray-300 hover:border-white/30'
             }`}
           >
-            <div className="text-3xl mb-2">{type.icon}</div>
+            <span className="report-type-tag">{type.tag}</span>
             <div className="font-semibold mb-1">{type.label}</div>
             <div className="text-xs text-gray-400">{type.description}</div>
           </button>
@@ -127,7 +130,7 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
           </div>
           <div className="flex justify-between">
             <span>Generated:</span>
-            <span className="text-white font-semibold">{new Date().toLocaleDateString('en-IN')}</span>
+          <span className="text-white font-semibold">{new Date().toLocaleDateString('en-IN')}</span>
           </div>
           <div className="flex justify-between">
             <span>Format:</span>
@@ -161,13 +164,13 @@ export default function ReportGenerator({ schemeId, schemeIds = [], schemeCode =
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6">
-        <h4 className="text-lg font-semibold text-blue-400 mb-3">💡 Quick Actions</h4>
+      <div className="app-note">
+        <h4 className="text-sm font-semibold mb-3">Formats and contents</h4>
         <ul className="space-y-2 text-blue-100 text-sm">
-          <li>• <strong>Executive Summary:</strong> Perfect for quick reviews and stakeholder updates</li>
-          <li>• <strong>Detailed Report:</strong> Includes KPI analysis, trends, and recommendations</li>
-          <li>• <strong>CSV Export:</strong> Use in Excel for custom analysis and visualizations</li>
-          <li>• <strong>Comparison:</strong> Compare performance across multiple schemes</li>
+          <li>• <strong>Executive Summary:</strong> Counts and selected dated readings for one scheme</li>
+          <li>• <strong>Detailed Report:</strong> Source values, dates, targets, and per-record status where available</li>
+          <li>• <strong>CSV Export:</strong> Use in a spreadsheet for your own analysis</li>
+          <li>• <strong>Comparison:</strong> Read each scheme's measures side by side; no combined score is calculated</li>
         </ul>
       </div>
     </div>

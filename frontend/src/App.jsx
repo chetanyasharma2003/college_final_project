@@ -14,10 +14,10 @@ const NotFound = lazy(() => import('./pages/NotFound').catch(() => ({ default: (
 // Full-screen spinner shown while a lazy chunk is loading
 function PageLoader() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
+    <div className="app-theme app-loading-page">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-gray-500">Loading...</p>
+        <div className="spinner" />
+        <p>Loading dashboard…</p>
       </div>
     </div>
   );
@@ -61,7 +61,7 @@ function App() {
           }
         />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
   );

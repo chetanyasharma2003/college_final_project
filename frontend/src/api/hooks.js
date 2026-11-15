@@ -120,7 +120,7 @@ export const useAuth = () => {
 // Schemes Hook
 export const useSchemes = () => {
   const [schemes, setSchemes] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchSchemes = useCallback(async () => {
@@ -149,12 +149,8 @@ export const useSchemes = () => {
   }, [fetchSchemes]);
 
   const getSchemeById = useCallback(async (id) => {
-    try {
-      const response = await client.get(`/schemes/${id}`);
-      return response.data.data;
-    } catch (err) {
-      throw err;
-    }
+    const response = await client.get(`/schemes/${id}`);
+    return response.data.data;
   }, []);
 
   return { schemes, loading, error, fetchSchemes, getSchemeById };
@@ -164,9 +160,14 @@ export const useSchemes = () => {
 export const useKPIs = (schemeIdOrCode = null, stateId = null) => {
   const [kpis, setKpis] = useState([]);
   const [kpiValues, setKpiValues] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchKPIs = useCallback(async () => {
+    if (schemeIdOrCode === '') {
+      setKpis([]);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       // Support both scheme code (string) and scheme ID (number)
@@ -194,6 +195,11 @@ export const useKPIs = (schemeIdOrCode = null, stateId = null) => {
   }, [schemeIdOrCode, stateId]);
 
   const fetchLatestKPIValues = useCallback(async () => {
+    if (schemeIdOrCode === '') {
+      setKpiValues([]);
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       let url = '/kpis/latest';
@@ -218,30 +224,18 @@ export const useKPIs = (schemeIdOrCode = null, stateId = null) => {
   }, [schemeIdOrCode, stateId]);
 
   const getKPITrend = useCallback(async (kpiId, days = 90) => {
-    try {
-      const response = await client.get(`/kpis/${kpiId}/trend?days=${days}`);
-      return response.data.data;
-    } catch (err) {
-      throw err;
-    }
+    const response = await client.get(`/kpis/${kpiId}/trend?days=${days}`);
+    return response.data.data;
   }, []);
 
   const getKPIStatistics = useCallback(async (kpiId) => {
-    try {
-      const response = await client.get(`/kpis/${kpiId}/statistics`);
-      return response.data.data;
-    } catch (err) {
-      throw err;
-    }
+    const response = await client.get(`/kpis/${kpiId}/statistics`);
+    return response.data.data;
   }, []);
 
   const getTopPerformers = useCallback(async (kpiId) => {
-    try {
-      const response = await client.get(`/kpis/${kpiId}/top?limit=5`);
-      return response.data.data;
-    } catch (err) {
-      throw err;
-    }
+    const response = await client.get(`/kpis/${kpiId}/top?limit=5`);
+    return response.data.data;
   }, []);
 
   useEffect(() => {
@@ -312,13 +306,18 @@ export const useGeographic = () => {
   const [districts, setDistricts] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [villages, setVillages] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchStates = useCallback(async () => {
     try {
       setLoading(true);
       const response = await client.get('/geo/states');
-      setStates(response.data.data);
+      setStates(Array.isArray(response.data?.data) ? response.data.data : []);
+      setError(null);
+    } catch (requestError) {
+      setStates([]);
+      setError(requestError.response?.data?.message || 'Could not load states and union territories.');
     } finally {
       setLoading(false);
     }
@@ -326,10 +325,13 @@ export const useGeographic = () => {
 
   const fetchDistricts = useCallback(async (stateId) => {
     try {
+      setDistricts([]);
       const response = await client.get(`/geo/districts?stateId=${stateId}`);
-      setDistricts(response.data.data);
-    } catch (err) {
-      console.error(err);
+      setDistricts(Array.isArray(response.data?.data) ? response.data.data : []);
+      setError(null);
+    } catch (requestError) {
+      setDistricts([]);
+      setError(requestError.response?.data?.message || 'Could not load districts.');
     }
   }, []);
 
@@ -361,6 +363,7 @@ export const useGeographic = () => {
     blocks,
     villages,
     loading,
+    error,
     fetchStates,
     fetchDistricts,
     fetchBlocks,
