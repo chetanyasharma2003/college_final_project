@@ -1,0 +1,2160 @@
+{
+  "metadata": {
+    "scheme_name": "Deen Dayal Upadhyaya Grameen Kaushalya Yojana",
+    "scheme_code": "DDU-GKY",
+    "generated_date": "2026-11-15T08:40:46.569Z",
+    "period_start": "2021-03-31",
+    "period_end": "2024-03-31",
+    "total_records": 238
+  },
+  "performance": {
+    "on_track": 0,
+    "at_risk": 0,
+    "critical": 0
+  },
+  "kpi_details": [
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Andhra Pradesh",
+      "date": "2021-03-31",
+      "value": 4156,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Uttar Pradesh",
+      "date": "2021-03-31",
+      "value": 1540,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Manipur",
+      "date": "2021-03-31",
+      "value": 387,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Manipur",
+      "date": "2021-03-31",
+      "value": 338,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Maharashtra",
+      "date": "2021-03-31",
+      "value": 3319,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Maharashtra",
+      "date": "2021-03-31",
+      "value": 874,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Jammu and Kashmir",
+      "date": "2021-03-31",
+      "value": 3454,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Jammu and Kashmir",
+      "date": "2021-03-31",
+      "value": 1945,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Assam",
+      "date": "2021-03-31",
+      "value": 1966,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Assam",
+      "date": "2021-03-31",
+      "value": 3296,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Madhya Pradesh",
+      "date": "2021-03-31",
+      "value": 969,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Madhya Pradesh",
+      "date": "2021-03-31",
+      "value": 903,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Kerala",
+      "date": "2021-03-31",
+      "value": 2931,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Kerala",
+      "date": "2021-03-31",
+      "value": 3053,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Jharkhand",
+      "date": "2021-03-31",
+      "value": 1050,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Jharkhand",
+      "date": "2021-03-31",
+      "value": 1879,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "National",
+      "date": "2021-03-31",
+      "value": 38289,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "West Bengal",
+      "date": "2021-03-31",
+      "value": 2544,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Karnataka",
+      "date": "2021-03-31",
+      "value": 1649,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Karnataka",
+      "date": "2021-03-31",
+      "value": 769,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Tripura",
+      "date": "2021-03-31",
+      "value": 609,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Tripura",
+      "date": "2021-03-31",
+      "value": 21,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Telangana",
+      "date": "2021-03-31",
+      "value": 1436,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Telangana",
+      "date": "2021-03-31",
+      "value": 2752,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Bihar",
+      "date": "2021-03-31",
+      "value": 2687,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Bihar",
+      "date": "2021-03-31",
+      "value": 2745,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "West Bengal",
+      "date": "2021-03-31",
+      "value": 521,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Arunachal Pradesh",
+      "date": "2021-03-31",
+      "value": 28,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Tamil Nadu",
+      "date": "2021-03-31",
+      "value": 1286,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Tamil Nadu",
+      "date": "2021-03-31",
+      "value": 213,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Sikkim",
+      "date": "2021-03-31",
+      "value": 43,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Sikkim",
+      "date": "2021-03-31",
+      "value": 0,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Chhattisgarh",
+      "date": "2021-03-31",
+      "value": 1109,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Chhattisgarh",
+      "date": "2021-03-31",
+      "value": 3683,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Arunachal Pradesh",
+      "date": "2021-03-31",
+      "value": 33,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Andhra Pradesh",
+      "date": "2021-03-31",
+      "value": 2177,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Rajasthan",
+      "date": "2021-03-31",
+      "value": 1759,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Rajasthan",
+      "date": "2021-03-31",
+      "value": 981,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Punjab",
+      "date": "2021-03-31",
+      "value": 1931,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Punjab",
+      "date": "2021-03-31",
+      "value": 2922,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Gujarat",
+      "date": "2021-03-31",
+      "value": 240,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Gujarat",
+      "date": "2021-03-31",
+      "value": 875,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "National",
+      "date": "2021-03-31",
+      "value": 49563,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Uttarakhand",
+      "date": "2021-03-31",
+      "value": 416,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Odisha",
+      "date": "2021-03-31",
+      "value": 7729,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Odisha",
+      "date": "2021-03-31",
+      "value": 7978,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Nagaland",
+      "date": "2021-03-31",
+      "value": 278,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Nagaland",
+      "date": "2021-03-31",
+      "value": 221,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Haryana",
+      "date": "2021-03-31",
+      "value": 26,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Haryana",
+      "date": "2021-03-31",
+      "value": 1213,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Uttarakhand",
+      "date": "2021-03-31",
+      "value": 367,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Uttar Pradesh",
+      "date": "2021-03-31",
+      "value": 4068,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Mizoram",
+      "date": "2021-03-31",
+      "value": 88,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Mizoram",
+      "date": "2021-03-31",
+      "value": 37,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Meghalaya",
+      "date": "2021-03-31",
+      "value": 158,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Meghalaya",
+      "date": "2021-03-31",
+      "value": 83,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2020-21)",
+      "state": "Himachal Pradesh",
+      "date": "2021-03-31",
+      "value": 0,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2020-21)",
+      "state": "Himachal Pradesh",
+      "date": "2021-03-31",
+      "value": 117,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Himachal Pradesh",
+      "date": "2022-03-31",
+      "value": 334,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Andhra Pradesh",
+      "date": "2022-03-31",
+      "value": 1606,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Andhra Pradesh",
+      "date": "2022-03-31",
+      "value": 2135,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Arunachal Pradesh",
+      "date": "2022-03-31",
+      "value": 233,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Arunachal Pradesh",
+      "date": "2022-03-31",
+      "value": 71,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Assam",
+      "date": "2022-03-31",
+      "value": 3553,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Assam",
+      "date": "2022-03-31",
+      "value": 916,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Bihar",
+      "date": "2022-03-31",
+      "value": 7099,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Bihar",
+      "date": "2022-03-31",
+      "value": 2491,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Chhattisgarh",
+      "date": "2022-03-31",
+      "value": 6499,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Chhattisgarh",
+      "date": "2022-03-31",
+      "value": 2883,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Gujarat",
+      "date": "2022-03-31",
+      "value": 830,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Gujarat",
+      "date": "2022-03-31",
+      "value": 599,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Haryana",
+      "date": "2022-03-31",
+      "value": 1772,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Haryana",
+      "date": "2022-03-31",
+      "value": 680,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Himachal Pradesh",
+      "date": "2022-03-31",
+      "value": 10,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Jammu and Kashmir",
+      "date": "2022-03-31",
+      "value": 2300,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Jammu and Kashmir",
+      "date": "2022-03-31",
+      "value": 1102,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Jharkhand",
+      "date": "2022-03-31",
+      "value": 4035,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Jharkhand",
+      "date": "2022-03-31",
+      "value": 1354,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Karnataka",
+      "date": "2022-03-31",
+      "value": 1442,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Karnataka",
+      "date": "2022-03-31",
+      "value": 673,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Kerala",
+      "date": "2022-03-31",
+      "value": 3219,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Kerala",
+      "date": "2022-03-31",
+      "value": 1097,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Madhya Pradesh",
+      "date": "2022-03-31",
+      "value": 6825,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Madhya Pradesh",
+      "date": "2022-03-31",
+      "value": 3977,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Maharashtra",
+      "date": "2022-03-31",
+      "value": 348,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Maharashtra",
+      "date": "2022-03-31",
+      "value": 1612,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Manipur",
+      "date": "2022-03-31",
+      "value": 811,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Manipur",
+      "date": "2022-03-31",
+      "value": 139,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Meghalaya",
+      "date": "2022-03-31",
+      "value": 456,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Meghalaya",
+      "date": "2022-03-31",
+      "value": 241,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Mizoram",
+      "date": "2022-03-31",
+      "value": 105,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Mizoram",
+      "date": "2022-03-31",
+      "value": 94,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Nagaland",
+      "date": "2022-03-31",
+      "value": 1009,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Nagaland",
+      "date": "2022-03-31",
+      "value": 614,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Odisha",
+      "date": "2022-03-31",
+      "value": 10474,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Odisha",
+      "date": "2022-03-31",
+      "value": 4828,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Punjab",
+      "date": "2022-03-31",
+      "value": 6976,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Punjab",
+      "date": "2022-03-31",
+      "value": 4188,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Rajasthan",
+      "date": "2022-03-31",
+      "value": 3096,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Rajasthan",
+      "date": "2022-03-31",
+      "value": 3130,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Sikkim",
+      "date": "2022-03-31",
+      "value": 90,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Sikkim",
+      "date": "2022-03-31",
+      "value": 0,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Tamil Nadu",
+      "date": "2022-03-31",
+      "value": 8228,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Tamil Nadu",
+      "date": "2022-03-31",
+      "value": 2941,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Telangana",
+      "date": "2022-03-31",
+      "value": 3177,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Telangana",
+      "date": "2022-03-31",
+      "value": 2494,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Tripura",
+      "date": "2022-03-31",
+      "value": 1049,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Tripura",
+      "date": "2022-03-31",
+      "value": 193,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Uttar Pradesh",
+      "date": "2022-03-31",
+      "value": 16898,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Uttar Pradesh",
+      "date": "2022-03-31",
+      "value": 3765,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Uttarakhand",
+      "date": "2022-03-31",
+      "value": 3645,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Uttarakhand",
+      "date": "2022-03-31",
+      "value": 917,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "West Bengal",
+      "date": "2022-03-31",
+      "value": 732,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "West Bengal",
+      "date": "2022-03-31",
+      "value": 2424,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "Puducherry",
+      "date": "2022-03-31",
+      "value": 165,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "Puducherry",
+      "date": "2022-03-31",
+      "value": 44,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2021-22)",
+      "state": "National",
+      "date": "2022-03-31",
+      "value": 97006,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2021-22)",
+      "state": "National",
+      "date": "2022-03-31",
+      "value": 45612,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Odisha",
+      "date": "2023-03-31",
+      "value": 16506,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Odisha",
+      "date": "2023-03-31",
+      "value": 12411,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Tamil Nadu",
+      "date": "2023-03-31",
+      "value": 15224,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Tamil Nadu",
+      "date": "2023-03-31",
+      "value": 9641,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Mizoram",
+      "date": "2023-03-31",
+      "value": 344,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Mizoram",
+      "date": "2023-03-31",
+      "value": 319,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Meghalaya",
+      "date": "2023-03-31",
+      "value": 2165,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Meghalaya",
+      "date": "2023-03-31",
+      "value": 1301,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "National",
+      "date": "2023-03-31",
+      "value": 229490,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "National",
+      "date": "2023-03-31",
+      "value": 149304,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Telangana",
+      "date": "2023-03-31",
+      "value": 4165,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Telangana",
+      "date": "2023-03-31",
+      "value": 1877,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Arunachal Pradesh",
+      "date": "2023-03-31",
+      "value": 294,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Arunachal Pradesh",
+      "date": "2023-03-31",
+      "value": 608,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Assam",
+      "date": "2023-03-31",
+      "value": 6277,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Assam",
+      "date": "2023-03-31",
+      "value": 11889,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Puducherry",
+      "date": "2023-03-31",
+      "value": 844,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Puducherry",
+      "date": "2023-03-31",
+      "value": 261,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Tripura",
+      "date": "2023-03-31",
+      "value": 2244,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Tripura",
+      "date": "2023-03-31",
+      "value": 1021,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Punjab",
+      "date": "2023-03-31",
+      "value": 8119,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Punjab",
+      "date": "2023-03-31",
+      "value": 7646,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Jharkhand",
+      "date": "2023-03-31",
+      "value": 7146,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Jharkhand",
+      "date": "2023-03-31",
+      "value": 10215,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Uttarakhand",
+      "date": "2023-03-31",
+      "value": 8280,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Uttarakhand",
+      "date": "2023-03-31",
+      "value": 4459,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Karnataka",
+      "date": "2023-03-31",
+      "value": 3757,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Karnataka",
+      "date": "2023-03-31",
+      "value": 2551,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Chhattisgarh",
+      "date": "2023-03-31",
+      "value": 8542,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Chhattisgarh",
+      "date": "2023-03-31",
+      "value": 9742,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Nagaland",
+      "date": "2023-03-31",
+      "value": 2371,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Nagaland",
+      "date": "2023-03-31",
+      "value": 1464,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Rajasthan",
+      "date": "2023-03-31",
+      "value": 6048,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Rajasthan",
+      "date": "2023-03-31",
+      "value": 5611,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Kerala",
+      "date": "2023-03-31",
+      "value": 8413,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Kerala",
+      "date": "2023-03-31",
+      "value": 5125,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Haryana",
+      "date": "2023-03-31",
+      "value": 2686,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Haryana",
+      "date": "2023-03-31",
+      "value": 5518,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Jammu and Kashmir",
+      "date": "2023-03-31",
+      "value": 2485,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Jammu and Kashmir",
+      "date": "2023-03-31",
+      "value": 5459,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Gujarat",
+      "date": "2023-03-31",
+      "value": 1327,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Gujarat",
+      "date": "2023-03-31",
+      "value": 2912,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Madhya Pradesh",
+      "date": "2023-03-31",
+      "value": 15653,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Madhya Pradesh",
+      "date": "2023-03-31",
+      "value": 11987,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "West Bengal",
+      "date": "2023-03-31",
+      "value": 9406,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "West Bengal",
+      "date": "2023-03-31",
+      "value": 4354,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Sikkim",
+      "date": "2023-03-31",
+      "value": 859,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Sikkim",
+      "date": "2023-03-31",
+      "value": 328,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Uttar Pradesh",
+      "date": "2023-03-31",
+      "value": 36509,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Uttar Pradesh",
+      "date": "2023-03-31",
+      "value": 20271,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Maharashtra",
+      "date": "2023-03-31",
+      "value": 6053,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Maharashtra",
+      "date": "2023-03-31",
+      "value": 3023,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Andhra Pradesh",
+      "date": "2023-03-31",
+      "value": 15690,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Andhra Pradesh",
+      "date": "2023-03-31",
+      "value": 18651,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Himachal Pradesh",
+      "date": "2023-03-31",
+      "value": 2325,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Himachal Pradesh",
+      "date": "2023-03-31",
+      "value": 3967,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Bihar",
+      "date": "2023-03-31",
+      "value": 7976,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Bihar",
+      "date": "2023-03-31",
+      "value": 11515,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2022-23)",
+      "state": "Manipur",
+      "date": "2023-03-31",
+      "value": 1921,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2022-23)",
+      "state": "Manipur",
+      "date": "2023-03-31",
+      "value": 869,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Madhya Pradesh",
+      "date": "2024-03-31",
+      "value": 9250,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Manipur",
+      "date": "2024-03-31",
+      "value": 326,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Haryana",
+      "date": "2024-03-31",
+      "value": 2494,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Haryana",
+      "date": "2024-03-31",
+      "value": 6644,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Meghalaya",
+      "date": "2024-03-31",
+      "value": 1387,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Meghalaya",
+      "date": "2024-03-31",
+      "value": 857,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Mizoram",
+      "date": "2024-03-31",
+      "value": 523,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Mizoram",
+      "date": "2024-03-31",
+      "value": 145,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Gujarat",
+      "date": "2024-03-31",
+      "value": 1510,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Gujarat",
+      "date": "2024-03-31",
+      "value": 2679,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Nagaland",
+      "date": "2024-03-31",
+      "value": 1382,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Nagaland",
+      "date": "2024-03-31",
+      "value": 1017,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Uttarakhand",
+      "date": "2024-03-31",
+      "value": 4732,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Uttarakhand",
+      "date": "2024-03-31",
+      "value": 3403,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Odisha",
+      "date": "2024-03-31",
+      "value": 2936,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Odisha",
+      "date": "2024-03-31",
+      "value": 3265,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Chhattisgarh",
+      "date": "2024-03-31",
+      "value": 2193,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Chhattisgarh",
+      "date": "2024-03-31",
+      "value": 2231,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Andhra Pradesh",
+      "date": "2024-03-31",
+      "value": 9534,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Andhra Pradesh",
+      "date": "2024-03-31",
+      "value": 15328,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Punjab",
+      "date": "2024-03-31",
+      "value": 9895,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Punjab",
+      "date": "2024-03-31",
+      "value": 5521,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "National",
+      "date": "2024-03-31",
+      "value": 152132,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "National",
+      "date": "2024-03-31",
+      "value": 83896,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Rajasthan",
+      "date": "2024-03-31",
+      "value": 5089,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Rajasthan",
+      "date": "2024-03-31",
+      "value": 1881,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Bihar",
+      "date": "2024-03-31",
+      "value": 3840,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Bihar",
+      "date": "2024-03-31",
+      "value": 5445,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Sikkim",
+      "date": "2024-03-31",
+      "value": 956,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Sikkim",
+      "date": "2024-03-31",
+      "value": 252,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "West Bengal",
+      "date": "2024-03-31",
+      "value": 3878,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "West Bengal",
+      "date": "2024-03-31",
+      "value": 3536,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Tamil Nadu",
+      "date": "2024-03-31",
+      "value": 10387,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Tamil Nadu",
+      "date": "2024-03-31",
+      "value": 4640,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Assam",
+      "date": "2024-03-31",
+      "value": 4546,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Assam",
+      "date": "2024-03-31",
+      "value": 8070,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Telangana",
+      "date": "2024-03-31",
+      "value": 25,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Telangana",
+      "date": "2024-03-31",
+      "value": 93,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Jharkhand",
+      "date": "2024-03-31",
+      "value": 8580,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Jharkhand",
+      "date": "2024-03-31",
+      "value": 4535,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Tripura",
+      "date": "2024-03-31",
+      "value": 1718,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Tripura",
+      "date": "2024-03-31",
+      "value": 531,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Karnataka",
+      "date": "2024-03-31",
+      "value": 2666,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Karnataka",
+      "date": "2024-03-31",
+      "value": 1210,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Jammu and Kashmir",
+      "date": "2024-03-31",
+      "value": 927,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Jammu and Kashmir",
+      "date": "2024-03-31",
+      "value": 770,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Arunachal Pradesh",
+      "date": "2024-03-31",
+      "value": 138,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Arunachal Pradesh",
+      "date": "2024-03-31",
+      "value": 414,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Kerala",
+      "date": "2024-03-31",
+      "value": 4046,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Kerala",
+      "date": "2024-03-31",
+      "value": 1831,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Puducherry",
+      "date": "2024-03-31",
+      "value": 813,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Puducherry",
+      "date": "2024-03-31",
+      "value": 386,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Manipur",
+      "date": "2024-03-31",
+      "value": 375,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Madhya Pradesh",
+      "date": "2024-03-31",
+      "value": 6748,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Himachal Pradesh",
+      "date": "2024-03-31",
+      "value": 1646,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Himachal Pradesh",
+      "date": "2024-03-31",
+      "value": 3504,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Maharashtra",
+      "date": "2024-03-31",
+      "value": 3045,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Maharashtra",
+      "date": "2024-03-31",
+      "value": 1461,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Trained (2023-24)",
+      "state": "Uttar Pradesh",
+      "date": "2024-03-31",
+      "value": 34974,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Candidates Placed (2023-24)",
+      "state": "Uttar Pradesh",
+      "date": "2024-03-31",
+      "value": 15313,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    }
+  ],
+  "predictions": []
+}

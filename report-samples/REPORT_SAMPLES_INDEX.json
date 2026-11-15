@@ -1,0 +1,75 @@
+{
+  "timestamp": "2026-11-15T08:40:46.540Z",
+  "schemes": [
+    {
+      "scheme_id": 2,
+      "scheme_code": "DDU-GKY",
+      "scheme_name": "Deen Dayal Upadhyaya Grameen Kaushalya Yojana",
+      "csv_file": "DDU-GKY_sample.csv",
+      "json_file": "DDU-GKY_sample.json",
+      "pdf_summary_file": "DDU-GKY_summary.json",
+      "records": 238
+    },
+    {
+      "scheme_id": 6,
+      "scheme_code": "MGNREGS",
+      "scheme_name": "Mahatma Gandhi National Rural Employment Guarantee Scheme",
+      "csv_file": "MGNREGS_sample.csv",
+      "json_file": "MGNREGS_sample.json",
+      "pdf_summary_file": "MGNREGS_summary.json",
+      "records": 0
+    },
+    {
+      "scheme_id": 5,
+      "scheme_code": "NRLM",
+      "scheme_name": "National Rural Livelihoods Mission",
+      "csv_file": "NRLM_sample.csv",
+      "json_file": "NRLM_sample.json",
+      "pdf_summary_file": "NRLM_summary.json",
+      "records": 93
+    },
+    {
+      "scheme_id": 3,
+      "scheme_code": "PMAY-G",
+      "scheme_name": "Pradhan Mantri Awaas Yojana-Gramin",
+      "csv_file": "PMAY-G_sample.csv",
+      "json_file": "PMAY-G_sample.json",
+      "pdf_summary_file": "PMAY-G_summary.json",
+      "records": 25
+    },
+    {
+      "scheme_id": 4,
+      "scheme_code": "PMAY-U",
+      "scheme_name": "Pradhan Mantri Awas Yojana-Urban",
+      "csv_file": "PMAY-U_sample.csv",
+      "json_file": "PMAY-U_sample.json",
+      "pdf_summary_file": "PMAY-U_summary.json",
+      "records": 96
+    },
+    {
+      "scheme_id": 7,
+      "scheme_code": "PMGSY",
+      "scheme_name": "Pradhan Mantri Gram Sadak Yojana",
+      "csv_file": "PMGSY_sample.csv",
+      "json_file": "PMGSY_sample.json",
+      "pdf_summary_file": "PMGSY_summary.json",
+      "records": 0
+    },
+    {
+      "scheme_id": 1,
+      "scheme_code": "SAGY",
+      "scheme_name": "Sansad Adarsh Gram Yojana",
+      "csv_file": "SAGY_sample.csv",
+      "json_file": "SAGY_sample.json",
+      "pdf_summary_file": "SAGY_summary.json",
+      "records": 116
+    }
+  ],
+  "summary": {
+    "total_schemes": 7,
+    "csv_generated": 7,
+    "pdf_generated": 7,
+    "json_generated": 7,
+    "total_records": 568
+  }
+}

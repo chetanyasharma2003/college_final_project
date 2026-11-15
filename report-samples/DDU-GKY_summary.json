@@ -1,0 +1,50 @@
+{
+  "scheme_name": "Deen Dayal Upadhyaya Grameen Kaushalya Yojana",
+  "scheme_code": "DDU-GKY",
+  "ministry": "Ministry of Rural Development",
+  "budget": null,
+  "period": "Source dates: 2021-03-31 to 2024-03-31",
+  "generated_date": "2026-11-15",
+  "total_observations": 238,
+  "indicator_count": 8,
+  "on_track": 0,
+  "at_risk": 0,
+  "critical": 0,
+  "key_metrics": [
+    {
+      "name": "Candidates Trained (2023-24)",
+      "value": 2936,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Candidates Placed (2023-24)",
+      "value": 3840,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Candidates Trained (2023-24)",
+      "value": 1387,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Candidates Placed (2023-24)",
+      "value": 857,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Candidates Placed (2023-24)",
+      "value": 252,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    }
+  ]
+}

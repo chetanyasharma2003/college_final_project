@@ -1,0 +1,50 @@
+{
+  "scheme_name": "Pradhan Mantri Awas Yojana-Urban",
+  "scheme_code": "PMAY-U",
+  "ministry": "Ministry of Housing and Urban Affairs",
+  "budget": null,
+  "period": "Source snapshot: 2026-01-22",
+  "generated_date": "2026-11-15",
+  "total_observations": 96,
+  "indicator_count": 3,
+  "on_track": 0,
+  "at_risk": 0,
+  "critical": 0,
+  "key_metrics": [
+    {
+      "name": "Houses Sanctioned",
+      "value": 274065,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Houses Completed",
+      "value": 692373,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Houses Occupied",
+      "value": 601901,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Houses Sanctioned",
+      "value": 115213,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Houses Completed",
+      "value": 92113,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    }
+  ]
+}

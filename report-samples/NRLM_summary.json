@@ -1,0 +1,50 @@
+{
+  "scheme_name": "National Rural Livelihoods Mission",
+  "scheme_code": "NRLM",
+  "ministry": "Ministry of Rural Development",
+  "budget": null,
+  "period": "Source dates: 2022-03-31 to 2024-03-31",
+  "generated_date": "2026-11-15",
+  "total_observations": 93,
+  "indicator_count": 3,
+  "on_track": 0,
+  "at_risk": 0,
+  "critical": 0,
+  "key_metrics": [
+    {
+      "name": "Funds Allocation (2023-24)",
+      "value": 22801.05,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Funds Allocation (2023-24)",
+      "value": 32587.14,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Funds Allocation (2023-24)",
+      "value": 54852.58,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Funds Allocation (2023-24)",
+      "value": 16428.04,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Funds Allocation (2023-24)",
+      "value": 14621.75,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    }
+  ]
+}

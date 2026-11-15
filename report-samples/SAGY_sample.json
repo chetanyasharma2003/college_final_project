@@ -1,0 +1,1062 @@
+{
+  "metadata": {
+    "scheme_name": "Sansad Adarsh Gram Yojana",
+    "scheme_code": "SAGY",
+    "generated_date": "2026-11-15T08:40:46.633Z",
+    "period_start": "2020-03-03",
+    "period_end": "2020-03-03",
+    "total_records": 116
+  },
+  "performance": {
+    "on_track": 0,
+    "at_risk": 0,
+    "critical": 0
+  },
+  "kpi_details": [
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Andhra Pradesh",
+      "date": "2020-03-03",
+      "value": 32,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Andhra Pradesh",
+      "date": "2020-03-03",
+      "value": 19,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Andhra Pradesh",
+      "date": "2020-03-03",
+      "value": 14,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Andhra Pradesh",
+      "date": "2020-03-03",
+      "value": 24,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Arunachal Pradesh",
+      "date": "2020-03-03",
+      "value": 3,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Arunachal Pradesh",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Arunachal Pradesh",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Assam",
+      "date": "2020-03-03",
+      "value": 21,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Assam",
+      "date": "2020-03-03",
+      "value": 10,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Assam",
+      "date": "2020-03-03",
+      "value": 4,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Bihar",
+      "date": "2020-03-03",
+      "value": 53,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Bihar",
+      "date": "2020-03-03",
+      "value": 20,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Bihar",
+      "date": "2020-03-03",
+      "value": 9,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Bihar",
+      "date": "2020-03-03",
+      "value": 1,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Chhattisgarh",
+      "date": "2020-03-03",
+      "value": 16,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Chhattisgarh",
+      "date": "2020-03-03",
+      "value": 16,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Chhattisgarh",
+      "date": "2020-03-03",
+      "value": 12,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Chhattisgarh",
+      "date": "2020-03-03",
+      "value": 11,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Delhi",
+      "date": "2020-03-03",
+      "value": 8,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Delhi",
+      "date": "2020-03-03",
+      "value": 3,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Delhi",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Goa",
+      "date": "2020-03-03",
+      "value": 3,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Goa",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Gujarat",
+      "date": "2020-03-03",
+      "value": 37,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Gujarat",
+      "date": "2020-03-03",
+      "value": 28,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Gujarat",
+      "date": "2020-03-03",
+      "value": 10,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Gujarat",
+      "date": "2020-03-03",
+      "value": 22,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Haryana",
+      "date": "2020-03-03",
+      "value": 15,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Haryana",
+      "date": "2020-03-03",
+      "value": 11,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Haryana",
+      "date": "2020-03-03",
+      "value": 6,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Haryana",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Himachal Pradesh",
+      "date": "2020-03-03",
+      "value": 7,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Himachal Pradesh",
+      "date": "2020-03-03",
+      "value": 5,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Himachal Pradesh",
+      "date": "2020-03-03",
+      "value": 3,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Himachal Pradesh",
+      "date": "2020-03-03",
+      "value": 1,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Jammu and Kashmir",
+      "date": "2020-03-03",
+      "value": 9,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Jammu and Kashmir",
+      "date": "2020-03-03",
+      "value": 4,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Jharkhand",
+      "date": "2020-03-03",
+      "value": 20,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Jharkhand",
+      "date": "2020-03-03",
+      "value": 19,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Jharkhand",
+      "date": "2020-03-03",
+      "value": 12,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Jharkhand",
+      "date": "2020-03-03",
+      "value": 4,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Karnataka",
+      "date": "2020-03-03",
+      "value": 39,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Karnataka",
+      "date": "2020-03-03",
+      "value": 16,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Karnataka",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Karnataka",
+      "date": "2020-03-03",
+      "value": 15,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Kerala",
+      "date": "2020-03-03",
+      "value": 31,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Kerala",
+      "date": "2020-03-03",
+      "value": 29,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Kerala",
+      "date": "2020-03-03",
+      "value": 23,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Kerala",
+      "date": "2020-03-03",
+      "value": 24,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Madhya Pradesh",
+      "date": "2020-03-03",
+      "value": 37,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Madhya Pradesh",
+      "date": "2020-03-03",
+      "value": 20,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Madhya Pradesh",
+      "date": "2020-03-03",
+      "value": 11,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Madhya Pradesh",
+      "date": "2020-03-03",
+      "value": 17,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Maharashtra",
+      "date": "2020-03-03",
+      "value": 70,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Maharashtra",
+      "date": "2020-03-03",
+      "value": 49,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Maharashtra",
+      "date": "2020-03-03",
+      "value": 17,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Maharashtra",
+      "date": "2020-03-03",
+      "value": 35,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Manipur",
+      "date": "2020-03-03",
+      "value": 3,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Manipur",
+      "date": "2020-03-03",
+      "value": 6,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Manipur",
+      "date": "2020-03-03",
+      "value": 6,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Manipur",
+      "date": "2020-03-03",
+      "value": 1,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Meghalaya",
+      "date": "2020-03-03",
+      "value": 4,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Meghalaya",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Meghalaya",
+      "date": "2020-03-03",
+      "value": 1,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Mizoram",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Mizoram",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Mizoram",
+      "date": "2020-03-03",
+      "value": 1,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Mizoram",
+      "date": "2020-03-03",
+      "value": 1,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Nagaland",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Nagaland",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Nagaland",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Nagaland",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Odisha",
+      "date": "2020-03-03",
+      "value": 28,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Odisha",
+      "date": "2020-03-03",
+      "value": 13,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Odisha",
+      "date": "2020-03-03",
+      "value": 7,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Odisha",
+      "date": "2020-03-03",
+      "value": 9,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Puducherry",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Punjab",
+      "date": "2020-03-03",
+      "value": 20,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Punjab",
+      "date": "2020-03-03",
+      "value": 8,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Punjab",
+      "date": "2020-03-03",
+      "value": 4,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Punjab",
+      "date": "2020-03-03",
+      "value": 4,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Rajasthan",
+      "date": "2020-03-03",
+      "value": 34,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Rajasthan",
+      "date": "2020-03-03",
+      "value": 31,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Rajasthan",
+      "date": "2020-03-03",
+      "value": 15,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Rajasthan",
+      "date": "2020-03-03",
+      "value": 20,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Sikkim",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Sikkim",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Sikkim",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Sikkim",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Tamil Nadu",
+      "date": "2020-03-03",
+      "value": 58,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Tamil Nadu",
+      "date": "2020-03-03",
+      "value": 55,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Tamil Nadu",
+      "date": "2020-03-03",
+      "value": 45,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Tamil Nadu",
+      "date": "2020-03-03",
+      "value": 41,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Telangana",
+      "date": "2020-03-03",
+      "value": 22,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Telangana",
+      "date": "2020-03-03",
+      "value": 15,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Telangana",
+      "date": "2020-03-03",
+      "value": 9,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Telangana",
+      "date": "2020-03-03",
+      "value": 7,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Tripura",
+      "date": "2020-03-03",
+      "value": 3,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Tripura",
+      "date": "2020-03-03",
+      "value": 1,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Tripura",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Uttar Pradesh",
+      "date": "2020-03-03",
+      "value": 104,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Uttar Pradesh",
+      "date": "2020-03-03",
+      "value": 100,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Uttar Pradesh",
+      "date": "2020-03-03",
+      "value": 66,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Uttar Pradesh",
+      "date": "2020-03-03",
+      "value": 59,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "Uttarakhand",
+      "date": "2020-03-03",
+      "value": 7,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "Uttarakhand",
+      "date": "2020-03-03",
+      "value": 6,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "Uttarakhand",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "Uttarakhand",
+      "date": "2020-03-03",
+      "value": 3,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "West Bengal",
+      "date": "2020-03-03",
+      "value": 5,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "West Bengal",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "West Bengal",
+      "date": "2020-03-03",
+      "value": 2,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "West Bengal",
+      "date": "2020-03-03",
+      "value": 1,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase I)",
+      "state": "National",
+      "date": "2020-03-03",
+      "value": 703,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase II)",
+      "state": "National",
+      "date": "2020-03-03",
+      "value": 500,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase III)",
+      "state": "National",
+      "date": "2020-03-03",
+      "value": 290,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Gram Panchayats Identified (Phase IV)",
+      "state": "National",
+      "date": "2020-03-03",
+      "value": 310,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    }
+  ],
+  "predictions": []
+}

@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "scheme_name": "Pradhan Mantri Gram Sadak Yojana",
+    "scheme_code": "PMGSY",
+    "generated_date": "2026-11-15T08:40:46.622Z",
+    "period_start": null,
+    "period_end": null,
+    "total_records": 0
+  },
+  "performance": {
+    "on_track": 0,
+    "at_risk": 0,
+    "critical": 0
+  },
+  "kpi_details": [],
+  "predictions": []
+}

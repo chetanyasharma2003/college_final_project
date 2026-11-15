@@ -1,0 +1,855 @@
+{
+  "metadata": {
+    "scheme_name": "National Rural Livelihoods Mission",
+    "scheme_code": "NRLM",
+    "generated_date": "2026-11-15T08:40:46.593Z",
+    "period_start": "2022-03-31",
+    "period_end": "2024-03-31",
+    "total_records": 93
+  },
+  "performance": {
+    "on_track": 0,
+    "at_risk": 0,
+    "critical": 0
+  },
+  "kpi_details": [
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Nagaland",
+      "date": "2022-03-31",
+      "value": 17118.28,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Puducherry",
+      "date": "2022-03-31",
+      "value": 1000,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Kerala",
+      "date": "2022-03-31",
+      "value": 14618.18,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Goa",
+      "date": "2022-03-31",
+      "value": 700,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "West Bengal",
+      "date": "2022-03-31",
+      "value": 54839.23,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Madhya Pradesh",
+      "date": "2022-03-31",
+      "value": 48834.35,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Tripura",
+      "date": "2022-03-31",
+      "value": 17364.21,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Uttarakhand",
+      "date": "2022-03-31",
+      "value": 7779.53,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Maharashtra",
+      "date": "2022-03-31",
+      "value": 51618.68,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Mizoram",
+      "date": "2022-03-31",
+      "value": 10540.55,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Uttar Pradesh",
+      "date": "2022-03-31",
+      "value": 147757.57,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Odisha",
+      "date": "2022-03-31",
+      "value": 49346.87,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Gujarat",
+      "date": "2022-03-31",
+      "value": 16239.87,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Tamil Nadu",
+      "date": "2022-03-31",
+      "value": 38148.01,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Punjab",
+      "date": "2022-03-31",
+      "value": 4643.24,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Bihar",
+      "date": "2022-03-31",
+      "value": 102633.22,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Rajasthan",
+      "date": "2022-03-31",
+      "value": 24738.45,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Meghalaya",
+      "date": "2022-03-31",
+      "value": 14375.43,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Haryana",
+      "date": "2022-03-31",
+      "value": 9554.21,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Telangana",
+      "date": "2022-03-31",
+      "value": 17976.3,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Manipur",
+      "date": "2022-03-31",
+      "value": 10273.53,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Himachal Pradesh",
+      "date": "2022-03-31",
+      "value": 4023.63,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Sikkim",
+      "date": "2022-03-31",
+      "value": 4431.85,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Andhra Pradesh",
+      "date": "2022-03-31",
+      "value": 25166.83,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Jammu and Kashmir",
+      "date": "2022-03-31",
+      "value": 14668.93,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Chhattisgarh",
+      "date": "2022-03-31",
+      "value": 22795.48,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Assam",
+      "date": "2022-03-31",
+      "value": 34298.66,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Jharkhand",
+      "date": "2022-03-31",
+      "value": 38698.78,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "National",
+      "date": "2022-03-31",
+      "value": 847572.47,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Arunachal Pradesh",
+      "date": "2022-03-31",
+      "value": 8289.42,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2021-22)",
+      "state": "Karnataka",
+      "date": "2022-03-31",
+      "value": 32579.18,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Assam",
+      "date": "2023-03-31",
+      "value": 38136.28,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Andhra Pradesh",
+      "date": "2023-03-31",
+      "value": 25172.97,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Telangana",
+      "date": "2023-03-31",
+      "value": 17980.69,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Bihar",
+      "date": "2023-03-31",
+      "value": 102658.29,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Chhattisgarh",
+      "date": "2023-03-31",
+      "value": 22801.05,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Goa",
+      "date": "2023-03-31",
+      "value": 750,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Gujarat",
+      "date": "2023-03-31",
+      "value": 16243.84,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Haryana",
+      "date": "2023-03-31",
+      "value": 9556.55,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Himachal Pradesh",
+      "date": "2023-03-31",
+      "value": 4024.62,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Jammu and Kashmir",
+      "date": "2023-03-31",
+      "value": 18016.86,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Jharkhand",
+      "date": "2023-03-31",
+      "value": 38708.23,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Karnataka",
+      "date": "2023-03-31",
+      "value": 32587.14,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Kerala",
+      "date": "2023-03-31",
+      "value": 14621.75,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Madhya Pradesh",
+      "date": "2023-03-31",
+      "value": 48846.28,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Maharashtra",
+      "date": "2023-03-31",
+      "value": 64401.08,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Odisha",
+      "date": "2023-03-31",
+      "value": 49358.92,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Punjab",
+      "date": "2023-03-31",
+      "value": 4644.38,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Rajasthan",
+      "date": "2023-03-31",
+      "value": 24744.5,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Tamil Nadu",
+      "date": "2023-03-31",
+      "value": 38157.33,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Uttar Pradesh",
+      "date": "2023-03-31",
+      "value": 147793.66,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Uttarakhand",
+      "date": "2023-03-31",
+      "value": 7781.43,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "West Bengal",
+      "date": "2023-03-31",
+      "value": 54852.58,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Puducherry",
+      "date": "2023-03-31",
+      "value": 1700,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Arunachal Pradesh",
+      "date": "2023-03-31",
+      "value": 13225.95,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Manipur",
+      "date": "2023-03-31",
+      "value": 12538.3,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Meghalaya",
+      "date": "2023-03-31",
+      "value": 16928.18,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Mizoram",
+      "date": "2023-03-31",
+      "value": 15671.94,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Nagaland",
+      "date": "2023-03-31",
+      "value": 17793.9,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Sikkim",
+      "date": "2023-03-31",
+      "value": 6648.53,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "Tripura",
+      "date": "2023-03-31",
+      "value": 24162.21,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2022-23)",
+      "state": "National",
+      "date": "2023-03-31",
+      "value": 893565.84,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "West Bengal",
+      "date": "2024-03-31",
+      "value": 54852.58,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Karnataka",
+      "date": "2024-03-31",
+      "value": 32587.14,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Bihar",
+      "date": "2024-03-31",
+      "value": 102658.29,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Puducherry",
+      "date": "2024-03-31",
+      "value": 1700,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Jharkhand",
+      "date": "2024-03-31",
+      "value": 38708.23,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Andhra Pradesh",
+      "date": "2024-03-31",
+      "value": 25172.97,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Arunachal Pradesh",
+      "date": "2024-03-31",
+      "value": 12775.5,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Jammu and Kashmir",
+      "date": "2024-03-31",
+      "value": 18000,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Himachal Pradesh",
+      "date": "2024-03-31",
+      "value": 4024.62,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Assam",
+      "date": "2024-03-31",
+      "value": 39843.04,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Haryana",
+      "date": "2024-03-31",
+      "value": 9556.55,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Sikkim",
+      "date": "2024-03-31",
+      "value": 7331.71,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Manipur",
+      "date": "2024-03-31",
+      "value": 10523.46,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Gujarat",
+      "date": "2024-03-31",
+      "value": 16243.84,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Telangana",
+      "date": "2024-03-31",
+      "value": 17980.69,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Meghalaya",
+      "date": "2024-03-31",
+      "value": 19976.24,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Goa",
+      "date": "2024-03-31",
+      "value": 750,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Punjab",
+      "date": "2024-03-31",
+      "value": 4644.38,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "National",
+      "date": "2024-03-31",
+      "value": 901559.79,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Rajasthan",
+      "date": "2024-03-31",
+      "value": 24744.5,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Odisha",
+      "date": "2024-03-31",
+      "value": 49358.92,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Mizoram",
+      "date": "2024-03-31",
+      "value": 16396.02,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Tamil Nadu",
+      "date": "2024-03-31",
+      "value": 38157.33,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Maharashtra",
+      "date": "2024-03-31",
+      "value": 64416.79,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Chhattisgarh",
+      "date": "2024-03-31",
+      "value": 22801.05,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Uttar Pradesh",
+      "date": "2024-03-31",
+      "value": 147793.66,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Madhya Pradesh",
+      "date": "2024-03-31",
+      "value": 48846.28,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Tripura",
+      "date": "2024-03-31",
+      "value": 30534.78,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Uttarakhand",
+      "date": "2024-03-31",
+      "value": 7781.43,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Kerala",
+      "date": "2024-03-31",
+      "value": 14621.75,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Funds Allocation (2023-24)",
+      "state": "Nagaland",
+      "date": "2024-03-31",
+      "value": 16428.04,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    }
+  ],
+  "predictions": []
+}

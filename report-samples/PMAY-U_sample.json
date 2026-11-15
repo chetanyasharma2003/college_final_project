@@ -1,0 +1,882 @@
+{
+  "metadata": {
+    "scheme_name": "Pradhan Mantri Awas Yojana-Urban",
+    "scheme_code": "PMAY-U",
+    "generated_date": "2026-11-15T08:40:46.614Z",
+    "period_start": "2026-01-22",
+    "period_end": "2026-01-22",
+    "total_records": 96
+  },
+  "performance": {
+    "on_track": 0,
+    "at_risk": 0,
+    "critical": 0
+  },
+  "kpi_details": [
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Andhra Pradesh",
+      "date": "2026-01-22",
+      "value": 274065,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Andhra Pradesh",
+      "date": "2026-01-22",
+      "value": 692373,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Andhra Pradesh",
+      "date": "2026-01-22",
+      "value": 601901,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Bihar",
+      "date": "2026-01-22",
+      "value": 115213,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Bihar",
+      "date": "2026-01-22",
+      "value": 92113,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Bihar",
+      "date": "2026-01-22",
+      "value": 92164,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Chhattisgarh",
+      "date": "2026-01-22",
+      "value": 40451,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Chhattisgarh",
+      "date": "2026-01-22",
+      "value": 113214,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Chhattisgarh",
+      "date": "2026-01-22",
+      "value": 114055,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Goa",
+      "date": "2026-01-22",
+      "value": 330,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Goa",
+      "date": "2026-01-22",
+      "value": 332,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Goa",
+      "date": "2026-01-22",
+      "value": 332,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Gujarat",
+      "date": "2026-01-22",
+      "value": 153501,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Gujarat",
+      "date": "2026-01-22",
+      "value": 267917,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Gujarat",
+      "date": "2026-01-22",
+      "value": 267297,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Haryana",
+      "date": "2026-01-22",
+      "value": 20398,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Haryana",
+      "date": "2026-01-22",
+      "value": 20106,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Haryana",
+      "date": "2026-01-22",
+      "value": 20122,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Himachal Pradesh",
+      "date": "2026-01-22",
+      "value": 1472,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Himachal Pradesh",
+      "date": "2026-01-22",
+      "value": 4215,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Himachal Pradesh",
+      "date": "2026-01-22",
+      "value": 4233,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Jharkhand",
+      "date": "2026-01-22",
+      "value": 6625,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Jharkhand",
+      "date": "2026-01-22",
+      "value": 48180,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Jharkhand",
+      "date": "2026-01-22",
+      "value": 50545,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Karnataka",
+      "date": "2026-01-22",
+      "value": 28900,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Karnataka",
+      "date": "2026-01-22",
+      "value": 99145,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Karnataka",
+      "date": "2026-01-22",
+      "value": 125856,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Kerala",
+      "date": "2026-01-22",
+      "value": 21629,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Kerala",
+      "date": "2026-01-22",
+      "value": 35043,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Kerala",
+      "date": "2026-01-22",
+      "value": 34864,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Madhya Pradesh",
+      "date": "2026-01-22",
+      "value": 75882,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Madhya Pradesh",
+      "date": "2026-01-22",
+      "value": 377658,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Madhya Pradesh",
+      "date": "2026-01-22",
+      "value": 374780,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Maharashtra",
+      "date": "2026-01-22",
+      "value": 147889,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Maharashtra",
+      "date": "2026-01-22",
+      "value": 358145,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Maharashtra",
+      "date": "2026-01-22",
+      "value": 352239,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Odisha",
+      "date": "2026-01-22",
+      "value": 25398,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Odisha",
+      "date": "2026-01-22",
+      "value": 58547,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Odisha",
+      "date": "2026-01-22",
+      "value": 59514,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Punjab",
+      "date": "2026-01-22",
+      "value": 24284,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Punjab",
+      "date": "2026-01-22",
+      "value": 47196,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Punjab",
+      "date": "2026-01-22",
+      "value": 47322,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Rajasthan",
+      "date": "2026-01-22",
+      "value": 145231,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Rajasthan",
+      "date": "2026-01-22",
+      "value": 91070,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Rajasthan",
+      "date": "2026-01-22",
+      "value": 88469,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Tamil Nadu",
+      "date": "2026-01-22",
+      "value": 41891,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Tamil Nadu",
+      "date": "2026-01-22",
+      "value": 171823,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Tamil Nadu",
+      "date": "2026-01-22",
+      "value": 167471,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Telangana",
+      "date": "2026-01-22",
+      "value": 121432,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Telangana",
+      "date": "2026-01-22",
+      "value": 84025,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Telangana",
+      "date": "2026-01-22",
+      "value": 18093,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Uttar Pradesh",
+      "date": "2026-01-22",
+      "value": 337808,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Uttar Pradesh",
+      "date": "2026-01-22",
+      "value": 613904,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Uttar Pradesh",
+      "date": "2026-01-22",
+      "value": 638727,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Uttarakhand",
+      "date": "2026-01-22",
+      "value": 14622,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Uttarakhand",
+      "date": "2026-01-22",
+      "value": 14036,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Uttarakhand",
+      "date": "2026-01-22",
+      "value": 15573,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "West Bengal",
+      "date": "2026-01-22",
+      "value": 12264,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "West Bengal",
+      "date": "2026-01-22",
+      "value": 196539,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "West Bengal",
+      "date": "2026-01-22",
+      "value": 196779,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Arunachal Pradesh",
+      "date": "2026-01-22",
+      "value": 5286,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Arunachal Pradesh",
+      "date": "2026-01-22",
+      "value": 4116,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Arunachal Pradesh",
+      "date": "2026-01-22",
+      "value": 5332,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Assam",
+      "date": "2026-01-22",
+      "value": 23068,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Assam",
+      "date": "2026-01-22",
+      "value": 80159,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Assam",
+      "date": "2026-01-22",
+      "value": 80159,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Manipur",
+      "date": "2026-01-22",
+      "value": 21,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Manipur",
+      "date": "2026-01-22",
+      "value": 11709,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Manipur",
+      "date": "2026-01-22",
+      "value": 11709,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Meghalaya",
+      "date": "2026-01-22",
+      "value": 4,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Meghalaya",
+      "date": "2026-01-22",
+      "value": 1252,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Meghalaya",
+      "date": "2026-01-22",
+      "value": 1252,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Mizoram",
+      "date": "2026-01-22",
+      "value": 270,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Mizoram",
+      "date": "2026-01-22",
+      "value": 20016,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Mizoram",
+      "date": "2026-01-22",
+      "value": 20016,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Nagaland",
+      "date": "2026-01-22",
+      "value": 1,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Nagaland",
+      "date": "2026-01-22",
+      "value": 22978,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Nagaland",
+      "date": "2026-01-22",
+      "value": 22978,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Sikkim",
+      "date": "2026-01-22",
+      "value": 26,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Sikkim",
+      "date": "2026-01-22",
+      "value": 26,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Sikkim",
+      "date": "2026-01-22",
+      "value": 26,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Tripura",
+      "date": "2026-01-22",
+      "value": 9234,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Tripura",
+      "date": "2026-01-22",
+      "value": 21591,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Tripura",
+      "date": "2026-01-22",
+      "value": 21518,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Delhi",
+      "date": "2026-01-22",
+      "value": 2669,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Delhi",
+      "date": "2026-01-22",
+      "value": 2669,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Delhi",
+      "date": "2026-01-22",
+      "value": 2669,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Jammu and Kashmir",
+      "date": "2026-01-22",
+      "value": 5215,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Jammu and Kashmir",
+      "date": "2026-01-22",
+      "value": 19375,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Jammu and Kashmir",
+      "date": "2026-01-22",
+      "value": 19375,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "Puducherry",
+      "date": "2026-01-22",
+      "value": 2713,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "Puducherry",
+      "date": "2026-01-22",
+      "value": 4930,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "Puducherry",
+      "date": "2026-01-22",
+      "value": 4930,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Sanctioned",
+      "state": "National",
+      "date": "2026-01-22",
+      "value": 1659268,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Completed",
+      "state": "National",
+      "date": "2026-01-22",
+      "value": 3577604,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "kpi_name": "Houses Occupied",
+      "state": "National",
+      "date": "2026-01-22",
+      "value": 3463831,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    }
+  ],
+  "predictions": []
+}

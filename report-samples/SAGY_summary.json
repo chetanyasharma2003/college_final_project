@@ -1,0 +1,50 @@
+{
+  "scheme_name": "Sansad Adarsh Gram Yojana",
+  "scheme_code": "SAGY",
+  "ministry": "Ministry of Rural Development",
+  "budget": null,
+  "period": "Source snapshot: 2020-03-03",
+  "generated_date": "2026-11-15",
+  "total_observations": 116,
+  "indicator_count": 4,
+  "on_track": 0,
+  "at_risk": 0,
+  "critical": 0,
+  "key_metrics": [
+    {
+      "name": "Gram Panchayats Identified (Phase I)",
+      "value": 32,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Gram Panchayats Identified (Phase II)",
+      "value": 19,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Gram Panchayats Identified (Phase III)",
+      "value": 14,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Gram Panchayats Identified (Phase IV)",
+      "value": 24,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Gram Panchayats Identified (Phase I)",
+      "value": 3,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    }
+  ]
+}

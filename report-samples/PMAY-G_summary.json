@@ -1,0 +1,50 @@
+{
+  "scheme_name": "Pradhan Mantri Awaas Yojana-Gramin",
+  "scheme_code": "PMAY-G",
+  "ministry": "Ministry of Rural Development",
+  "budget": null,
+  "period": "Source snapshot: 2022-04-06",
+  "generated_date": "2026-11-15",
+  "total_observations": 25,
+  "indicator_count": 1,
+  "on_track": 0,
+  "at_risk": 0,
+  "critical": 0,
+  "key_metrics": [
+    {
+      "name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "value": 272,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "value": 1884,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "value": 263551,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "value": 2280292,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    },
+    {
+      "name": "Eligible PMAY-G beneficiaries who availed a Rs. 70,000 loan",
+      "value": 12145,
+      "target": null,
+      "completion": null,
+      "status": "no_target"
+    }
+  ]
+}
