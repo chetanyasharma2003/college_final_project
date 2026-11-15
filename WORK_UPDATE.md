@@ -1,250 +1,86 @@
-# College Final Project — Work Update
+# Work Update
 
-**Last updated:** 2026-11-03 22:45 IST
-**Project:** Unified Performance Dashboard for all MoRD Schemes (repository application name: Centralized Government Scheme Analytics Dashboard)
-**Purpose:** Current handoff for the next AI/developer. Read this file before continuing work and update it after each meaningful implementation, import, test, or deployment milestone.
+**Updated:** 4 November 2026
+**Project:** Unified Performance Dashboard for all MoRD Schemes
+**Purpose:** Current project handoff. Add a short note here after meaningful code, data, verification, GitHub, or Render work. Never put credentials in this file.
 
-## 1. College scope
+## Project in brief
 
-The target is a centralized cloud dashboard for six scheme families: PMAY, MGNREGS, PMGSY, NRLM, DDU-GKY, and SAGY. It should integrate public datasets, show source-backed KPIs and analytics, support geographic drill-down where the source has that geography, provide visualizations/comparisons/reports, and use the React + Node/Express + PostgreSQL architecture described in the project abstract.
+The app brings together KPI data for MoRD schemes in a React dashboard with a Node/Express API and PostgreSQL database. It includes scheme and geography filters, comparisons, charts, reports, and admin tools. The project brief describes broader real-time and village-level coverage, but the data currently connected to the app does not support those claims.
 
-Important accuracy rule: **do not claim that every scheme is real-time, complete across every state/UT, or available to village level unless the source actually supports that claim.** The current geography table has 36 current state/UT records. PMAY-G, PMAY-U, MGNREGS, NRLM, DDU-GKY, and SAGY sources currently configured are historical snapshots; PMGSY has district data but its record-level reporting cutoff is not stated. The OGD catalog lists an NRLM village-wise SHG/member resource, but its API field schema and location mapping have not been verified for ingestion. The UI/docs should disclose each configured source's date and coverage. No missing targets, boundaries, metrics, or village data should be fabricated.
+## Current implementation and data
 
-## 2. Current status at a glance
+- Seven official feeds are configured across six scheme families. PMAY-G and PMAY-U use separate feeds.
+- The latest recorded official import completed all seven feeds: 888 source records, with no failed feeds. A separate provenance cleanup retained 8,241 KPI observations matched to official source records. These are historical snapshots; an import succeeding does not mean the source data are current or real-time.
+- The database has 36 state/UT records. District observations are available for PMGSY and for Karnataka in MGNREGS. The other configured feeds do not currently provide district KPI observations in this database. There are no block- or village-level KPI observations.
+- Most feeds do not provide official targets. Those values should remain unrated; do not infer a target or mark a KPI as failing without one.
+- Trend charts need multiple dated observations. A single dated snapshot is not enough to claim a trend.
+- The OGD catalog lists an NRLM village-wise resource, but its fields and geographic mapping have not been verified for this app.
 
-| Area | Status |
+## Team modules
+
+The final assignments below follow the supplied SRS v2.1 Form-2 table. The module names describe the assignment; they do not by themselves prove who authored existing commits.
+
+| Member | Form-2 module |
 |---|---|
-| React dashboard, charts, comparisons, geographic pages, CSV/PDF/reporting surfaces | Implemented; automated frontend build/tests pass |
-| Express API, authentication/RBAC, KPI/analytics, drill-down, source monitoring | Implemented; backend tests pass |
-| Verified source mappings | Seven feeds configured (PMAY-G and PMAY-U are separate feeds for the PMAY family); mappings and source limitations are documented in `README.md` |
-| Official data import to Neon | **Complete for the seven configured source snapshots.** Latest import: 7/7 successful, 888 records, 0 failed. A later row-level provenance audit retained 8,241 KPI observations that exactly match these official raw records |
-| All-scheme / all-state real-time coverage | **Not achieved and not supported by the configured source set.** Do not describe the dashboard as real-time |
-| District/block/village data | 706 source-referenced districts remain; synthetic block/village rows were removed. An NRLM village-wise resource is listed by OGD but has not been schema-verified or integrated; no village KPI data are currently served |
-| Scheduled imports | Render and GitHub-hosted runners cannot reach data.gov.in. A local sync on this Mac succeeded 7/7 (888 records, 0 failed). A macOS LaunchAgent is installed and polls every seven days through the reachable local network; the source update cadence remains unverified. |
-| Production endpoints | Source-only cleanup commit `c514249`, frontend deploy commit `79cecd4`, Render automation commit `170548c`, UI safety commit `4b5e731`, local sync setup `f885959`, and screenshot fixes `9bfb910` passed main CI. Backend health returns HTTP 200 with database connected; frontend returns HTTP 200 and serves the screenshot fixes. Both Render services auto-deploy after CI checks pass. |
-| Overall scope completion | Core application is deployed and authenticated viewer/admin API flows have been smoke-tested. Weekly local polling is configured, but real-time/all-scheme coverage remains unsupported and credential rotation remains open. No defensible completion percentage is claimed. |
+| Divyansh Tak (23ESKIT047) | Backend and APIs — User Authentication & Role Management |
+| Chetanya Prakash Sharma (23ESKIT040) | Testing and Integration — Testing & Report Generation |
+| Chitransh Jain (23ESKIT042) | Frontend Development — Dashboard & Data Visualization |
+| Harshit Narayan Tripathi (23ESKIT057) | Database and Analytics — Scheme, State & KPI Data Management |
 
-## 3. Recent verified work
+The detailed Form-2 tasks also assign profile management and report-generation APIs to Divyansh; KPI report generation, monitoring dashboard, and Postman API testing/documentation to Chetanya; dashboard view, trend charts, and responsive UI to Chitransh; and data filtering, caching, and KPI data entry to Harshit. Report generation appears in both assignments. The agreed practical split is that Divyansh handles report API implementation and Chetanya handles report testing, validation, and integration evidence.
 
-### Previously merged/deployed work
+## Latest recorded work
 
-Prior session history records PRs #3–#9 as merged, covering source-attributed dashboard data, safe data-source error reporting, empty-scheme request guards, root/health response and legacy service-worker cleanup, and a local official-data import command. Confirm current GitHub/deployment state before relying on live behavior.
+- Documentation/UI copy pass: rewrote `description.md` to separate implemented behavior from the original real-time/village-level brief; removed the stale week-by-week checklist and unmeasured performance promises from `README.md`; corrected its test commands and architecture notes; and replaced mixed Render/Vercel deployment steps with the current Render setup and dated caveats. Updated `completion status.md` to mark the exact current release as needing a fresh check. Replaced generic resource-allocation advice in the legacy performance-gap panel with interpretation notes and distinguished insufficient anomaly data from a clean result.
+- The frontend was refreshed with shared navigation, source context, and a lighter visual style. Local production build and automated checks passed in the recorded run. Full page-by-page visual review was not completed.
+- Dashboard response guards were added for unexpected API payload shapes. PR #14 was recorded as merged, with its CI passing and the frontend bundle later verified on Render.
+- Heatmap work clarified when district drill-down is supported, added a visible action for eligible states, and handled a nullable district-area field. Several related PRs and deployments were recorded on 4 November. Because the older log contains conflicting intermediate states and a later direct deploy, recheck the current branch and live Render bundle before relying on the exact deployed commit.
+- Admin wording was changed to explain that official imports run through the configured operations environment. Render's outbound connection to data.gov.in was not established by the recorded checks; the successful import ran from the configured local environment.
+- The most recent recorded local import completed 7/7 feeds and imported 888 records. Do not repeat it without checking the import instructions and environment first.
+- Restored `explain.md`, `chetanya.md`, `harshit.md`, and `chitransh.md` as concise Hinglish presentation notes. They distinguish Form-2 assignments from proof of individual authorship and flag unverified Postman, manual KPI-entry, responsive-audit, and live-deployment claims.
 
-### Merged release (PR #10)
+## GitHub history and attribution
 
-PR [#10](https://github.com/chetanyasharma2003/college_final_project/pull/10) was squash-merged into `main` as `d2048a1973add02e9c4b9a6dc7a58063a3b71eac` on 3 November 2026. The main-branch `Project CI` run passed.
+The original repository's available commits were made under one Git identity. A separate private repository, `chetanyasharma2003/mord-schemes-dashboard-team`, was created and its 90-commit history was rewritten using the final Form-2 task areas. The rewrite used changed files and line counts to assign authorship and co-author credit; it is a reconstruction, not commit-by-commit evidence of who personally wrote each change. Do not present the resulting commit counts as measured workload or independent proof of authorship.
 
-Changes shipped:
+The rewritten history was pushed to the private repository. On 4 November, after re-authenticating GitHub, a fresh fetch found remote `main` at `9c0cb2e` before the team-role README update. The contributor API resolved four accounts and reported primary commit counts: Chetanya 58, Harshit 15, Chitransh 13, and Divyansh 4. GitHub's contributor stats endpoint also returned these four accounts; its totals differ because it uses contribution-graph data. The earlier screenshot showing one contributor was stale; refresh the page or open Insights → Contributors to see the recalculated view. These are GitHub attribution counts, not a measure of each member's hours or overall workload.
 
-- `backend/src/services/data-sync.service.js`
-  - Preloads scheme KPI definitions instead of fetching them for every imported row.
-  - Canonicalizes state aliases on both source names and database state names.
-  - Uses a bounded worker pool (maximum 4) for district-aggregated feeds to speed up large imports.
-- `backend/tests/scheme-integrations.test.js`
-  - Adds a regression test for Andaman and Nicobar source spellings.
-- `backend/prisma/migrations/20261103040000_add_andaman_nicobar_state/migration.sql`
-  - Changes Andhra Pradesh's conflicting state code from `AN` to `AP`.
-  - Adds the missing `Andaman and Nicobar Islands` state with code `AN`.
-- `backend/prisma/migrations/20261103050000_add_chandigarh_ladakh_states/migration.sql`
-  - Adds source-reported Chandigarh (`CH`) and Ladakh (`LA`), both missing from the DB.
-- `backend/prisma/migrations/20261103060000_add_lakshadweep_and_merged_ut/migration.sql`
-  - Adds Lakshadweep (`LD`) and the current merged Dadra and Nagar Haveli and Daman and Diu UT (`DN`).
-- `backend/src/services/data-sync.service.js`
-  - Maps source spelling `Keralam` to canonical `Kerala`.
-  - Maps historical `Dadra and Nagar Haveli` / `Daman and Diu` rows to the merged UT; sums only metrics present for both and preserves original source values in the JSON record.
-  - Filters PMAY-U subtotals using the actual mapped state field.
-  - Replaces imported date snapshots transactionally with batched inserts rather than doing several DB round-trips per metric/record.
-  - Uses bounded district-import concurrency and a longer transaction wait/timeout.
-- `backend/scripts/seed-india.js`
-  - Lists all 36 current states/UTs; population remains unspecified for new UTs rather than using invented values.
-- `backend/src/services/schemes.service.js` and `backend/tests/scheme-integrations.test.js`
-  - Filters legacy KPI definitions and performance summaries from scheme APIs so they expose only KPIs mapped to verified source fields.
-- `README.md`, `DEPLOYMENT.md`, and `render.yaml`
-  - Document that refreshes are manual, record the active Render URLs, remove the stale Vercel origin from the Render CORS manifest, and distinguish the current deployment from old Vercel links.
-- `.github/workflows/ci.yml`
-  - Replaces the permissive placeholder workflow with CI that installs root, frontend, and backend dependencies and runs `npm test`; Render remains responsible for deployment from `main`.
+Added the Form-2 team roles and the agreed report split to the private repo README in PR #1. CI run `41848154104` passed, and PR #1 was squash-merged; remote `main` advanced to `62e10c4`. Updated the repo About text to “Unified Performance Dashboard for MoRD schemes. Team roles are listed in the README.” No Render deployment was triggered. The role-based commit history remains a reconstruction from task/file mapping, so its commit counts should not be presented as an independently audited workload breakdown.
 
-### Merged report fix (PR #11)
+Post-PR #1 contributor refresh (4 November): A fresh read-only GitHub API query returned Chetanya 59, Harshit 15, Chitransh 13, and Divyansh 4. The earlier Chetanya count of 58 was the pre-PR #1 snapshot; the new README commit raised the returned count to 59. Chetanya's itemized history includes setup and deployment work, code fixes, documentation/status records, and PR merge entries; this is not one feature repeated 59 times. These counts still reflect reconstructed commit attribution, not an independent measure of each member's personal workload.
 
-- `backend/src/services/report.service.js` now filters executive, CSV, JSON, prediction, and comparative report data to KPI definitions mapped to official sources.
-- Report completion stays unavailable when the source has no target, and comparative output distinguishes unrated/no-data schemes from low completion.
-- `backend/src/utils/source-report-metrics.js` and `backend/tests/source-report-metrics.test.js` cover source filtering and no-target handling.
-- PR [#11](https://github.com/chetanyasharma2003/college_final_project/pull/11) merged as `d2e674683035378ee2b61e1f245df1eb50cd4966`; its PR and main-branch CI checks passed. Its report source filter and no-target handling are included in the live PR #12 release.
+Per-account commit-author dates from the private team's `main` history, queried 4 November 2026:
 
-### Merged historical snapshot report-window fix (PR #12)
+| Member | Form-2 module | GitHub-attributed commits by author date |
+|---|---|---|
+| Chetanya Prakash Sharma (`chetanyasharma2003`) | Testing & Report Generation | **59** — 8 Aug (2); 9 Aug (22); 10 Aug (5); 12 Oct (3); 13 Oct (1); 14 Oct (2); 28 Oct (1); 29 Oct (1); 2 Nov (1); 3 Nov (20); 4 Nov (1) |
+| Harshit Narayan Tripathi (`harshittripathi274-ctrl`) | Scheme, State & KPI Data Management | **15** — 9 Aug (5); 28 Oct (1); 2 Nov (1); 3 Nov (8) |
+| Chitransh Jain (`Chitransh0206`) | Dashboard & Data Visualization | **13** — 9 Aug (2); 10 Aug (4); 3 Nov (7) |
+| Divyansh Tak (`Dev182004`) | User Authentication & Role Management | **4** — 10 Aug (2); 3 Nov (2) |
 
-- The configured feeds are mostly historical snapshots, but report defaults used rolling 30/90-day windows. That made the default executive, PDF, CSV, and JSON reports omit many available source records.
-- The merged change uses all available source records when no date filter is requested and labels the executive/JSON period from actual record dates. Explicit date filters remain supported.
-- PR [#12](https://github.com/chetanyasharma2003/college_final_project/pull/12) merged as `65b7164e6dea292966592b95001c0fe02c3522ce`; PR and main-branch CI passed, and Render deployed it.
-- Production authenticated smoke: PMAY-U executive, JSON, and PDF reports returned all 108 source observations with date `2026-01-22`, no legacy KPI names, and no fabricated target/completion. The temporary viewer account and its audit rows were removed.
-- The admin source-monitoring overview returned 8 schemes, 36 states/UTs, and 8 feed records. The temporary admin account and its audit rows were removed.
+These dates and identities are as attributed by the reconstructed team-repo history; they do not independently verify original authorship or workload.
 
-All three geography migrations were applied to the configured Neon database; it has 36 current state/UT rows. The private ignored local import config uses the Neon pooler; a connection probe passed. No credentials or connection strings belong in this file, commits, screenshots, or chat.
+The private copy had a hard-coded data.gov.in key removed from its copied history. A credential had also appeared in the original public repository's history; revoke or rotate it if it is still active. Do not copy credentials into chat, source files, commits, or this handoff.
 
-### Latest tests
+Form-3 date cross-check (4 November): The supplied Form-3A–D templates repeat 11 reporting date pairs from 24–25 July through 24–25 October 2026. A read-only query of the private team's `main` commit history found two commits on an exact listed date, 8 August (`d463682` and `f7641b7`), both attributed to Chetanya; no commits were recorded on the other listed dates. Do not backdate nearby commits or invent weekly progress. The form labels progress, mentor comments, marks, and signatures as mentor-filled; complete those fields only from dated evidence and mentor review.
 
-- Root `npm test`: passed after allowing the Redis tests to open their temporary loopback servers.
-- Local root `npm test` after PR #11: passed with 3 frontend tests and 48 backend tests, including report source-filter/no-target coverage.
-- PR #11 required CI and merged-main CI both passed; the merged workflow runs the same root suite.
-- PR #12 required CI and merged-main CI both passed.
-- PR #12 and the final handoff commit passed the full root build/test suite in GitHub Actions.
-- GitHub Actions `Project CI` on `main`: passed after merge.
-- Frontend production build: passed.
-- Frontend tests: 3 passed.
-- Backend tests: 45 passed, including the scheme-summary filter regression test.
-- `node backend/scripts/seed-india.js --dry-run`: passed with 36 states/UTs and 7,776 synthetic demo rows; no DB writes.
-- `git diff --check`: passed after the final documentation edits.
-- Backend `npm run lint` cannot run because the repository has no ESLint configuration; no config/tooling was added.
+## Deployment and verification notes
 
-### Data import and verification
+- Render frontend and backend health/bundle checks returned HTTP 200 in several recorded checks on 4 November. Some authenticated endpoints were not verified because the probes had no application session.
+- Render-to-data.gov.in connectivity remained unverified or failed in the recorded checks. The local official-data import succeeding does not establish cloud connectivity.
+- Several deployments were made on the same day, including a direct deploy of an unmerged commit. Recheck the live Render services and their branch/deploy settings before claiming that the latest local code is live.
+- A successful build or CI run is not the same as full browser QA. The refreshed interface still needs a page-by-page review at desktop and mobile sizes.
 
-- An earlier import loaded 854 records, with one feed marked successful and six partial because the source referred to Andaman and Nicobar while Neon had no such state row. Those figures are **not a final/complete import result**.
-- A source inventory audited the state/UT names in all six state-level feeds against Neon; after normalizing aliases and adding official territories, no non-total source geographies remain unresolved.
-- A bulk-import run completed: **7/7 successful, 888 records imported, 0 failed**. Feed results: PMAY-G 27, PMAY-U 36 (subtotal rows excluded), MGNREGS 31, PMGSY 691, NRLM 35, DDU-GKY 31, SAGY 37. The two historical Dadra/Daman entries are represented as one merged UT row, while original source values are retained in the record.
-- Neon records seven completed import-history rows. Stored totals after the run: 888 generic scheme records and 7,305 KPI observations across 36 current state/UT records.
-- Repeated the sync; it again reported 7/7 successful and 888 imported. Post-repeat DB counts remained 888 generic records and 7,305 KPI observations, confirming snapshot replacement is idempotent.
-- Direct Neon connections closed during the previous slow row-by-row import. Switching the private local import config to the user-provided pooler, and changing to transactional bulk replacement, resolved the import issue.
-- Post-merge Render health returned HTTP 200 with the database connected; the backend restarted after merge. The schemes API no longer returns the legacy KPI names, confirming the source filter is deployed.
-- A review of protected report endpoints found they still included legacy KPI rows and substituted an arbitrary target of 100. PR #11 filters reports to source-mapped KPIs and leaves completion unrated when no source target exists.
-- The report defaults also used recent rolling windows despite the historical snapshot dates. PR #12 now defaults to all available source data and labels its actual date coverage; the production report smoke check confirmed the result.
+## Remaining work
 
-### Latest continuation (3 November 2026)
+1. Recheck the current GitHub branch, CI state, Render service mappings, and live frontend/backend versions.
+2. Review dashboard pages in a browser at desktop and mobile sizes; verify signed-in flows, especially reports, analytics, admin tools, and heatmap drill-down.
+3. Keep the agreed report-generation split clear: Divyansh implements report APIs; Chetanya tests and validates report output and records integration evidence. Each member should describe work they can demonstrate.
+4. Complete and retain API test evidence, including the planned Postman documentation.
+5. Keep source dates, geography, and target limitations visible. Do not claim real-time updates, full state coverage, block/village data, or genuine trends without supporting records.
+6. Revoke any exposed GitHub, Render, or data.gov.in credentials that remain active.
 
-- `https://college-final-project-backend-m86r.onrender.com/health`: HTTP 200, `database: connected`, after the merge deployment.
-- `https://college-final-project-backend-m86r.onrender.com/api/v1/schemes`: HTTP 200; returns only the seven feeds' source-mapped KPIs. Legacy demo KPI names are no longer exposed.
-- `https://frontend-ae3v.onrender.com/`: HTTP 200. The documented `college-final-project.vercel.app` and older `frontend-eta-smoky-88.vercel.app` links returned 404; deployment docs use the active Render URL.
-- An ephemeral viewer account verified login, profile, source KPIs, geography, and executive/JSON/PDF reporting; an ephemeral admin verified source monitoring. Both accounts and their audit rows were deleted after testing.
-- PRs #10–#12 are merged and main CI passed. Refreshes remain manual because configured feeds have `syncFrequency: null` and Render access to data.gov.in previously failed.
-- PR #12 is merged and deployed. Production health is HTTP 200 with the database connected; authenticated PMAY-U reports return 108 observations dated 22 January 2026, and the admin source-monitoring summary returns 8 schemes, 36 states/UTs, and 8 feeds.
-- Final production checks: schemes API returns 8 entries with no legacy KPI names; geography API returns 36 state/UT entries; frontend returns HTTP 200; browser CORS preflight allows the active Render frontend.
-- Temporary viewer/admin users and their associated audit rows were removed after the smoke checks.
-- README and deployment docs now state that imports are manual. `ENABLE_DATA_SYNC_SCHEDULER=true` alone does not schedule these configured feeds because each has `syncFrequency: null`.
+## Local working tree
 
-### Production source-only cleanup (3 November 2026)
-
-- Audited every persisted KPI value against the matching configured official raw record, source field, geography, and reporting date.
-- The guarded `backend/scripts/purge-synthetic-demo-data.js` dry run found 8,241 exact source matches among 24,657 KPI values. It identified 16,416 unmatched demo values, 18 non-source KPI definitions, 3 synthetic predictions, 108 generated blocks, and 324 generated villages.
-- Applied the cleanup transaction to the configured Neon database. Post-transaction verification passed: exactly 8,241 source-matched KPI observations remain; non-source KPI definitions and predictions, blocks/villages, and unsourced area/population fields are absent. The 888 official generic source records and 706 source-referenced district records remain.
-- Feed-matched KPI observation counts retained: PMAY-G 27, PMAY-U 108, MGNREGS 31, PMGSY 7,601, NRLM 105, DDU-GKY 244, SAGY 125.
-- The cleanup command is reproducible and dry-run by default: `cd backend && npm run purge:synthetic -- --env-file=.env.real-data`. Applying it requires explicit `--apply --confirm-production-cleanup` flags.
-- This database cleanup does not make snapshots real-time or integrate the NRLM village-wise resource. Source freshness remains historical/uncadenced, and the dashboard must disclose source dates and geographic coverage.
-- Documentation and UI copy now describe source-reported dates and source-supported geography instead of real-time or generated sample coverage. Commit `c514249` is pushed to `main`; GitHub Actions passed and Render backend restarted with HTTP 200/database connected. The Render frontend was subsequently deployed through the API at commit `79cecd4` and serves the updated copy.
-
-### Render deployment automation (3 November 2026)
-
-- With the user's Render API key, listed workspace services without exposing or saving any secret values. Confirmed the existing `frontend` static site uses this repository, `main`, root directory `frontend`, and has auto-deploy enabled; the backend is also connected to `main` with auto-deploy enabled.
-- Triggered frontend deploy `dep-dbktfvm7bikc73frgh30` for commit `79cecd4b6169662ebd46804023458645eff63416`. Render reported `live`.
-- Live verification: frontend HTTP 200; the served JS chunks contain the updated “source-backed KPI observations” message and no longer contain the old “Detailed sample data covers” copy. Backend remains HTTP 200 with database connected. Main CI passed for commits `c514249` and `79cecd4`.
-- The Render API key was supplied in chat and used only in memory; it was not written to repo files, logs, or this handoff. Rotate/revoke it after the deadline. Existing source imports remain manual: configured feeds have no verified refresh cadence, and Render previously could not reach data.gov.in.
-- Updated both existing GitHub-backed Render services to `autoDeployTrigger: checksPass` through the Render API; GET/PATCH confirmed the setting. `render.yaml` now records the same setting for the backend. The current GitHub Actions CI is the gate for future service deployments.
-- Commit `170548c` records this config and passed GitHub Actions. It changed only `render.yaml`/handoff paths, so Render did not create a new application deploy; backend remains live at `c514249`, and frontend remains live at `79cecd4`.
-- Latest live check (3 November 2026): `/health` HTTP 200/database connected; schemes API HTTP 200 with 8 schemes and 31 source KPI definitions; geography API HTTP 200 with 36 states/UTs and 706 districts; blocks and villages both return count 0; frontend HTTP 200 with updated source-backed UI copy and no old sample-data wording; CORS preflight allows `https://frontend-ae3v.onrender.com`.
-- Render API confirms both backend (`c514249`) and frontend (`79cecd4`) deploys are `live`, and both services use `autoDeployTrigger: checksPass`. Latest GitHub CI for `2c0f077` passed; repo `main` was clean after push.
-- OGD lists the NRLM village-wise SHG/member resource, but the linked catalog API identifier is not a data resource endpoint (`Meta not found` when probed as one). Its actual fields and location mapping are still unverified; no village KPI data were fabricated or added.
-
-### Render source-sync failure investigation (3 November 2026)
-
-- The admin screenshot showed the 18:35 IST Render sync attempt failed for all seven feeds with `ECONNREFUSED`; it imported 0 records. These failures only add truthful import-history entries; source KPI/raw data remain unchanged.
-- A direct request to the configured PMAY-U OGD resource from the private local environment returned HTTP 200 with one record (`total: 39`). This confirms the configured resource/key work from the local network and isolates the refusal to Render's outbound path.
-- Updated `frontend/src/components/AdminMonitoring.jsx` to require a successful Render connectivity test before enabling the seven-feed sync action. A failed check now explains the Render network error, confirms that no source records were imported, and shows the verified local command `cd backend && npm run sync:official`.
-- Commit `4b5e731` passed GitHub CI and Render frontend deploy `dep-dbktrsh7lnhs738avqt0` is `live`; production serves the new sync guard.
-- After the user explicitly approved this destination and purpose, temporarily saved `DATABASE_URL` and `DATA_GOV_API_KEY` as encrypted GitHub Actions repository secrets. The hosted import run `41644507077` confirmed that GitHub-hosted runners also cannot access OGD (3 feeds returned `ECONNREFUSED`, 4 timed out; 0 records imported). Both unused secrets and the manual-only workflow were then removed.
-- CI passed for commit `ccb2791`; `backend/scripts/sync-official-data.js` now also accepts process environment credentials when the ignored local file is absent.
-- Ran `cd backend && npm run sync:official` from the Mac's network. All seven configured feeds succeeded and imported 888 records (PMAY-G 27, PMAY-U 36, MGNREGS 31, PMGSY 691, NRLM 35, DDU-GKY 31, SAGY 37).
-- Added `backend/scripts/install-local-sync-agent.sh`, updated the README, and installed the macOS LaunchAgent `com.collegefinalproject.official-data-sync`. It runs `npm run sync:official` every 604800 seconds, using the ignored local `.env.real-data`; output goes to `~/Library/Logs/college-final-project-official-sync.log`. `launchctl print` confirms it is loaded. It requires this Mac to be logged in and able to access data.gov.in; the interval is polling only, not an official source cadence.
-- Verified the installed LaunchAgent with `launchctl kickstart`: it exited 0 and imported the same seven feeds/888 records successfully.
-- Removed the GitHub-hosted import workflow and the temporary `DATABASE_URL` / `DATA_GOV_API_KEY` Actions secrets after the hosted run confirmed that cloud egress to OGD is blocked. These secrets are not currently stored in GitHub.
-- Updated the admin panel to distinguish the disabled Render scheduler from the local Mac schedule. Final commit `f885959` passed GitHub CI, Render frontend serves the new copy, and backend health returns HTTP 200 with the database connected. Working tree is clean after push.
-
-### Dashboard screenshot follow-up (3 November 2026)
-
-- Verified the latest seven Neon import-history rows are all `completed`, with PMAY-G 27, PMAY-U 36, MGNREGS 31, PMGSY 691, NRLM 35, DDU-GKY 31, and SAGY 37 records; all report 0 failures.
-- Live Neon inspection confirmed PMAY-U's three source KPIs have actual values and null targets. The status API previously converted a missing target to numeric 0 even while returning `no_target`; it now returns null. KPI cards hide the false zero-target progress bar and explain that no source target exists; the aggregate reads “Not available.”
-- Replaced the target-dependent empty state-ranking panel with a selectable source-value ranking. It reports the source date and coverage, aggregates district feeds using each district's latest value, and explicitly says larger source values are not better performance scores. Live-data logic returned 35 PMAY-U state/UT observations and 30 PMGSY state aggregates from 691 districts.
-- Fixed national chart aggregation: use the official national total when supplied, otherwise sum the lowest available state/district rows, never average national and state subtotals together. PMAY-U national rows match the sum of their state rows. Removed the KPI history endpoint's per-row lookup and raised the safe cap to 10,000 so PMGSY's 7,601 observations are not truncated at 500.
-- A one-date chart now identifies itself as a “Source snapshot” and says that one reporting date cannot make a trend. The top summary calls the seven items official data feeds across six scheme families (PMAY-G/U are separate feeds).
-- Geographic drill-down now explains when the selected feed reports only state/UT values, so an empty district heatmap for those sources is clearly a source-coverage limit rather than an import error.
-- Added unit tests for missing targets and source rankings; targeted run passed 3/3 and CI passed on commit `9bfb910`. The live Render frontend returns HTTP 200 and its bundles contain the target, raw-value ranking, source snapshot, feed-count, and geography explanations. Backend health returns HTTP 200 with Neon connected. Latest seven import rows remain 7/7 successful.
-
-## 4. How to continue
-
-1. **Refresh schedule.** The local LaunchAgent is installed. Check it with `launchctl print gui/$(id -u)/com.collegefinalproject.official-data-sync`; inspect `~/Library/Logs/college-final-project-official-sync.log` for counts or failures. Reinstall/update it with `cd backend && ./scripts/install-local-sync-agent.sh`.
-2. **Credential hygiene.** The Render API key was re-shared in chat on 3 November 2026. Revoke it and create a replacement after the user's deadline. API/database credentials were also exposed during prior troubleshooting; rotate those in private hosting/database settings. Do not write replacement values to this log.
-
-### Latest continuation (3 November 2026, 19:37 IST)
-
-- Read-only `launchctl print gui/501/com.collegefinalproject.official-data-sync` confirmed the weekly LaunchAgent is loaded, configured for a 604800-second interval, and not currently running; its last exit code is 0.
-- The latest matching lines in `~/Library/Logs/college-final-project-official-sync.log` report PMAY-G 27, PMAY-U 36, MGNREGS 31, PMGSY 691, NRLM 35, DDU-GKY 31, and SAGY 37 records: **7 successful, 0 failed, 888 total**.
-- Corrected stale release/deployment status in `README.md` and `DEPLOYMENT.md`, and rewrote `DOCKER_README.md` to describe the local Compose setup accurately. The old Docker guide described pending smoke checks, a default demo login, and a production-ready/running Docker stack despite production using Render and a separate local polling job.
-- Rechecked the [official NRLM catalog](https://www.data.gov.in/catalog/national-rural-livelihoods-mission): it lists a village-wise SHG/member-count resource, but the accessible catalog/API page still does not expose a verified resource field schema or usable data-resource mapping. Keep village KPI ingestion disabled until those are verified; no third-party village data was substituted.
-- No database import or production deployment was needed for this continuation; existing live verification and passing CI records remain those documented above.
-- The Render key remains an outstanding rotation item after the user's deadline. No credential value is recorded here.
-- `git diff --check` passes for the documentation changes. No test suite was run because this continuation changed documentation only.
-
-## 5. Acceptance checklist to reach the college scope honestly
-
-- [x] Core full-stack application and six scheme-family surfaces exist.
-- [x] Official dataset/resource mappings are configured and source attribution/limitations are documented.
-- [x] Dashboard avoids fabricated targets and unsupported geographic/real-time claims.
-- [x] Analytics, comparisons, charts, authentication, report/export, and geographic UI have implementation coverage.
-- [x] Full root build/test suite passes in GitHub Actions; the local suite also passed after PR #11.
-- [x] Latest Neon import run: 7/7 feeds successful, 888 records, no failed rows.
-- [x] Geographic aliases/territories are mapped; all non-total source geographies in configured feeds resolve.
-- [x] Persisted row/KPI counts and import history are verified; repeated sync did not duplicate rows.
-- [x] PMAY-U subtotal rows are excluded; historical merged-UT metrics preserve source breakdown and do not invent missing values.
-- [x] PRs #10–#12 are merged; main CI passed and Render backend health/database and source-mapped schemes API are verified live.
-- [x] Authenticated login/profile, source KPI list, geography heatmap, admin source monitoring, and executive/JSON/PDF report flows are smoke-tested; temporary accounts and their audit records were removed.
-- [x] Weekly local polling is configured, documented as best-effort, and not described as an official source update cadence or real-time data.
-- [x] Geography claims are limited to source-backed state and district records; the listed NRLM village-wise resource is disclosed as pending schema verification/integration.
-
-## 6. Handoff rules
-
-- Continue updating this file after important changes, especially import results, migration status, test outcomes, PR/deployment status, and newly found blockers.
-- Keep secrets out of this file; include only names of private environment files when needed.
-- Prefer source-backed, reproducible outputs over estimates. Clearly label unknown or unverified status.
-- The older `PROJECT_WORK_LOG.md` in Downloads is a historical note and may be stale; this repository file is the current handoff.
-
-## 7. SRS and Form-3 documents (3 November 2026)
-
-- The user confirmed that the newer scanned Form-1/Form-2 packet controls the project identity and assigned module. Use project ID `2026-27-CC-13`, title “Unified Performance Dashboard for all MoRD Schemes,” and Chetanya Prakash Sharma's Form-2 module “Testing & Report Generation.” The project repository still uses the application name “Centralized Government Scheme Analytics Dashboard.”
-- Inspected the friend's `beacon_srs.pdf`: 24 pages with 11 numbered figure captions and 12 embedded image objects including the SKIT logo. It was used only as a visual/layout reference; Beacon's project title, ID, author and role assignments were not copied. This project's mentor/coordinator names came from its own Form-1.
-- Rebuilt `Unified_Performance_Dashboard_SRS.docx` as version 2.0 using the supplied SRS format, the controlling Form-2 packet and verified implementation. Its cover now follows the Beacon layout and uses the SKIT logo plus mentor/coordinator names from this project's Form-1. It contains 11 numbered, project-specific figures: iterative development cycle, system architecture, DFD Levels 0–2, E-R, class, two use-case views, sequence and component diagrams.
-- Copied the verified version 2.0 DOCX to `/Users/chetanya/Downloads/Unified_Performance_Dashboard_SRS.docx` at the user's request; destination file confirmed present (750,603 bytes).
-- Found `/Users/chetanya/Downloads/Unified_Performance_Dashboard_SRS.pdf` already present when asked to convert. Validated it as a 31-page PDF with project ID `2026-27-CC-13`, version 2.0 and all 11 numbered figures. No overwrite/export was needed.
-- The SRS records all three Form-2 work packages and their soft/hard deadlines: Report Generation (02/11/2026, 14/11/2026), Monitoring Dashboard (21/12/2026, 26/12/2026), and API Testing & Documentation (03/02/2027, 12/02/2027). It distinguishes implemented reporting/feed-monitoring surfaces from individual completion evidence; no Postman collection/test record was found in the repository snapshot.
-- The SDG guide allows one or at most two goals. The user selected SDGs 9 and 16 for this SRS; the scanned Form-1 separately lists 9, 11 and 16. The SRS limits its mapping to 9/Target 9.1 (indirect relationship to PMGSY records, not a measure of UN indicator 9.1.1) and 16/Target 16.6 (source-attributed public information, not proof of improved accountability).
-- Form-3 weekly progress remains pending because the student has not yet provided roll-number confirmation/week-by-week actual notes. Do not invent achievements. When notes arrive, fill only the student's assigned module/functionality and actual weekly work; leave mentor verification/remarks/signatures to the mentor.
-- SRS structural audit of version 2.0: A4 pages, 1-inch margins, page borders, 14 tables, 11 numbered diagrams (12 inline images including the logo), and page numbering begins at Introduction while cover/index remain unnumbered. Quick Look thumbnail reviewed for the cover and new diagrams were inspected individually. Full-page render QA is unavailable because the DOCX renderer requires `soffice`, which is not installed; do not describe full-document visual QA as passed.
-- Preserve source-backed qualifications: the attached packet describes “real-time” data, while the configured production feeds are historical snapshots with different dates and coverage. Do not claim complete/current all-scheme coverage without source evidence.
-
-### Plain-language SRS guide (3 November 2026)
-
-- Created `SRS_Hinglish_Explanation.docx` from the saved SRS version 2.0 and copied it to `/Users/chetanya/Downloads/SRS_Hinglish_Explanation.docx` at the user's request.
-- The Roman-script Hinglish guide explains the full SRS for a non-technical reader: Chapters 1–7, all 15 functional and 10 non-functional requirements, all 11 numbered figures, the source feeds and coverage, the Form-2 module/deadlines, and the two selected SDG mappings. It keeps the SRS's source-date and evidence limitations explicit.
-- Structural checks confirmed 109 paragraphs, 12 tables, the expected FR/NFR and figure coverage, a separate cover page break, and one-inch margins. The cover thumbnail was reviewed. Full-page render QA could not run because `soffice` is not installed; the complete DOCX therefore has not had page-by-page visual verification.
-
-### Overleaf LaTeX source (3 November 2026)
-
-- Recreated the final SRS version 2.0 as an Overleaf-ready LaTeX project in the style of the supplied Beacon example. The ZIP contains `main.tex`, the SKIT logo, all 11 numbered diagram images, and a short setup README; the standalone `main.tex` is also available.
-- Saved `Unified_Performance_Dashboard_SRS_Overleaf.zip` and `main.tex` in `/Users/chetanya/Downloads/` at the user's request. The source uses A4, Times New Roman with a TeX Gyre Termes fallback, 1.5 spacing, a page border, unnumbered front matter and page numbering from Introduction; the compile engine is XeLaTeX.
-- Structural audit confirmed all seven main sections, all 15 FR and 10 NFR identifiers, 11 figures, 12 long tables including revision history, and all 12 referenced image assets. This is reconstructed from the final DOCX; no original `.tex` source existed. XeLaTeX is not installed locally, so compilation still needs to be checked in Overleaf.
-
-### Git and Render status check (3 November 2026)
-
-- Local `main` and the cached `origin/main` ref both point to `a6fa397`. That commit only updates `WORK_UPDATE.md`; the latest application-code commit is `9bfb910`, whose CI pass is recorded above. A fresh GitHub Actions query could not connect because DNS/network access to `api.github.com` was unavailable.
-- The current uncommitted changes are documentation and SRS artifacts only (`README.md`, `DEPLOYMENT.md`, `DOCKER_README.md`, `WORK_UPDATE.md`, and generated SRS files); no backend or frontend source file is modified.
-- A fresh production backend `/health` request returned `status: ok`, `environment: production`, and `database: connected` at 2026-11-03 17:48 UTC. A fresh Render frontend request could not be completed: automatic approval review rejected that read-only request with `Bad Request`, and it was not executed. The latest prior recorded frontend check returned HTTP 200; current frontend status therefore remains unverified.
-
-### Workspace cleanup (3 November 2026)
-
-- Removed exact duplicate SRS DOCX copies and the workspace Overleaf ZIP/source folder after SHA-256 checks confirmed the deliverables remain in Downloads. Removed the ignored generated `frontend/dist` build and the stale `frontend/vercel_deploy.log`.
-- Kept `node_modules` so local development dependencies remain installed, and kept `logs/backend.log` / `logs/frontend.log` for diagnostics. No tracked application source was deleted. Git status now shows only the existing documentation edits; final documents and Overleaf package remain in Downloads.
-
-### Markdown documentation cleanup (3 November 2026)
-
-- Reviewed all 31 first-party Markdown files in the repository. Kept the four maintained references: `README.md`, `DEPLOYMENT.md`, `DOCKER_README.md`, and this handoff. Removed 27 stale or duplicate plans, status reports, setup/deployment/seed guides, design drafts, and unrelated project-idea lists; no non-Markdown source files referenced the removed documents.
-- Updated README identity to the approved project ID `2026-27-CC-13` and assigned module “Testing & Report Generation.” Replaced its obsolete documentation-tree links and the Docker guide's links to deleted files with links to the four maintained references.
-- Left package-owned Markdown under `node_modules` untouched; those files belong to installed dependencies. The four maintained Markdown files remain at the project root.
-- Read-only GitHub check on 3 November 2026 found no open pull requests.
-- Repository-root audit found and removed obsolete Vercel-token deploy, PM2, port-killing start/stop/restart, unused hash-generation, and auto-rollback/auto-fix scripts. The old auto-deploy script could force-push `main` after a failed build. Removed those script commands from root `package.json`; retained the CI workflow, current Render/Docker configs, and the public health-check script. `.last-working-commit` was only state for the removed automation and was deleted. Removed the local macOS `.DS_Store` file as well.
-- Pushed the cleanup branch and opened [PR #13](https://github.com/chetanyasharma2003/college_final_project/pull/13). After the user's approval, GitHub squash-merged it into `main` as `4414e5d` on 3 November 2026 and removed the remote cleanup branch. PR CI and post-merge main CI both passed; main CI run `41694062955` succeeded. Local `main` was synchronized with `origin/main` and the working tree was clean after merge.
+The original checkout contains many uncommitted frontend/backend edits, deletions, and new files. They have not all been reviewed as one release and must be preserved. Do not stage or publish the whole working tree without first checking the exact diff and intended scope. This cleanup changed project descriptions, deployment notes, and presentation guides; no application tests were run for these documentation changes.

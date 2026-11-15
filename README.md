@@ -69,9 +69,20 @@ To audit an existing database for generated demo records, run `cd backend && npm
 
 ---
 
-## Assigned Module
+## Team modules
 
-Chetanya Prakash Sharma's approved Form-2 module is **Testing & Report Generation**. See [WORK_UPDATE.md](./WORK_UPDATE.md) for the current project handoff and [DEPLOYMENT.md](./DEPLOYMENT.md) for live deployment details.
+These are the assignments from the final SRS v2.1 Form-2. They describe each member's planned project area; GitHub's contributor graph is separate and should not be read as proof of individual work.
+
+| Member | GitHub | Form-2 role and module |
+|---|---|---|
+| Divyansh Tak (23ESKIT047) | [Dev182004](https://github.com/Dev182004) | Backend and APIs — User Authentication & Role Management |
+| Chetanya Prakash Sharma (23ESKIT040) | [chetanyasharma2003](https://github.com/chetanyasharma2003) | Testing and Integration — Testing & Report Generation |
+| Chitransh Jain (23ESKIT042) | [Chitransh0206](https://github.com/Chitransh0206) | Frontend Development — Dashboard & Data Visualization |
+| Harshit Narayan Tripathi (23ESKIT057) | [harshittripathi274-ctrl](https://github.com/harshittripathi274-ctrl) | Database and Analytics — Scheme, State & KPI Data Management |
+
+Form-2 assigns profile management and report-generation APIs to Divyansh; KPI reports, monitoring, and API testing/documentation to Chetanya; dashboard view, trend charts, and responsive UI to Chitransh; and filtering, caching, and KPI data entry to Harshit. The practical report split is API implementation by Divyansh and report testing/validation by Chetanya.
+
+To show who did specific work, use each person's actual pull requests, commits, review comments, test records, and demo. The table above records role assignments, not commit-level authorship. See [WORK_UPDATE.md](./WORK_UPDATE.md) for the repository attribution caveat and [DEPLOYMENT.md](./DEPLOYMENT.md) for deployment notes.
 
 ---
 
@@ -94,14 +105,14 @@ Chetanya Prakash Sharma's approved Form-2 module is **Testing & Report Generatio
         │                     │
 ┌───────▼──────────┐  ┌──────▼────────────┐
 │  PostgreSQL      │  │  Redis Cache     │
-│  (Structured     │  │  (Sessions,      │
-│   Data)          │  │   KPI Cache)     │
+│  (Structured     │  │  (Selected public│
+│   Data)          │  │   GET responses) │
 └──────────────────┘  └──────────────────┘
         │
 ┌───────▼──────────────────────────────────────────────┐
 │    External Data Sources                            │
-│  data.gov.in | Government APIs | CSV Upload        │
-│  → ETL Pipeline → Manual Import → DB Updates       │
+│       Configured data.gov.in resources             │
+│       → Import and source-mapped records            │
 └──────────────────────────────────────────────────────┘
 ```
 
@@ -126,7 +137,7 @@ Node.js 18+              # Runtime
 Express.js               # Web framework
 Prisma ORM               # Database ORM
 PostgreSQL 16            # Database
-Redis                    # Caching layer
+Redis                    # Optional cache for selected public GET requests
 Node.js timer scheduler  # Optional scheduled syncs; currently disabled for configured sources
 JWT                      # Authentication
 ```
@@ -138,7 +149,7 @@ GitHub                   # Version control
 GitHub Actions           # CI/CD
 Render                   # Current frontend and backend hosting
 Neon PostgreSQL           # Production database
-Redis                    # Optional cache integration
+Redis                    # Optional response cache; production availability is unverified
 ```
 
 ---
@@ -247,7 +258,6 @@ college_final_project/
 │   │   ├── pages/               # Page-level components
 │   │   ├── store/               # Redux state management
 │   │   ├── api/                 # API client & hooks
-│   │   ├── hooks/               # Custom React hooks
 │   │   ├── utils/               # Utility functions
 │   │   ├── App.jsx
 │   │   └── main.jsx
@@ -261,17 +271,14 @@ college_final_project/
 │   │   ├── services/            # Business logic
 │   │   ├── routes/              # API endpoints
 │   │   ├── middleware/          # Auth, validation
-│   │   ├── models/              # Prisma schemas
 │   │   ├── config/              # Configuration
-│   │   ├── migrations/          # Database migrations
-│   │   ├── jobs/                # Background jobs
 │   │   └── index.js
 │   ├── tests/
 │   ├── package.json
 │   ├── prisma/
 │   │   ├── schema.prisma        # Database schema
 │   │   └── migrations/          # SQL migrations
-│   └── .env
+│   └── .env.example
 │
 ├── docker-compose.yml           # Docker configuration
 ├── .env.example                 # Environment template
@@ -292,53 +299,9 @@ college_final_project/
 
 ---
 
-## 🔄 Development Workflow
+## Current implementation status
 
-### Phase 1: Setup & Architecture (Week 1-2) ✅
-- [x] GitHub repository setup
-- [x] Development environment configuration
-- [x] Database schema design
-- [x] Docker setup
-- [ ] Backend project initialization
-- [ ] Frontend project initialization
-
-### Phase 2: Authentication & User Management (Week 3-4)
-- [ ] User registration & login APIs
-- [ ] JWT implementation
-- [ ] Role-based access control
-- [ ] Frontend auth pages
-
-### Phase 3: Data Integration (Week 5-6)
-- [ ] CSV upload functionality
-- [ ] Data validation & ETL pipeline
-- [ ] Cron job scheduler
-- [ ] Data import APIs
-
-### Phase 4: KPI Module (Week 7-8)
-- [ ] KPI calculation engine
-- [ ] Real-time data display (the configured official feeds are historical snapshots)
-- [ ] KPI trend tracking
-
-### Phase 5: Visualization (Week 9-10)
-- [ ] Dashboard with charts
-- [ ] Interactive maps (Leaflet)
-- [ ] Heatmaps & drill-down
-
-### Phase 6: Analytics (Week 11-12)
-- [ ] Comparative analysis
-- [ ] Predictions & forecasting
-- [ ] Chatbot integration
-
-### Phase 7: Reports (Week 13-14)
-- [ ] Report generation (PDF/CSV)
-- [ ] Scheduled reports
-- [ ] Email delivery
-
-### Phase 8: Testing & Deployment (Week 15-16)
-- [ ] Unit & integration tests
-- [ ] Performance optimization
-- [ ] Security hardening
-- [ ] Production deployment
+The application is deployed on Render and includes dashboards, source-based filters, comparisons, reports, and administration tools. Source refresh, geographic coverage, and some verification work remain limited; see [WORK_UPDATE.md](./WORK_UPDATE.md) for the latest recorded status.
 
 ---
 
@@ -358,17 +321,15 @@ college_final_project/
 ## ✅ Testing
 
 ```bash
-# Backend
-cd backend
-npm test                    # Run all tests
-npm run test:watch        # Watch mode
-npm run test:coverage     # Coverage report
+# From the project root: frontend build, frontend tests, then backend tests
+npm test
 
-# Frontend
-cd frontend
-npm test                   # Run tests
-npm run test:coverage     # Coverage report
+# Run one package separately
+cd frontend && npm test
+cd backend && npm test
 ```
+
+The repository does not currently define test coverage or watch-mode scripts.
 
 ---
 
@@ -384,34 +345,7 @@ npm run test:coverage     # Coverage report
 - Reports & exports
 - Audit logs
 
-**Backup & Migration:**
-```bash
-# Backup database
-pg_dump gov_schemes_analytics > backup.sql
-
-# Restore database
-psql gov_schemes_analytics < backup.sql
-
-# Run migrations
-# Build the frontend and run backend regression tests
-npm test
-
-# Backend tests only
-cd backend && npm test
-
-# Frontend production build only
-cd frontend && npm run build
-# Configure vercel.json
-# Deploy
-vercel deploy --prod
-```
-
-### Backend (Railway/Render)
-```bash
-# Connect to Railway/Render
-# Environment variables configured
-# Automatic deploys on push
-```
+Database backups and restore procedures depend on the configured Neon account; this repository does not contain a verified production backup/restore runbook. For local migrations and checks, use the commands in the Quick Start and Testing sections.
 
 ---
 
@@ -446,42 +380,9 @@ vercel deploy --prod
 - [Recharts](https://recharts.org/)
 - [Leaflet Maps](https://leafletjs.com/)
 
-### Team Communication
-- Internal discussions: [to be set up]
-- Issue tracking: GitHub Issues
-- Progress updates: Weekly sync
+### Team and project records
 
----
-
-## 📈 Success Metrics
-
-By project completion, this system should:
-
-✅ **Functional goals currently supported by sources**
-- Six scheme families integrated with source-reported observations; data is not live
-- KPI values have official source dates; a local Mac polls weekly, but the sources have no verified update cadence
-- State drill-down for state sources and district drill-down for district sources; no source-backed village KPI feed is currently configured
-- Comparisons generating accurate insights
-- Forecast accuracy is not claimed for snapshots without a source-backed time series
-- Chatbot answering >90% of queries correctly
-
-✅ **Performance**
-- Dashboard loads in <2 seconds
-- API queries respond in <500ms
-- Report generation in <5 seconds
-- Handle 100+ concurrent users
-
-✅ **Reliability**
-- 99.5% uptime
-- Automated data imports working
-- Proper error handling & logging
-- Backup & disaster recovery
-
-✅ **Quality**
-- >80% test coverage
-- Complete API documentation
-- Security audit passed
-- Performance optimized
+Use the approved Form-2 table for member modules. Record completed work and verification in [WORK_UPDATE.md](./WORK_UPDATE.md); do not treat untested performance targets or unverified source coverage as achieved results.
 
 ---
 
@@ -499,5 +400,5 @@ Official-source imports run weekly from the configured local Mac LaunchAgent bec
 
 ---
 
-**Last Updated:** November 3, 2026
-**Status:** Core release deployed; weekly best-effort local polling configured; source freshness and coverage remain operational limits.
+**Last Updated:** November 4, 2026
+**Status:** Core dashboard is deployed. Source freshness and geographic coverage vary by feed; see the handoff for the latest recorded verification.

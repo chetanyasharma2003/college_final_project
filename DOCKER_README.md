@@ -29,7 +29,7 @@ The Compose stack runs the application with local PostgreSQL and Redis container
 
 ### 📦 Services
 - **PostgreSQL** - Data persistence
-- **Redis** - Session & KPI caching
+- **Redis** - Optional caching for selected public API responses
 - **Node.js API** - Express backend with ML/Analytics
 - **React Frontend** - Vite + interactive dashboard
 
@@ -169,32 +169,30 @@ The `.env` file is ignored by Git. Do not use production credentials in a local 
 - [x] Analytics and comparative views
 - [x] Report generation & export
 - [x] Prediction and chatbot API surfaces
-- [x] Redis caching for performance
+- [x] Optional Redis cache for selected public GET responses
 - [x] Database persistence
-- [x] Production-grade error handling
+- [x] Centralized API error handling
 
 ### Data behavior
 
 The Compose database is separate from production and starts without the production Neon data. Apply migrations before using it. Official source snapshots are not imported by `docker compose up`; the configured weekly importer runs on the designated Mac and writes to Neon. Current source dates and geographic coverage vary by scheme, and no village KPI observations are configured.
 
-### 🎨 Frontend
-- Responsive dashboard
+### Frontend
+- Dashboard layout for desktop and smaller screens
 - KPI cards with status indicators
 - Interactive charts & graphs
 - Geographic maps
 - Report builder
-- User-friendly UI
 
-### ⚙️ Backend
-- RESTful API (50+ endpoints)
+### Backend
+- Express REST API
 - JWT authentication
 - RBAC (role-based access control)
-- ML/Analytics engine
+- Analytics and prediction endpoints
 - Report generation
 - Data caching
-- Circuit breaker pattern
-- Request deduplication
-- Graceful error handling
+- Database circuit-breaker middleware and short-window request deduplication
+- Centralized error handling
 
 ---
 
